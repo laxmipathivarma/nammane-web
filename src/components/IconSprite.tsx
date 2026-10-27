@@ -131,6 +131,20 @@ export default function IconSprite() {
           <ellipse cx="0" cy="0" rx="34" ry="12.4" fill="none" stroke="#fff" strokeWidth="1.6" opacity=".55" />
           <ellipse cx="-10" cy="-7" rx="28" ry="8" fill="#fff" opacity=".35" />
         </g>
+        <radialGradient id="g-dice" cx="35%" cy="28%" r="80%">
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset="1" stopColor="#e9e3f7" />
+        </radialGradient>
+        <linearGradient id="g-dice2" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ffd37a" />
+          <stop offset="1" stopColor="#e8942c" />
+        </linearGradient>
+        <g id="nm-chip">
+          <circle cx="0" cy="0" r="19" fill="#ff4f9e" />
+          <circle cx="0" cy="0" r="19" fill="none" stroke="#fff" strokeWidth="3.6" strokeDasharray="4 5" opacity=".9" />
+          <circle cx="0" cy="0" r="12.4" fill="none" stroke="#fff" strokeWidth="1.4" opacity=".55" />
+          <ellipse cx="-5" cy="-6" rx="9" ry="5" fill="#fff" opacity=".35" />
+        </g>
         <g id="nm-mark">
           <circle cx="60" cy="60" r="58" fill="none" stroke="url(#l-goldline)" strokeWidth="2.4" />
           <circle cx="60" cy="60" r="50" fill="none" stroke="url(#l-goldline)" strokeWidth="1" strokeDasharray="2.6 5.2" opacity=".8" />

@@ -437,3 +437,74 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .nm-hero-card-anim { animation: none; }
 }
+
+/* ---- Marketing hero: shuffling card deck + decorations (matches the
+   approved "NamMane Landing (animated)" design exactly) ---- */
+.nm-deck-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 244px;
+  height: 330px;
+  margin-left: -122px;
+  margin-top: -165px;
+  border-radius: 30px;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  animation: nm-shuffle 10s infinite;
+  overflow: hidden;
+}
+.nm-deck-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 30px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), transparent 42%);
+  pointer-events: none;
+}
+@keyframes nm-shuffle {
+  0% { opacity: 0; transform: scale(0.8) rotate(-16deg) translateY(30px); }
+  4% { opacity: 1; transform: scale(1) rotate(-6deg) translateY(0); }
+  16% { opacity: 1; transform: scale(1) rotate(-6deg) translateY(0); }
+  21% { opacity: 0; transform: scale(0.8) rotate(12deg) translateY(-30px); }
+  100% { opacity: 0; }
+}
+.nm-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+}
+.nm-bob1 { animation: nm-bob1 1.8s ease-in-out infinite; }
+@keyframes nm-bob1 {
+  0%, 100% { transform: translate(75px, 104px) scale(0.85); }
+  50% { transform: translate(75px, 92px) scale(0.85); }
+}
+.nm-bob2 { animation: nm-bob2 1.8s ease-in-out infinite; animation-delay: 0.3s; }
+@keyframes nm-bob2 {
+  0%, 100% { transform: translate(80px, 86px) scale(0.85) rotate(-4deg); }
+  50% { transform: translate(80px, 74px) scale(0.85) rotate(-4deg); }
+}
+.nm-bob3 { animation: nm-bob3 1.8s ease-in-out infinite; animation-delay: 0.6s; }
+@keyframes nm-bob3 {
+  0%, 100% { transform: translate(70px, 68px) scale(0.85) rotate(5deg); }
+  50% { transform: translate(70px, 56px) scale(0.85) rotate(5deg); }
+}
+.nm-bob-dice { animation: nm-bob-dice 2.6s ease-in-out infinite; }
+@keyframes nm-bob-dice {
+  0% { transform: translateX(-20px) rotate(0deg); }
+  50% { transform: translateX(20px) rotate(180deg); }
+  100% { transform: translateX(-20px) rotate(360deg); }
+}
+.nm-bob-dice2 { animation: nm-bob-dice2 2.6s ease-in-out infinite; animation-delay: 0.35s; }
+@keyframes nm-bob-dice2 {
+  0% { transform: translateX(18px) rotate(0deg); }
+  50% { transform: translateX(-18px) rotate(-180deg); }
+  100% { transform: translateX(18px) rotate(-360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nm-deck-card, .nm-bob1, .nm-bob2, .nm-bob3, .nm-bob-dice, .nm-bob-dice2 {
+    animation: none !important;
+  }
+}
