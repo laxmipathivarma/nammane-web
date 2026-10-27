@@ -12,7 +12,16 @@ export function middleware(request: NextRequest) {
   if (MARKETING_HOSTS.includes(hostname) && !pathname.startsWith('/marketing')) {
     const url = request.nextUrl.clone()
     url.pathname = `/marketing${pathname === '/' ? '' : pathname}`
-    return NextResponse.rewrite(url)
+
+    // usePathname() on the client reflects the ORIGINAL request URL, not the
+    // rewritten one -- a rewrite is invisible to client components. So
+    // SiteChrome can't detect "we're on a marketing route" from pathname
+    // alone when the request got here via this host-based rewrite. Flag it
+    // via a request header instead, read server-side in the root layout.
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-nm-marketing', '1')
+
+    return NextResponse.rewrite(url, { request: { headers: requestHeaders } })
   }
 
   return NextResponse.next()

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import '@/styles/globals.css'
 import IconSprite from '@/components/IconSprite'
 import SiteChrome from '@/components/SiteChrome'
@@ -16,6 +17,13 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Set server-side by middleware when a nammane.in/www.nammane.in request
+  // got rewritten to /marketing. usePathname() in SiteChrome (a client
+  // component) can't see that rewrite -- it still reports the original URL
+  // -- so we settle "is this a marketing route" here, on the server, where
+  // the rewritten request headers are visible.
+  const isMarketing = headers().get('x-nm-marketing') === '1'
+
   return (
     <html lang="en">
       <head>
@@ -28,7 +36,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased bg-ink">
         <IconSprite />
-        <SiteChrome>
+        <SiteChrome isMarketing={isMarketing}>
           <main>{children}</main>
         </SiteChrome>
       </body>
