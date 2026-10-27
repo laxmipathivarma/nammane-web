@@ -128,7 +128,7 @@ export default function MarketingHero() {
           </div>
 
           <h1 className="nm-head text-[2.6rem] leading-[1.08] md:text-[3.2rem] font-extrabold text-white m-0">
-            {line1}{' '}
+            {line1.split(' ').slice(0, 2).join(' ')}{' '}
             <span
               style={{
                 background: 'linear-gradient(120deg,#c57bff,#ff6fc2,#4cc9f0,#c57bff)',
@@ -138,10 +138,10 @@ export default function MarketingHero() {
                 color: 'transparent',
               }}
             >
-              {line2.split(' ')[0]}
+              {line1.split(' ')[2]}
             </span>
             <br />
-            {line2.split(' ').slice(1).join(' ')}
+            {line2}
           </h1>
 
           <p className="text-muted text-[15px] font-medium leading-relaxed mt-5 max-w-md">
