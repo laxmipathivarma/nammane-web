@@ -7,6 +7,7 @@ import EventCard, { EventCardData } from '@/components/EventCard'
 const ALL_EVENTS: EventCardData[] = [
   {
     title: 'High Stakes Friday',
+    slug: 'high-stakes-friday',
     category: 'poker',
     tagLabel: 'POKER',
     subtitle: "Texas Hold'em · No-limit · Intermediate",
@@ -19,6 +20,7 @@ const ALL_EVENTS: EventCardData[] = [
   },
   {
     title: 'Sunday 13-Card Social',
+    slug: 'sunday-13-card-social',
     category: 'rummy',
     tagLabel: 'RUMMY',
     subtitle: 'Points rummy · 2 tables · Casual',
@@ -31,6 +33,7 @@ const ALL_EVENTS: EventCardData[] = [
   },
   {
     title: 'Copper & Smoke',
+    slug: 'copper-and-smoke',
     category: 'drinks',
     tagLabel: 'DRINKS',
     subtitle: 'BYOB · Snacks on the house · 21+',
@@ -43,6 +46,7 @@ const ALL_EVENTS: EventCardData[] = [
   },
   {
     title: 'An Evening Table',
+    slug: 'an-evening-table',
     category: 'dinner',
     tagLabel: 'DINNER',
     subtitle: 'Mediterranean set menu · Seats 8',
@@ -55,6 +59,7 @@ const ALL_EVENTS: EventCardData[] = [
   },
   {
     title: 'Rooftop Neon Soirée',
+    slug: 'rooftop-neon-soiree',
     category: 'party',
     tagLabel: 'PARTY',
     subtitle: 'Theme: Vegas lights',
@@ -67,6 +72,7 @@ const ALL_EVENTS: EventCardData[] = [
   },
   {
     title: 'Board Game Marathon',
+    slug: 'board-game-marathon',
     category: 'other',
     tagLabel: 'OTHER',
     subtitle: 'Custom event · Snacks & chill music',

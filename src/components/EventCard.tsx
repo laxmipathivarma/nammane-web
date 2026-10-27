@@ -1,4 +1,7 @@
+import Link from 'next/link'
+
 export type EventCardData = {
+  slug: string
   title: string
   category: 'poker' | 'rummy' | 'drinks' | 'dinner' | 'party' | 'other'
   tagLabel: string
@@ -33,7 +36,7 @@ const categoryIcon: Record<EventCardData['category'], string> = {
 export default function EventCard({ data }: { data: EventCardData }) {
   const icon = categoryIcon[data.category]
   return (
-    <div className="nm-card rounded-[20px] overflow-hidden flex flex-col">
+    <Link href={`/event/${data.slug}`} className="nm-card rounded-[20px] overflow-hidden flex flex-col hover:border-gold/30 transition-colors">
       <div className="h-28 relative" style={{ background: categoryHero[data.category] }}>
         <div className="absolute left-4 bottom-2.5 bg-black/55 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1.5 text-[11px] font-extrabold text-gold-text">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
@@ -81,8 +84,8 @@ export default function EventCard({ data }: { data: EventCardData }) {
           </div>
         )}
 
-        <button className="nm-btn nm-btn-gold w-full mt-3 py-3 text-[13.5px]">{data.ctaLabel}</button>
+        <div className="nm-btn nm-btn-gold w-full mt-3 py-3 text-[13.5px] text-center">{data.ctaLabel}</div>
       </div>
-    </div>
+    </Link>
   )
 }

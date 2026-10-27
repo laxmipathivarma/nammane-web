@@ -22,6 +22,7 @@ const eventWords = [
 const featured = [
   {
     title: 'High Stakes Friday',
+    slug: 'high-stakes-friday',
     category: 'poker' as const,
     tagLabel: 'POKER',
     subtitle: "Texas Hold'em · No-limit · Intermediate",
@@ -34,6 +35,7 @@ const featured = [
   },
   {
     title: 'Sunday 13-Card Social',
+    slug: 'sunday-13-card-social',
     category: 'rummy' as const,
     tagLabel: 'RUMMY',
     subtitle: 'Points rummy · 2 tables · Casual',
@@ -46,6 +48,7 @@ const featured = [
   },
   {
     title: 'Rooftop Neon Soirée',
+    slug: 'rooftop-neon-soiree',
     category: 'party' as const,
     tagLabel: 'PARTY',
     subtitle: 'Theme: Vegas lights',

@@ -41,7 +41,8 @@ export default function Header() {
         <nav className="hidden lg:flex items-center gap-7 text-[13.5px] font-semibold text-muted">
           <Link href="/discover" className="hover:text-gold-text transition-colors">Discover</Link>
           <Link href="/#how-it-works" className="hover:text-gold-text transition-colors">How it works</Link>
-          <Link href="/#host" className="hover:text-gold-text transition-colors">Host an event</Link>
+          <Link href="/host/create" className="hover:text-gold-text transition-colors">Host an event</Link>
+          <Link href="/bookings" className="hover:text-gold-text transition-colors">Bookings</Link>
         </nav>
 
         {/* right controls */}
@@ -114,8 +115,10 @@ export default function Header() {
         <div className="lg:hidden border-t border-white/10 px-5 py-4 flex flex-col gap-3 text-[14px] font-semibold text-[#e8ddc8] bg-ink">
           <Link href="/discover" onClick={() => setMobileOpen(false)}>Discover</Link>
           <Link href="/#how-it-works" onClick={() => setMobileOpen(false)}>How it works</Link>
-          <Link href="/#host" onClick={() => setMobileOpen(false)}>Host an event</Link>
+          <Link href="/host/create" onClick={() => setMobileOpen(false)}>Host an event</Link>
           <a href="https://app.nammane.in" className="text-gold-text">Web App</a>
+          <Link href="/bookings" onClick={() => setMobileOpen(false)}>Bookings</Link>
+          <Link href="/profile" onClick={() => setMobileOpen(false)}>Profile</Link>
           <span className="text-muted text-[13px]">Mobile App — coming soon for Android &amp; iOS</span>
           <div className="border-t border-white/10 pt-3 flex gap-3">
             <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="flex-1 nm-btn bg-ink2 text-white py-2.5 text-[13px]">
