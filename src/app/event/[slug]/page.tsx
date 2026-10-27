@@ -149,7 +149,7 @@ export default function EventDetailPage({ params }: { params: { slug: string } }
       </div>
 
       {/* sticky request bar */}
-      <div className="fixed left-0 right-0 bottom-0 bg-gradient-to-t from-ink via-ink/95 to-transparent pt-6 pb-5 px-5">
+      <div className="sticky bottom-0 bg-gradient-to-t from-ink via-ink/95 to-transparent pt-6 pb-5 px-5">
         <div className="max-w-3xl mx-auto flex items-center gap-3">
           <div className="flex-1 text-[12.5px] text-muted font-semibold">
             {event.seatsLeft} seat{event.seatsLeft === 1 ? '' : 's'} left for {event.title}

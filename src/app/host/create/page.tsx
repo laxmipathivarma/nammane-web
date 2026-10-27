@@ -125,7 +125,7 @@ export default function CreateEventPage() {
         </button>
       </div>
 
-      <div className="fixed left-0 right-0 bottom-0 bg-gradient-to-t from-ink via-ink/95 to-transparent pt-6 pb-5 px-5">
+      <div className="sticky bottom-0 bg-gradient-to-t from-ink via-ink/95 to-transparent pt-6 pb-5 px-5">
         <div className="max-w-2xl mx-auto">
           <button type="button" className="nm-btn nm-btn-gold w-full py-4 text-[14.5px]">
             Publish event
