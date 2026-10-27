@@ -5,6 +5,18 @@ export default function IconSprite() {
         <path id="i-spade" d="M12 0C13.8 3.6 20 7 20 14 C20 17.6 16.6 19.8 13.4 18.2 C12.7 17.8 12.3 17.4 12 17 C12.3 19.4 13.1 21 14.6 23 H9.4 C10.9 21 11.7 19.4 12 17 C11.7 17.4 11.3 17.8 10.6 18.2 C7.4 19.8 4 17.6 4 14 C4 7 10.2 3.6 12 0Z" />
         <path id="i-heart" d="M12 22C9 18 2 13 2 7.6 C2 3.6 7 1 12 6 C17 1 22 3.6 22 7.6 C22 13 15 18 12 22Z" />
         <path id="i-diamond" d="M12 0 L21 12 L12 24 L3 12Z" />
+        <g id="i-club">
+          <circle cx="12" cy="7.6" r="4.3" />
+          <circle cx="6.9" cy="13.6" r="4.3" />
+          <circle cx="17.1" cy="13.6" r="4.3" />
+          <path d="M12 11.8 C12.8 15.6 13.6 18.8 15.2 22 H8.8 C10.4 18.8 11.2 15.6 12 11.8 Z" />
+        </g>
+        <g id="i-disco">
+          <circle cx="12" cy="12" r="9" fill="currentColor" opacity=".16" />
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.4" />
+          <path d="M3.6 9 H20.4 M3.6 15 H20.4 M7.2 3.3 V20.7 M12 3 V21 M16.8 3.3 V20.7" stroke="currentColor" strokeWidth="1" opacity=".6" strokeLinecap="round" />
+          <path d="M12 0.6 V3 M5.6 2 L6.9 4 M18.4 2 L17.1 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+        </g>
         <g id="i-martini">
           <path d="M3 3 H21 L12 13 Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
           <line x1="12" y1="13" x2="12" y2="21" stroke="currentColor" strokeWidth="2" />
@@ -138,6 +150,11 @@ export default function IconSprite() {
         <linearGradient id="g-dice2" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#ffd37a" />
           <stop offset="1" stopColor="#e8942c" />
+        </linearGradient>
+        <linearGradient id="g-gold-fill" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#f6dd9a" />
+          <stop offset=".5" stopColor="#e3b64c" />
+          <stop offset="1" stopColor="#b9872a" />
         </linearGradient>
         <g id="nm-chip">
           <circle cx="0" cy="0" r="19" fill="#ff4f9e" />
