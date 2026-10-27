@@ -1,6 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
+type CookieToSet = {
+  name: string
+  value: string
+  options?: Record<string, unknown>
+}
+
 export const createServerSupabaseClient = async () => {
   const cookieStore = await cookies()
 
@@ -12,11 +18,10 @@ export const createServerSupabaseClient = async () => {
         getAll() {
           return cookieStore.getAll()
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setAll(cookiesToSet: any[]) {
+        setAll(cookiesToSet: CookieToSet[]) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+            cookiesToSet.forEach(({ name, value }) =>
+              cookieStore.set(name, value)
             )
           } catch {
             // Handle cookies in middleware
