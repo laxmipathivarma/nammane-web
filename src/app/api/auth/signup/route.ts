@@ -12,9 +12,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Auth logic will be implemented after Supabase setup
-    return NextResponse.json({ user: { email } }, { status: 201 })
-  } catch (error) {
+    const supabase = await createServerSupabaseClient()
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    })
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
+    if (data.user) {
+      await supabase.from('profiles').insert({
+        id: data.user.id,
+        email: data.user.email,
+      })
+    }
+
+    return NextResponse.json({ user: data.user }, { status: 201 })
+  } catch (err) {
+    console.error(err)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
