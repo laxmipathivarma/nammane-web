@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import CategoryChips from '@/components/CategoryChips'
 import EventCard from '@/components/EventCard'
-import LandingHero from '@/components/LandingHero'
 
 const featured = [
   {
@@ -50,7 +49,26 @@ const featured = [
 export default function Home() {
   return (
     <div className="nm-root nm-bg min-h-screen text-white">
-      <LandingHero />
+      {/* login / signup */}
+      <div className="px-5 pt-10 pb-8 max-w-5xl mx-auto">
+        <div className="nm-card rounded-[28px] p-7 md:p-9 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="text-center md:text-left">
+            <div className="nm-marquee text-2xl md:text-3xl text-white mb-2">Welcome to NamMane</div>
+            <p className="text-muted text-[14px] font-medium leading-relaxed max-w-md">
+              Sign in to request to join a night out, or create an account to get started —
+              you can still browse tonight&apos;s tables below either way.
+            </p>
+          </div>
+          <div className="flex gap-3 shrink-0">
+            <Link href="/auth/login" className="nm-btn bg-ink2 text-white border border-white/10 px-6 py-3 text-[13.5px]">
+              Sign in
+            </Link>
+            <Link href="/auth/signup" className="nm-btn nm-btn-gold px-6 py-3 text-[13.5px]">
+              Sign up
+            </Link>
+          </div>
+        </div>
+      </div>
 
       {/* role toggle */}
       <div className="flex justify-center px-5 pb-4">
@@ -83,27 +101,6 @@ export default function Home() {
           ))}
         </div>
       </div>
-
-      {/* feature strip */}
-      <div className="px-5 pb-16 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
-        <FeatureCard title="Easy Discovery" description="Browse events in your city, filter by category, and find your vibe." icon="i-grid" />
-        <FeatureCard title="Trusted Community" description="Host verification, approval-based bookings, and safety first." icon="i-shield" />
-        <FeatureCard title="Direct Chat" description="Connect with hosts and guests before and during events." icon="i-chat" />
-      </div>
-    </div>
-  )
-}
-
-function FeatureCard({ icon, title, description }: { icon: string; title: string; description: string }) {
-  return (
-    <div className="nm-card rounded-2xl p-6">
-      <div className="w-10 h-10 rounded-full bg-ink2 border border-gold/30 flex items-center justify-center text-gold-text mb-4">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <use href={`#${icon}`} />
-        </svg>
-      </div>
-      <h3 className="nm-marquee text-lg text-white mb-2">{title}</h3>
-      <p className="text-muted text-[13.5px] font-medium leading-relaxed">{description}</p>
     </div>
   )
 }
