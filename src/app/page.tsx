@@ -25,7 +25,6 @@ const featured = [
     category: 'poker' as const,
     tagLabel: 'POKER',
     subtitle: "Texas Hold'em · No-limit · Intermediate",
-    priceLabel: '₹500 buy-in',
     host: 'Hosted by Rahul · verified',
     hostInitials: 'RK',
     rating: '4.9',
@@ -38,7 +37,6 @@ const featured = [
     category: 'rummy' as const,
     tagLabel: 'RUMMY',
     subtitle: 'Points rummy · 2 tables · Casual',
-    priceLabel: 'Free entry',
     host: 'Hosted by Meera · verified',
     hostInitials: 'MS',
     rating: '4.8',
@@ -50,7 +48,7 @@ const featured = [
     title: 'Rooftop Neon Soirée',
     category: 'party' as const,
     tagLabel: 'PARTY',
-    subtitle: 'Theme: Vegas lights · ₹800 contribution',
+    subtitle: 'Theme: Vegas lights',
     host: 'Hosted by Aisha · verified',
     hostInitials: 'AJ',
     rating: '4.9',
@@ -82,21 +80,6 @@ export default function Home() {
             filter: 'blur(2px)',
           }}
         />
-        <div className="relative z-10 flex items-center justify-between max-w-5xl mx-auto">
-          <div className="flex items-center gap-1.5 text-[#e8ddc8] text-xs font-bold">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8ddc8" strokeWidth="2">
-              <path d="M12 22 C12 22 20 15 20 9 A8 8 0 0 0 4 9 C4 15 12 22 12 22Z" />
-              <circle cx="12" cy="9" r="2.6" fill="#e8ddc8" stroke="none" />
-            </svg>
-            Bengaluru · Mumbai · Delhi NCR
-          </div>
-          <div className="w-8 h-8 rounded-full bg-ink2 border border-gold/40 flex items-center justify-center text-gold">
-            <svg width="15" height="15" viewBox="0 0 24 24">
-              <use href="#i-bell" />
-            </svg>
-          </div>
-        </div>
-
         <div className="relative z-10 text-center mt-4 flex flex-col items-center max-w-3xl mx-auto">
           <AnimatedLogo size={72} />
 
@@ -173,11 +156,6 @@ export default function Home() {
         <FeatureCard title="Trusted Community" description="Host verification, approval-based bookings, and safety first." icon="i-shield" />
         <FeatureCard title="Direct Chat" description="Connect with hosts and guests before and during events." icon="i-chat" />
       </div>
-
-      <footer className="text-center text-muted text-xs border-t border-white/10 pt-6 pb-10 px-5">
-        <p className="mb-1 font-semibold">Version 0.1.0 · Wave 1: Web App</p>
-        <p>Built for Bengaluru, Mumbai, and Delhi NCR</p>
-      </footer>
     </div>
   )
 }

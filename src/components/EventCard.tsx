@@ -41,11 +41,7 @@ export default function EventCard({ data }: { data: EventCardData }) {
           </svg>
           {data.tagLabel}
         </div>
-        {data.priceLabel && (
-          <div className="absolute right-3 top-2.5 bg-gradient-to-b from-gold-light to-gold-dark text-[#241607] text-[10px] font-extrabold px-2.5 py-1 rounded-full">
-            {data.priceLabel}
-          </div>
-        )}
+        {/* Pricing is host-controlled and hidden by default — never shown unless the host sets it. */}
       </div>
       <div className="p-3.5 flex-1 flex flex-col">
         <div className="flex items-center justify-between gap-2">

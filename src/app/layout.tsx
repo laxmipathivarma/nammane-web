@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import '@/styles/globals.css'
 import IconSprite from '@/components/IconSprite'
+import SiteChrome from '@/components/SiteChrome'
 
 export const metadata: Metadata = {
   title: 'NamMane - Find Your Table',
@@ -27,7 +28,9 @@ export default function RootLayout({
       </head>
       <body className="antialiased bg-ink">
         <IconSprite />
-        <main>{children}</main>
+        <SiteChrome>
+          <main>{children}</main>
+        </SiteChrome>
       </body>
     </html>
   )
