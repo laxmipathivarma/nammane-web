@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import CategoryChips from '@/components/CategoryChips'
 import EventCard from '@/components/EventCard'
+import AnimatedLogo from '@/components/AnimatedLogo'
 
 const eventWords = [
   'Poker Night',
@@ -97,13 +98,14 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 text-center mt-4 flex flex-col items-center max-w-3xl mx-auto">
-          <svg width="52" height="52" viewBox="0 0 120 120" className="mb-2">
-            <use href="#nm-mark" />
-          </svg>
-          <h1 className="nm-marquee text-[#e8d9ac] text-4xl md:text-5xl leading-none">NamMane</h1>
-          <div className="text-[13px] md:text-sm text-muted font-semibold tracking-wide mt-3">
-            Find your table.
-          </div>
+          <AnimatedLogo size={72} />
+
+          <h2 className="nm-marquee text-gold-text text-2xl md:text-3xl leading-tight mt-5">
+            Gather Better. Live Closer.
+          </h2>
+          <p className="text-[13px] md:text-sm text-muted font-semibold tracking-wide mt-2 max-w-sm">
+            Community-driven and warm, with a sense of belonging.
+          </p>
 
           <div className="h-12 overflow-hidden mt-5 w-full max-w-sm">
             <div
@@ -119,7 +121,7 @@ export default function Home() {
           </div>
 
           <p className="text-[13.5px] text-muted mt-4 font-medium max-w-md">
-            Tonight&apos;s hottest tables, your rules. Discover approval-based gatherings, or host your own.
+            Discover approval-based gatherings nearby, or host your own tonight.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 mt-6 w-full max-w-sm">
