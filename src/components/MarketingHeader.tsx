@@ -7,8 +7,8 @@ const LOGIN_URL = 'https://app.nammane.in/auth/login'
 
 const navItems = [
   { label: 'Home', href: '/', external: false },
-  { label: 'Host an Event', href: LOGIN_URL, external: true },
-  { label: 'Join the Event', href: LOGIN_URL, external: true },
+  { label: 'Host', href: LOGIN_URL, external: true },
+  { label: 'Join', href: LOGIN_URL, external: true },
   { label: 'Discover', href: LOGIN_URL, external: true },
 ]
 
