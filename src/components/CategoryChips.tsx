@@ -35,19 +35,19 @@ export default function CategoryChips({
             style={
               isActive
                 ? {
-                    background: 'linear-gradient(180deg,#c9707a,#b23a4a)',
-                    color: '#1c1210',
-                    boxShadow: '0 0 0 2px rgba(178,58,74,.18),0 6px 14px rgba(178,58,74,.18)',
+                    background: 'linear-gradient(120deg,#8b3ffb,#ff4f9e)',
+                    color: '#fff',
+                    boxShadow: '0 0 0 2px rgba(201,104,255,.18),0 6px 14px rgba(201,104,255,.25)',
                   }
-                : { background: '#1c160e', color: '#e8ddc8' }
+                : { background: 'rgba(255,255,255,.06)', color: '#e4d4ff' }
             }
           >
             <svg
               width="15"
               height="15"
               viewBox="0 0 24 24"
-              fill={isActive ? '#1c1210' : c.fill ? '#e8ddc8' : 'none'}
-              stroke={isActive ? 'none' : c.fill ? 'none' : '#e8ddc8'}
+              fill={isActive ? '#fff' : c.fill ? '#e4d4ff' : 'none'}
+              stroke={isActive ? 'none' : c.fill ? 'none' : '#e4d4ff'}
             >
               <use href={`#${c.icon}`} />
             </svg>

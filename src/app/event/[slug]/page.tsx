@@ -13,7 +13,7 @@ export default function EventDetailPage({ params }: { params: { slug: string } }
   const icon = categoryIcon[event.category]
 
   return (
-    <div className="nm-bg min-h-screen text-[#f5efe3]">
+    <div className="nm-bg min-h-screen text-white">
       {/* hero */}
       <div className="relative h-[260px] md:h-[320px] overflow-hidden" style={{ background: categoryHero[event.category] }}>
         <div
@@ -33,8 +33,8 @@ export default function EventDetailPage({ params }: { params: { slug: string } }
           </button>
         </div>
         <div className="absolute left-0 right-0 bottom-0 h-24 bg-gradient-to-t from-ink to-transparent" />
-        <div className="absolute left-5 md:left-auto md:right-auto bottom-3.5 bg-gradient-to-b from-[#c9707a] to-[#b23a4a] text-[#1c1210] font-extrabold text-[11.5px] px-3.5 py-1.5 rounded-full flex items-center gap-1.5 max-w-[calc(100%-40px)]">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="#1c1210">
+        <div className="absolute left-5 md:left-auto md:right-auto bottom-3.5 bg-gradient-to-b from-[#ff8fd1] to-[#ff4f9e] text-[#2e0c20] font-extrabold text-[11.5px] px-3.5 py-1.5 rounded-full flex items-center gap-1.5 max-w-[calc(100%-40px)]">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="#2e0c20">
             <use href={`#${icon}`} />
           </svg>
           {event.tagLabel}
@@ -77,28 +77,28 @@ export default function EventDetailPage({ params }: { params: { slug: string } }
         {/* details grid */}
         <div className="grid grid-cols-2 gap-2.5 mt-4">
           <div className="nm-card rounded-2xl p-3.5">
-            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#d9bd7a" fill="none">
+            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#c9a8ff" fill="none">
               <use href="#i-clock" />
             </svg>
             <div className="text-[11px] text-muted font-bold mt-1.5">When</div>
             <div className="text-[13px] font-extrabold mt-0.5">{event.schedule}</div>
           </div>
           <div className="nm-card rounded-2xl p-3.5">
-            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#d9bd7a" fill="none">
+            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#c9a8ff" fill="none">
               <use href="#i-pin" />
             </svg>
             <div className="text-[11px] text-muted font-bold mt-1.5">{event.area}</div>
             <div className="text-[13px] font-extrabold mt-0.5">Exact spot shown after approval</div>
           </div>
           <div className="nm-card rounded-2xl p-3.5">
-            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#d9bd7a" fill="none">
+            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#c9a8ff" fill="none">
               <use href="#i-seat" />
             </svg>
             <div className="text-[11px] text-muted font-bold mt-1.5">Seats</div>
             <div className="text-[13px] font-extrabold mt-0.5">{event.seatsLabel}</div>
           </div>
           <div className="nm-card rounded-2xl p-3.5">
-            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#d9bd7a" fill="none">
+            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#c9a8ff" fill="none">
               <use href={`#${icon}`} />
             </svg>
             <div className="text-[11px] text-muted font-bold mt-1.5">Format</div>
@@ -108,7 +108,7 @@ export default function EventDetailPage({ params }: { params: { slug: string } }
 
         {/* who's at the table */}
         <div className="mt-5">
-          <div className="text-[12px] font-extrabold text-[#e8ddc8] mb-2">Who&apos;s going</div>
+          <div className="text-[12px] font-extrabold text-[#e4d4ff] mb-2">Who&apos;s going</div>
           <div className="flex items-center">
             {event.guests.map((g, i) => (
               <div
@@ -127,8 +127,8 @@ export default function EventDetailPage({ params }: { params: { slug: string } }
 
         {/* house rules */}
         <div className="mt-5">
-          <div className="text-[12px] font-extrabold text-[#e8ddc8] mb-2">House rules</div>
-          <div className="nm-card rounded-2xl p-3.5 text-[12.5px] text-[#d9cdb8] leading-relaxed font-semibold">
+          <div className="text-[12px] font-extrabold text-[#e4d4ff] mb-2">House rules</div>
+          <div className="nm-card rounded-2xl p-3.5 text-[12.5px] text-[#d8d2f0] leading-relaxed font-semibold">
             {event.houseRules}
           </div>
         </div>
@@ -141,7 +141,7 @@ export default function EventDetailPage({ params }: { params: { slug: string } }
         )}
 
         <div className="flex items-center gap-2 mt-4 text-[11px] text-muted2 font-semibold">
-          <svg width="14" height="14" viewBox="0 0 24 24" stroke="#8a7d68" fill="none">
+          <svg width="14" height="14" viewBox="0 0 24 24" stroke="#776fa0" fill="none">
             <use href="#i-shield" />
           </svg>
           Real-money wagering is disabled pending legal &amp; app-store review

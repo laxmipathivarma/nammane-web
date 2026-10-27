@@ -1,23 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import CategoryChips from '@/components/CategoryChips'
 import EventCard from '@/components/EventCard'
-import AnimatedLogo from '@/components/AnimatedLogo'
-
-const eventWords = [
-  'Poker Night',
-  'Game Night',
-  'Dinner',
-  'Karaoke Night',
-  'Dance Party',
-  'Birthday Party',
-  'Drinks Night',
-  'Movie Night',
-  'Brunch',
-  'Rooftop Party',
-]
+import LandingHero from '@/components/LandingHero'
 
 const featured = [
   {
@@ -62,64 +48,9 @@ const featured = [
 ]
 
 export default function Home() {
-  const [currentWordIndex, setCurrentWordIndex] = useState(0)
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentWordIndex((prev) => (prev + 1) % eventWords.length)
-    }, 2000)
-    return () => clearInterval(timer)
-  }, [])
-
   return (
-    <div className="nm-root nm-bg min-h-screen text-[#f5efe3]">
-      {/* header / marquee */}
-      <div className="relative px-5 pt-6 pb-4 overflow-hidden">
-        <div
-          className="absolute -inset-x-5 -top-10 h-56 pointer-events-none"
-          style={{
-            background:
-              'conic-gradient(from 0deg at 50% 0%, rgba(178,58,74,.12), rgba(205,168,88,.08), transparent 40%, transparent 60%, rgba(178,58,74,.12))',
-            filter: 'blur(2px)',
-          }}
-        />
-        <div className="relative z-10 text-center mt-4 flex flex-col items-center max-w-3xl mx-auto">
-          <AnimatedLogo size={72} />
-
-          <h2 className="nm-marquee text-gold-text text-2xl md:text-3xl leading-tight mt-5">
-            Gather Better. Live Closer.
-          </h2>
-          <p className="text-[13px] md:text-sm text-muted font-semibold tracking-wide mt-2 max-w-sm">
-            Community-driven and warm, with a sense of belonging.
-          </p>
-
-          <div className="h-12 overflow-hidden mt-5 w-full max-w-sm">
-            <div
-              className="transition-transform duration-700 ease-in-out"
-              style={{ transform: `translateY(-${currentWordIndex * 48}px)` }}
-            >
-              {eventWords.map((word, idx) => (
-                <div key={idx} className="h-12 flex items-center justify-center text-2xl md:text-3xl font-extrabold text-gold-text nm-marquee">
-                  {word}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <p className="text-[13.5px] text-muted mt-4 font-medium max-w-md">
-            Discover approval-based gatherings nearby, or host your own tonight.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 mt-6 w-full max-w-sm">
-            <Link href="/auth/signup" className="nm-btn nm-btn-gold flex-1 px-6 py-3 text-[13.5px]">
-              Get started
-            </Link>
-            <Link href="/discover" className="nm-btn nm-btn-outline flex-1 px-6 py-3 text-[13.5px]">
-              Explore events
-            </Link>
-          </div>
-        </div>
-      </div>
+    <div className="nm-root nm-bg min-h-screen text-white">
+      <LandingHero />
 
       {/* role toggle */}
       <div className="flex justify-center px-5 pb-4">

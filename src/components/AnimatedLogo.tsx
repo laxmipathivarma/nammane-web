@@ -32,7 +32,7 @@ export default function AnimatedLogo({
                 y1={y1}
                 x2={x2}
                 y2={y2}
-                stroke="#e8d9ac"
+                stroke="#e4d4ff"
                 strokeWidth="3"
                 strokeLinecap="round"
                 className="nm-spark-ray"
@@ -46,7 +46,7 @@ export default function AnimatedLogo({
         <g className="nm-confetti">
           {Array.from({ length: 14 }).map((_, i) => {
             const cx = 20 + (i * 101) % 100
-            const colors = ['#cda858', '#b23a4a', '#1e6e4a', '#e8d9ac']
+            const colors = ['#b968ff', '#ff4f9e', '#4cc9f0', '#e4d4ff']
             return (
               <rect
                 key={i}
@@ -75,40 +75,40 @@ export default function AnimatedLogo({
             strokeWidth="4"
             strokeLinejoin="round"
           />
-          <rect x="12" y="116" width="116" height="4" rx="2" fill="#cda858" />
+          <rect x="12" y="116" width="116" height="4" rx="2" fill="#b968ff" />
 
           {/* windows */}
-          <rect className="nm-window" x="38" y="78" width="14" height="14" rx="2" fill="#e8d9ac" />
-          <rect className="nm-window" x="88" y="78" width="14" height="14" rx="2" fill="#e8d9ac" style={{ animationDelay: '0.3s' }} />
-          <circle className="nm-window" cx="70" cy="60" r="4" fill="#e8d9ac" style={{ animationDelay: '0.15s' }} />
+          <rect className="nm-window" x="38" y="78" width="14" height="14" rx="2" fill="#e4d4ff" />
+          <rect className="nm-window" x="88" y="78" width="14" height="14" rx="2" fill="#e4d4ff" style={{ animationDelay: '0.3s' }} />
+          <circle className="nm-window" cx="70" cy="60" r="4" fill="#e4d4ff" style={{ animationDelay: '0.15s' }} />
 
           {/* door */}
           <g className="nm-door-frame">
-            <path d="M58 118 V92 C58 86 63 82 70 82 C77 82 82 86 82 92 V118" fill="none" stroke="#cda858" strokeWidth="3" />
-            <path className="nm-door nm-door-left" d="M58 118 V92 C58 88 61 85 64.5 83.5 V118 Z" fill="#15110b" />
-            <path className="nm-door nm-door-right" d="M82 118 V92 C82 88 79 85 75.5 83.5 V118 Z" fill="#15110b" />
+            <path d="M58 118 V92 C58 86 63 82 70 82 C77 82 82 86 82 92 V118" fill="none" stroke="#b968ff" strokeWidth="3" />
+            <path className="nm-door nm-door-left" d="M58 118 V92 C58 88 61 85 64.5 83.5 V118 Z" fill="#120f26" />
+            <path className="nm-door nm-door-right" d="M82 118 V92 C82 88 79 85 75.5 83.5 V118 Z" fill="#120f26" />
           </g>
 
           {/* guests */}
           <g className="nm-guest nm-guest-1" style={{ transformOrigin: '70px 118px' }}>
-            <circle cx="70" cy="100" r="6" fill="#e8d9ac" />
-            <path d="M62 118 C62 110 66 106 70 106 C74 106 78 110 78 118 Z" fill="#e8d9ac" />
+            <circle cx="70" cy="100" r="6" fill="#e4d4ff" />
+            <path d="M62 118 C62 110 66 106 70 106 C74 106 78 110 78 118 Z" fill="#e4d4ff" />
           </g>
           <g className="nm-guest nm-guest-2" style={{ transformOrigin: '55px 118px' }}>
-            <circle cx="55" cy="104" r="5" fill="#b23a4a" />
-            <path d="M48 118 C48 112 51 108 55 108 C59 108 62 112 62 118 Z" fill="#b23a4a" />
+            <circle cx="55" cy="104" r="5" fill="#ff4f9e" />
+            <path d="M48 118 C48 112 51 108 55 108 C59 108 62 112 62 118 Z" fill="#ff4f9e" />
           </g>
           <g className="nm-guest nm-guest-3" style={{ transformOrigin: '85px 118px' }}>
-            <circle cx="85" cy="104" r="5" fill="#1e6e4a" />
-            <path d="M78 118 C78 112 81 108 85 108 C89 108 92 112 92 118 Z" fill="#1e6e4a" />
+            <circle cx="85" cy="104" r="5" fill="#4cc9f0" />
+            <path d="M78 118 C78 112 81 108 85 108 C89 108 92 112 92 118 Z" fill="#4cc9f0" />
           </g>
         </g>
 
         <defs>
           <linearGradient id="nm-house-gold" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#f1e3bd" />
-            <stop offset=".5" stopColor="#cda858" />
-            <stop offset="1" stopColor="#8a661f" />
+            <stop offset="0" stopColor="#e4d4ff" />
+            <stop offset=".5" stopColor="#b968ff" />
+            <stop offset="1" stopColor="#6d1fd1" />
           </linearGradient>
         </defs>
       </svg>
@@ -120,7 +120,7 @@ export default function AnimatedLogo({
             className="nm-letter"
             style={{
               animationDelay: `${0.75 + i * 0.05}s`,
-              color: i < 3 ? '#f5efe3' : '#d9bd7a',
+              color: i < 3 ? '#ffffff' : '#c9a8ff',
             }}
           >
             {ch}

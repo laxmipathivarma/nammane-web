@@ -91,7 +91,7 @@ export default function Discover() {
   const activeLabel = CATEGORIES.find((c) => c.key === filter)?.label ?? ''
 
   return (
-    <div className="nm-root nm-bg min-h-screen text-[#f5efe3]">
+    <div className="nm-root nm-bg min-h-screen text-white">
       <div className="px-5 pt-8 pb-4 max-w-5xl mx-auto">
         <h1 className="nm-marquee text-2xl md:text-3xl text-gold-text font-extrabold">Discover</h1>
         <p className="text-[12.5px] text-muted font-semibold mt-1">Tonight&apos;s hottest tables, your rules</p>

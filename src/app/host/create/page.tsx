@@ -9,7 +9,7 @@ export default function CreateEventPage() {
   const [requireApproval, setRequireApproval] = useState(true)
 
   return (
-    <div className="nm-bg min-h-screen text-[#f5efe3]">
+    <div className="nm-bg min-h-screen text-white">
       <div className="max-w-2xl mx-auto px-5 pt-7 pb-28">
         <div className="flex items-center gap-3 mb-6">
           <Link href="/discover" className="w-8 h-8 rounded-full bg-ink2 flex items-center justify-center shrink-0">
@@ -29,11 +29,11 @@ export default function CreateEventPage() {
               onClick={() => setCategory(c.key)}
               className={`rounded-2xl flex flex-col items-center gap-1.5 py-3 px-1.5 text-[10.5px] font-bold border transition-colors ${
                 category === c.key
-                  ? 'border-ruby bg-gradient-to-br from-[#3a2416] to-[#201a12] text-white shadow-[0_0_0_1px_rgba(178,58,74,.4),0_8px_16px_rgba(178,58,74,.13)]'
+                  ? 'border-ruby bg-gradient-to-br from-[#2a1a40] to-[#120f26] text-white shadow-[0_0_0_1px_rgba(255,79,158,.4),0_8px_16px_rgba(255,79,158,.18)]'
                   : 'border-white/10 bg-ink2 text-muted'
               }`}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill={category === c.key ? '#fff' : 'none'} stroke={category === c.key ? 'none' : '#b8ab98'}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill={category === c.key ? '#fff' : 'none'} stroke={category === c.key ? 'none' : '#cfc9e6'}>
                 <use href={`#${c.icon}`} />
               </svg>
               {c.label}
@@ -73,7 +73,7 @@ export default function CreateEventPage() {
           <div>
             <label className="nm-label">Seats / capacity</label>
             <div className="nm-field flex items-center gap-2">
-              <svg width="15" height="15" viewBox="0 0 24 24" stroke="#d9bd7a" fill="none">
+              <svg width="15" height="15" viewBox="0 0 24 24" stroke="#c9a8ff" fill="none">
                 <use href="#i-seat" />
               </svg>
               6
@@ -118,7 +118,7 @@ export default function CreateEventPage() {
             }`}
           >
             <div
-              className="w-[18px] h-[18px] rounded-full bg-[#241607] absolute top-[3px] transition-all"
+              className="w-[18px] h-[18px] rounded-full bg-[#1a0f33] absolute top-[3px] transition-all"
               style={{ left: requireApproval ? 21 : 3 }}
             />
           </div>

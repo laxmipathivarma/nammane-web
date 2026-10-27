@@ -26,15 +26,15 @@ export default function Header() {
           <svg width="28" height="28" viewBox="0 0 120 120">
             <defs>
               <linearGradient id="hdr-gold" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#f1e3bd" />
-                <stop offset=".5" stopColor="#cda858" />
-                <stop offset="1" stopColor="#8a661f" />
+                <stop offset="0" stopColor="#e4d4ff" />
+                <stop offset=".5" stopColor="#b968ff" />
+                <stop offset="1" stopColor="#6d1fd1" />
               </linearGradient>
             </defs>
             <circle cx="60" cy="60" r="58" fill="none" stroke="url(#hdr-gold)" strokeWidth="2.4" />
-            <text x="60" y="78" textAnchor="middle" fontFamily="Playfair Display, serif" fontWeight="800" fontSize="58" fill="url(#hdr-gold)">N</text>
+            <text x="60" y="78" textAnchor="middle" fontFamily="Unbounded, sans-serif" fontWeight="800" fontSize="58" fill="url(#hdr-gold)">N</text>
           </svg>
-          <span className="nm-marquee text-lg text-[#e8d9ac] font-extrabold">NamMane</span>
+          <span className="nm-marquee text-lg text-[#e4d4ff] font-extrabold">NamMane</span>
         </Link>
 
         {/* nav links */}
@@ -51,7 +51,7 @@ export default function Header() {
           <div className="relative hidden sm:block" ref={appMenuRef}>
             <button
               onClick={() => setAppMenuOpen((v) => !v)}
-              className="nm-btn px-3.5 py-2 text-[12px] bg-ink2 text-[#e8ddc8] border border-white/10"
+              className="nm-btn px-3.5 py-2 text-[12px] bg-ink2 text-[#e4d4ff] border border-white/10"
             >
               Get the app
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -91,7 +91,7 @@ export default function Header() {
             )}
           </div>
 
-          <Link href="/auth/login" className="hidden sm:inline-flex text-[13px] font-bold text-[#e8ddc8] px-3 py-2 hover:text-gold-text transition-colors">
+          <Link href="/auth/login" className="hidden sm:inline-flex text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors">
             Sign in
           </Link>
           <Link href="/auth/signup" className="nm-btn nm-btn-gold px-4 py-2 text-[13px]">
@@ -100,7 +100,7 @@ export default function Header() {
 
           {/* mobile menu toggle */}
           <button
-            className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-[#e8ddc8]"
+            className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-[#e4d4ff]"
             onClick={() => setMobileOpen((v) => !v)}
             aria-label="Toggle menu"
           >
@@ -112,7 +112,7 @@ export default function Header() {
       </div>
 
       {mobileOpen && (
-        <div className="lg:hidden border-t border-white/10 px-5 py-4 flex flex-col gap-3 text-[14px] font-semibold text-[#e8ddc8] bg-ink">
+        <div className="lg:hidden border-t border-white/10 px-5 py-4 flex flex-col gap-3 text-[14px] font-semibold text-[#e4d4ff] bg-ink">
           <Link href="/discover" onClick={() => setMobileOpen(false)}>Discover</Link>
           <Link href="/#how-it-works" onClick={() => setMobileOpen(false)}>How it works</Link>
           <Link href="/host/create" onClick={() => setMobileOpen(false)}>Host an event</Link>

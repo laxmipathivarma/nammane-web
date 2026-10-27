@@ -6,12 +6,12 @@ export default function AuthShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* brand panel */}
-      <div className="nm-bg relative flex flex-col items-center justify-center px-8 py-16 md:w-1/2 text-[#f5efe3] overflow-hidden">
+      <div className="nm-bg relative flex flex-col items-center justify-center px-8 py-16 md:w-1/2 text-white overflow-hidden">
         <div
           className="absolute -inset-x-20 -top-20 h-72 pointer-events-none"
           style={{
             background:
-              'conic-gradient(from 0deg at 50% 0%, rgba(178,58,74,.12), rgba(205,168,88,.1), transparent 40%, transparent 60%, rgba(178,58,74,.12))',
+              'conic-gradient(from 0deg at 50% 0%, rgba(139,63,251,.18), rgba(255,79,158,.12), transparent 40%, transparent 60%, rgba(139,63,251,.18))',
             filter: 'blur(2px)',
           }}
         />
@@ -25,7 +25,7 @@ export default function AuthShell({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* form panel */}
-      <div className="flex-1 bg-[#f5efe3] flex items-center justify-center px-6 py-16">
+      <div className="flex-1 bg-ink flex items-center justify-center px-6 py-16">
         <div className="w-full max-w-sm">{children}</div>
       </div>
     </div>

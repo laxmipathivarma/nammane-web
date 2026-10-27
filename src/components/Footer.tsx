@@ -54,15 +54,15 @@ export default function Footer() {
               <svg width="30" height="30" viewBox="0 0 120 120">
                 <defs>
                   <linearGradient id="ftr-gold" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stopColor="#f1e3bd" />
-                    <stop offset=".5" stopColor="#cda858" />
-                    <stop offset="1" stopColor="#8a661f" />
+                    <stop offset="0" stopColor="#e4d4ff" />
+                    <stop offset=".5" stopColor="#b968ff" />
+                    <stop offset="1" stopColor="#6d1fd1" />
                   </linearGradient>
                 </defs>
                 <circle cx="60" cy="60" r="58" fill="none" stroke="url(#ftr-gold)" strokeWidth="2.4" />
-                <text x="60" y="78" textAnchor="middle" fontFamily="Playfair Display, serif" fontWeight="800" fontSize="58" fill="url(#ftr-gold)">N</text>
+                <text x="60" y="78" textAnchor="middle" fontFamily="Unbounded, sans-serif" fontWeight="800" fontSize="58" fill="url(#ftr-gold)">N</text>
               </svg>
-              <span className="nm-marquee text-xl text-[#e8d9ac] font-extrabold">NamMane</span>
+              <span className="nm-marquee text-xl text-[#e4d4ff] font-extrabold">NamMane</span>
             </Link>
             <p className="text-muted text-[13.5px] font-medium leading-relaxed max-w-xs mb-5">
               Gather better. Live closer. Community-driven gatherings, hosted by people you trust.
@@ -85,7 +85,7 @@ export default function Footer() {
 
           {columns.map((col) => (
             <div key={col.title}>
-              <div className="text-[11.5px] font-extrabold tracking-wide text-[#e8ddc8] uppercase mb-4">
+              <div className="text-[11.5px] font-extrabold tracking-wide text-[#e4d4ff] uppercase mb-4">
                 {col.title}
               </div>
               <ul className="space-y-2.5">
@@ -104,7 +104,7 @@ export default function Footer() {
         {/* app download row */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-7 border-t border-white/10">
           <div>
-            <div className="text-[13px] font-bold text-[#e8ddc8] mb-0.5">Get the NamMane app</div>
+            <div className="text-[13px] font-bold text-[#e4d4ff] mb-0.5">Get the NamMane app</div>
             <div className="text-[12px] text-muted">Coming soon for Android &amp; iOS — use the web app today.</div>
           </div>
           <div className="flex gap-2.5">

@@ -11,7 +11,7 @@ const bookings: Record<Tab, { slug: string; title: string; icon: string; iconBg:
       slug: 'high-stakes-friday',
       title: 'High Stakes Friday',
       icon: 'i-spade',
-      iconBg: 'radial-gradient(70% 90% at 30% 10%, #1e6e4a, #082318)',
+      iconBg: 'radial-gradient(70% 90% at 30% 10%, #8b3ffb, #16092e)',
       meta: 'Fri, 8:30 PM · Indiranagar',
       note: 'Waiting on Rahul to approve — usually replies in 2h',
       status: 'PENDING',
@@ -21,7 +21,7 @@ const bookings: Record<Tab, { slug: string; title: string; icon: string; iconBg:
       slug: 'rooftop-neon-soiree',
       title: 'Rooftop Neon Soirée',
       icon: 'i-party',
-      iconBg: 'radial-gradient(70% 90% at 30% 10%, #8a2332, #180c0c)',
+      iconBg: 'radial-gradient(70% 90% at 30% 10%, #ff4f9e, #2e0c20)',
       meta: 'Sat, 9 PM · Koramangala',
       status: 'PENDING',
       statusTone: 'pending',
@@ -32,7 +32,7 @@ const bookings: Record<Tab, { slug: string; title: string; icon: string; iconBg:
       slug: 'sunday-13-card-social',
       title: 'Sunday 13-Card Social',
       icon: 'i-diamond',
-      iconBg: 'radial-gradient(70% 90% at 70% 10%, #4a2e1a, #120d09)',
+      iconBg: 'radial-gradient(70% 90% at 70% 10%, #b968ff, #1e0d3a)',
       meta: 'HSR Layout · Sun, 5 PM',
       status: 'CONFIRMED',
       statusTone: 'confirmed',
@@ -52,7 +52,7 @@ export default function BookingsPage() {
   const items = bookings[tab]
 
   return (
-    <div className="nm-bg min-h-screen text-[#f5efe3]">
+    <div className="nm-bg min-h-screen text-white">
       <div className="max-w-2xl mx-auto px-5 pt-8 pb-16">
         <h1 className="nm-marquee text-2xl text-gold-text">My Bookings</h1>
         <p className="text-[12px] text-muted font-semibold mt-1">Track every table you&apos;re on</p>
@@ -63,7 +63,7 @@ export default function BookingsPage() {
               key={t.key}
               onClick={() => setTab(t.key)}
               className={`flex-1 text-center py-2.5 rounded-full text-[12px] font-extrabold transition-colors ${
-                tab === t.key ? 'bg-gradient-to-b from-gold-light via-gold to-gold-dark text-[#241607]' : 'text-muted2'
+                tab === t.key ? 'bg-gradient-to-b from-gold-light via-gold to-gold-dark text-white' : 'text-muted2'
               }`}
             >
               {t.label}
@@ -96,7 +96,7 @@ export default function BookingsPage() {
                     </div>
                   </div>
                   <div className="text-[11px] text-muted font-semibold mt-1.5 flex items-center gap-1.5">
-                    <svg width="11" height="11" viewBox="0 0 24 24" stroke="#b8ab98" fill="none">
+                    <svg width="11" height="11" viewBox="0 0 24 24" stroke="#cfc9e6" fill="none">
                       <use href="#i-clock" />
                     </svg>
                     {b.meta}

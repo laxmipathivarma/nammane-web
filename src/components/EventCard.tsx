@@ -16,12 +16,12 @@ export type EventCardData = {
 }
 
 const categoryHero: Record<EventCardData['category'], string> = {
-  poker: 'radial-gradient(70% 120% at 30% 0%, #1e6e4a 0%, #0d3a27 60%, #082318 100%)',
-  rummy: 'radial-gradient(70% 120% at 70% 0%, #4a2e1a 0%, #1f140d 60%, #120d09 100%)',
-  drinks: 'radial-gradient(70% 120% at 30% 0%, #5a3414 0%, #2e1a0a 60%, #170d05 100%)',
-  dinner: 'radial-gradient(70% 120% at 30% 0%, #5c1620 0%, #2e0e13 60%, #170709 100%)',
-  party: 'radial-gradient(70% 120% at 30% 0%, #8a2332 0%, #4a1a1e 60%, #180c0c 100%)',
-  other: 'radial-gradient(70% 120% at 30% 0%, #2c2c2c 0%, #181818 60%, #0c0c0c 100%)',
+  poker: 'radial-gradient(70% 120% at 30% 0%, #8b3ffb 0%, #3d1a7a 60%, #16092e 100%)',
+  rummy: 'radial-gradient(70% 120% at 70% 0%, #b968ff 0%, #5a1fa8 60%, #1e0d3a 100%)',
+  drinks: 'radial-gradient(70% 120% at 30% 0%, #1a8fd1 0%, #0e3f66 60%, #081a2c 100%)',
+  dinner: 'radial-gradient(70% 120% at 30% 0%, #e8942c 0%, #7a4a12 60%, #2c1a06 100%)',
+  party: 'radial-gradient(70% 120% at 30% 0%, #ff4f9e 0%, #a01866 60%, #2e0c20 100%)',
+  other: 'radial-gradient(70% 120% at 30% 0%, #4a4a6e 0%, #241f38 60%, #0c0c18 100%)',
 }
 
 const categoryIcon: Record<EventCardData['category'], string> = {
@@ -65,7 +65,7 @@ export default function EventCard({ data }: { data: EventCardData }) {
             <div className="w-5.5 h-5.5 rounded-full bg-ruby text-white text-[10px] font-extrabold flex items-center justify-center" style={{ width: 22, height: 22 }}>
               {data.hostInitials}
             </div>
-            <div className="text-[11.5px] font-bold text-[#e8ddc8]">{data.host}</div>
+            <div className="text-[11.5px] font-bold text-[#e4d4ff]">{data.host}</div>
             <svg width="13" height="13" viewBox="0 0 24 24" style={{ marginLeft: -2 }}>
               <use href="#i-check" />
             </svg>
@@ -77,7 +77,7 @@ export default function EventCard({ data }: { data: EventCardData }) {
             <div className="flex-1 h-1.5 rounded-full bg-ink2 overflow-hidden">
               <div
                 className="h-full rounded-full"
-                style={{ width: `${data.seatsFilledPct}%`, background: 'linear-gradient(90deg,#b23a4a,#cda858)' }}
+                style={{ width: `${data.seatsFilledPct}%`, background: 'linear-gradient(90deg,#8b3ffb,#ff4f9e)' }}
               />
             </div>
             <div className="text-[10.5px] text-muted font-bold whitespace-nowrap">{data.seatsLabel}</div>

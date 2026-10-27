@@ -45,9 +45,9 @@ export const EVENTS: Record<string, EventDetail> = {
     houseRules:
       "Chips-only play — no real-money wagering on NamMane. BYO snacks, host provides chips & cards. Please arrive by 8:45 PM; no-shows after 2 events may be removed from future tables.",
     guests: [
-      { initials: 'RK', color: '#9c3344' },
-      { initials: 'SM', color: '#4a2e1a' },
-      { initials: 'AJ', color: '#16804f' },
+      { initials: 'RK', color: '#ff4f9e' },
+      { initials: 'SM', color: '#b968ff' },
+      { initials: 'AJ', color: '#4cc9f0' },
     ],
   },
   'sunday-13-card-social': {
@@ -68,9 +68,9 @@ export const EVENTS: Record<string, EventDetail> = {
     houseRules:
       'Casual stakes, beginners welcome. Host provides cards and score sheets — just bring yourself and a snack to share.',
     guests: [
-      { initials: 'MS', color: '#4a2e1a' },
-      { initials: 'PK', color: '#5a3414' },
-      { initials: 'RT', color: '#9c3344' },
+      { initials: 'MS', color: '#b968ff' },
+      { initials: 'PK', color: '#e8942c' },
+      { initials: 'RT', color: '#ff4f9e' },
     ],
   },
   'copper-and-smoke': {
@@ -90,9 +90,9 @@ export const EVENTS: Record<string, EventDetail> = {
     seatsLeft: 6,
     houseRules: 'BYOB — host provides mixers, ice and snacks. Please drink responsibly and arrange your own ride home.',
     guests: [
-      { initials: 'VK', color: '#5a3414' },
-      { initials: 'NS', color: '#8a2332' },
-      { initials: 'PR', color: '#16804f' },
+      { initials: 'VK', color: '#e8942c' },
+      { initials: 'NS', color: '#8b3ffb' },
+      { initials: 'PR', color: '#4cc9f0' },
     ],
   },
   'an-evening-table': {
@@ -112,9 +112,9 @@ export const EVENTS: Record<string, EventDetail> = {
     seatsLeft: 2,
     houseRules: 'Set menu, dietary notes welcome at RSVP. Please arrive on time — the kitchen plates everything together.',
     guests: [
-      { initials: 'PS', color: '#5c1620' },
-      { initials: 'KN', color: '#4a2e1a' },
-      { initials: 'AJ', color: '#16804f' },
+      { initials: 'PS', color: '#ff7fc2' },
+      { initials: 'KN', color: '#b968ff' },
+      { initials: 'AJ', color: '#4cc9f0' },
     ],
   },
   'rooftop-neon-soiree': {
@@ -134,9 +134,9 @@ export const EVENTS: Record<string, EventDetail> = {
     seatsLeft: 12,
     houseRules: 'Dress to the theme if you like — not required. Host supplies music and lighting; bring your own drinks.',
     guests: [
-      { initials: 'AJ', color: '#8a2332' },
-      { initials: 'RK', color: '#9c3344' },
-      { initials: 'MS', color: '#4a2e1a' },
+      { initials: 'AJ', color: '#8b3ffb' },
+      { initials: 'RK', color: '#ff4f9e' },
+      { initials: 'MS', color: '#b968ff' },
     ],
   },
   'board-game-marathon': {
@@ -156,20 +156,20 @@ export const EVENTS: Record<string, EventDetail> = {
     seatsLeft: 5,
     houseRules: 'Bring your favorite board game if you have one — host has a shelf of classics too. Snacks provided.',
     guests: [
-      { initials: 'KN', color: '#2c2c2c' },
-      { initials: 'VK', color: '#5a3414' },
-      { initials: 'PS', color: '#5c1620' },
+      { initials: 'KN', color: '#4a4a6e' },
+      { initials: 'VK', color: '#e8942c' },
+      { initials: 'PS', color: '#ff7fc2' },
     ],
   },
 }
 
 export const categoryHero: Record<EventCategory, string> = {
-  poker: 'radial-gradient(85% 100% at 50% 20%, #1f7a4f 0%, #0f4229 55%, #082318 100%)',
-  rummy: 'radial-gradient(85% 100% at 50% 20%, #5a3414 0%, #2e1a0a 55%, #170d05 100%)',
-  drinks: 'radial-gradient(85% 100% at 50% 20%, #6b3d16 0%, #35200c 55%, #180d05 100%)',
-  dinner: 'radial-gradient(85% 100% at 50% 20%, #6b1c28 0%, #350f16 55%, #170709 100%)',
-  party: 'radial-gradient(85% 100% at 50% 20%, #8a2332 0%, #4a1a1e 55%, #180c0c 100%)',
-  other: 'radial-gradient(85% 100% at 50% 20%, #343434 0%, #1c1c1c 55%, #0c0c0c 100%)',
+  poker: 'radial-gradient(85% 100% at 50% 20%, #8b3ffb 0%, #3d1a7a 55%, #16092e 100%)',
+  rummy: 'radial-gradient(85% 100% at 50% 20%, #b968ff 0%, #5a1fa8 55%, #1e0d3a 100%)',
+  drinks: 'radial-gradient(85% 100% at 50% 20%, #1a8fd1 0%, #0e3f66 55%, #081a2c 100%)',
+  dinner: 'radial-gradient(85% 100% at 50% 20%, #e8942c 0%, #7a4a12 55%, #2c1a06 100%)',
+  party: 'radial-gradient(85% 100% at 50% 20%, #ff4f9e 0%, #a01866 55%, #2e0c20 100%)',
+  other: 'radial-gradient(85% 100% at 50% 20%, #4a4a6e 0%, #241f38 55%, #0c0c18 100%)',
 }
 
 export const categoryIcon: Record<EventCategory, string> = {

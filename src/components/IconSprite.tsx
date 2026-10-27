@@ -51,7 +51,7 @@ export default function IconSprite() {
           <path d="M12 3 L14.7 9 L21 9.8 L16.3 14 L17.6 20.3 L12 17.1 L6.4 20.3 L7.7 14 L3 9.8 L9.3 9 Z" fill="currentColor" />
         </g>
         <g id="i-check">
-          <circle cx="12" cy="12" r="10" fill="#cda858" />
+          <circle cx="12" cy="12" r="10" fill="#b968ff" />
           <path d="M7.5 12.5 L10.3 15.3 L16.5 9" fill="none" stroke="#1f1810" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
         </g>
         <g id="i-seat">
@@ -71,12 +71,12 @@ export default function IconSprite() {
           <path d="M8.6 12 L11 14.4 L15.6 9.6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
         </g>
         <g id="i-chip-stack">
-          <ellipse cx="0" cy="0" rx="19" ry="7" fill="#c3322a" />
-          <path d="M-19 0 V4 A19 7 0 0 0 19 4 V0 Z" fill="#8f1a13" />
-          <ellipse cx="0" cy="-5" rx="19" ry="7" fill="#c3322a" />
+          <ellipse cx="0" cy="0" rx="19" ry="7" fill="#ff4f9e" />
+          <path d="M-19 0 V4 A19 7 0 0 0 19 4 V0 Z" fill="#a01866" />
+          <ellipse cx="0" cy="-5" rx="19" ry="7" fill="#ff4f9e" />
           <ellipse cx="0" cy="-5" rx="19" ry="7" fill="none" stroke="#f4efe2" strokeWidth="3.6" strokeDasharray="4 5" />
-          <path d="M-19 -5 V-1 A19 7 0 0 0 19 -1 V-5 Z" fill="#8f1a13" />
-          <ellipse cx="0" cy="-10" rx="19" ry="7" fill="#16804f" />
+          <path d="M-19 -5 V-1 A19 7 0 0 0 19 -1 V-5 Z" fill="#a01866" />
+          <ellipse cx="0" cy="-10" rx="19" ry="7" fill="#4cc9f0" />
           <ellipse cx="0" cy="-10" rx="19" ry="7" fill="none" stroke="#f4efe2" strokeWidth="3.6" strokeDasharray="4 5" />
         </g>
         <g id="i-back">
@@ -109,14 +109,26 @@ export default function IconSprite() {
           <path d="M4 16 L9 11 L13 14.5 L16 11.5 L20 15" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
         </g>
         <linearGradient id="l-goldline" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f1e3bd" />
-          <stop offset=".5" stopColor="#cda858" />
-          <stop offset="1" stopColor="#8a661f" />
+          <stop offset="0" stopColor="#e4d4ff" />
+          <stop offset=".5" stopColor="#b968ff" />
+          <stop offset="1" stopColor="#6d1fd1" />
         </linearGradient>
+        <g id="i-mic">
+          <rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor" />
+          <path d="M6 11 C6 14.3 8.7 17 12 17 C15.3 17 18 14.3 18 11" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </g>
+        <g id="nm-chip-flat">
+          <ellipse cx="0" cy="0" rx="52" ry="19" />
+          <ellipse cx="0" cy="0" rx="52" ry="19" fill="none" stroke="#fff" strokeWidth="7" strokeDasharray="10 13" opacity=".9" />
+          <ellipse cx="0" cy="0" rx="34" ry="12.4" fill="none" stroke="#fff" strokeWidth="1.6" opacity=".55" />
+          <ellipse cx="-10" cy="-7" rx="28" ry="8" fill="#fff" opacity=".35" />
+        </g>
         <g id="nm-mark">
           <circle cx="60" cy="60" r="58" fill="none" stroke="url(#l-goldline)" strokeWidth="2.4" />
           <circle cx="60" cy="60" r="50" fill="none" stroke="url(#l-goldline)" strokeWidth="1" strokeDasharray="2.6 5.2" opacity=".8" />
-          <text x="60" y="78" textAnchor="middle" fontFamily="Playfair Display, serif" fontWeight="800" fontSize="58" fill="url(#l-goldline)">N</text>
+          <text x="60" y="78" textAnchor="middle" fontFamily="Unbounded, sans-serif" fontWeight="800" fontSize="58" fill="url(#l-goldline)">N</text>
           <use href="#i-spade" transform="translate(60 93) scale(.62)" fill="url(#l-goldline)" />
         </g>
       </defs>

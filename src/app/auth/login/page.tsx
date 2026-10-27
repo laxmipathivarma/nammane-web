@@ -18,14 +18,14 @@ export default function LoginPage() {
 
   return (
     <AuthShell>
-      <h1 className="nm-marquee text-3xl text-ink font-extrabold">Welcome home</h1>
-      <p className="text-[#5a5245] text-[13.5px] font-medium mt-2 mb-7">
+      <h1 className="nm-marquee text-3xl text-white font-extrabold">Welcome home</h1>
+      <p className="text-muted text-[13.5px] font-medium mt-2 mb-7">
         Sign in to see what&apos;s happening at your place.
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="nm-label !text-[#8a7d68]">Email</label>
+          <label className="nm-label !text-muted2">Email</label>
           <input
             type="email"
             value={email}
@@ -37,8 +37,8 @@ export default function LoginPage() {
         </div>
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="nm-label !text-[#8a7d68] !mb-0">Password</label>
-            <Link href="/auth/forgot" className="text-[11px] font-bold text-gold-dark">
+            <label className="nm-label !text-muted2 !mb-0">Password</label>
+            <Link href="/auth/forgot" className="text-[11px] font-bold text-gold-text">
               Forgot?
             </Link>
           </div>
@@ -58,9 +58,9 @@ export default function LoginPage() {
       </form>
 
       <div className="flex items-center gap-3 my-6">
-        <div className="flex-1 h-px bg-[#ddd3bd]" />
-        <span className="text-[#8a7d68] text-xs font-semibold">or</span>
-        <div className="flex-1 h-px bg-[#ddd3bd]" />
+        <div className="flex-1 h-px bg-white/10" />
+        <span className="text-muted2 text-xs font-semibold">or</span>
+        <div className="flex-1 h-px bg-white/10" />
       </div>
 
       <div className="space-y-3">
@@ -72,9 +72,9 @@ export default function LoginPage() {
         </button>
       </div>
 
-      <p className="text-center text-[#8a7d68] text-[13px] mt-7 font-medium">
+      <p className="text-center text-muted2 text-[13px] mt-7 font-medium">
         New to NamMane?{' '}
-        <Link href="/auth/signup" className="text-gold-dark font-bold">
+        <Link href="/auth/signup" className="text-gold-text font-bold">
           Create an account
         </Link>
       </p>

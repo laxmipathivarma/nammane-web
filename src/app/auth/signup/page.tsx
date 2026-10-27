@@ -37,24 +37,24 @@ export default function SignupPage() {
 
   return (
     <AuthShell>
-      <h1 className="nm-marquee text-3xl text-ink font-extrabold">Join the party</h1>
-      <p className="text-[#5a5245] text-[13.5px] font-medium mt-2 mb-7">
+      <h1 className="nm-marquee text-3xl text-white font-extrabold">Join the party</h1>
+      <p className="text-muted text-[13.5px] font-medium mt-2 mb-7">
         Host game nights, dinners, dance parties and birthdays at home.
       </p>
 
       {error && (
-        <div className="bg-ruby/10 border border-ruby/40 text-[#9c3344] px-4 py-3 rounded-xl mb-4 text-[13px] font-semibold">
+        <div className="bg-ruby/10 border border-ruby/40 text-[#ff8fd1] px-4 py-3 rounded-xl mb-4 text-[13px] font-semibold">
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="nm-label !text-[#8a7d68]">Full name</label>
+          <label className="nm-label !text-muted2">Full name</label>
           <input type="text" placeholder="Your name" required className="nm-field" />
         </div>
         <div>
-          <label className="nm-label !text-[#8a7d68]">Email</label>
+          <label className="nm-label !text-muted2">Email</label>
           <input
             type="email"
             value={email}
@@ -65,7 +65,7 @@ export default function SignupPage() {
           />
         </div>
         <div>
-          <label className="nm-label !text-[#8a7d68]">Password</label>
+          <label className="nm-label !text-muted2">Password</label>
           <input
             type="password"
             value={password}
@@ -82,9 +82,9 @@ export default function SignupPage() {
       </form>
 
       <div className="flex items-center gap-3 my-6">
-        <div className="flex-1 h-px bg-[#ddd3bd]" />
-        <span className="text-[#8a7d68] text-xs font-semibold">or</span>
-        <div className="flex-1 h-px bg-[#ddd3bd]" />
+        <div className="flex-1 h-px bg-white/10" />
+        <span className="text-muted2 text-xs font-semibold">or</span>
+        <div className="flex-1 h-px bg-white/10" />
       </div>
 
       <div className="space-y-3">
@@ -96,9 +96,9 @@ export default function SignupPage() {
         </button>
       </div>
 
-      <p className="text-center text-[#8a7d68] text-[13px] mt-7 font-medium">
+      <p className="text-center text-muted2 text-[13px] mt-7 font-medium">
         Already a member?{' '}
-        <Link href="/auth/login" className="text-gold-dark font-bold">
+        <Link href="/auth/login" className="text-gold-text font-bold">
           Sign in
         </Link>
       </p>
