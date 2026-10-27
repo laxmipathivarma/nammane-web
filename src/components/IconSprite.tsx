@@ -79,6 +79,12 @@ export default function IconSprite() {
           <ellipse cx="0" cy="-10" rx="19" ry="7" fill="#4cc9f0" />
           <ellipse cx="0" cy="-10" rx="19" ry="7" fill="none" stroke="#f4efe2" strokeWidth="3.6" strokeDasharray="4 5" />
         </g>
+        <g id="i-calendar">
+          <rect x="3" y="5" width="18" height="16" rx="3" fill="none" stroke="currentColor" strokeWidth="1.7" />
+          <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="1.7" />
+          <line x1="7" y1="3" x2="7" y2="7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+          <line x1="17" y1="3" x2="17" y2="7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+        </g>
         <g id="i-back">
           <path d="M15 5 L8 12 L15 19" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
         </g>

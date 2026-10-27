@@ -13,134 +13,107 @@ export default function EventDetailPage({ params }: { params: { slug: string } }
   const icon = categoryIcon[event.category]
 
   return (
-    <div className="nm-bg min-h-screen text-white">
+    <div className="bg-ink min-h-screen text-white">
       {/* hero */}
-      <div className="relative h-[260px] md:h-[320px] overflow-hidden" style={{ background: categoryHero[event.category] }}>
-        <div
-          className="absolute inset-0"
-          style={{ background: 'repeating-radial-gradient(circle at 50% 110%, rgba(0,0,0,0) 0 120px, rgba(0,0,0,.25) 121px 123px)' }}
-        />
+      <div className="relative h-[260px] md:h-[300px] overflow-hidden" style={{ background: categoryHero[event.category] }}>
+        <div className="absolute w-[300px] h-[300px] -right-[100px] -top-[80px] rounded-full opacity-60 blur-sm" style={{ background: 'radial-gradient(circle,#ff4f9e,transparent 70%)' }} />
+
         <div className="relative z-10 max-w-3xl mx-auto px-5 pt-5 flex items-center justify-between">
-          <Link href="/discover" className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center">
+          <Link href="/discover" className="nm-glass w-9 h-9 rounded-full flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 24 24" stroke="#fff" fill="none">
               <use href="#i-back" />
             </svg>
           </Link>
-          <button className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center" aria-label="Share event">
+          <button className="nm-glass w-9 h-9 rounded-full flex items-center justify-center" aria-label="Share event">
             <svg width="16" height="16" viewBox="0 0 24 24" stroke="#fff" fill="none">
               <use href="#i-share" />
             </svg>
           </button>
         </div>
-        <div className="absolute left-0 right-0 bottom-0 h-24 bg-gradient-to-t from-ink to-transparent" />
-        <div className="absolute left-5 md:left-auto md:right-auto bottom-3.5 bg-gradient-to-b from-[#ff8fd1] to-[#ff4f9e] text-[#2e0c20] font-extrabold text-[11.5px] px-3.5 py-1.5 rounded-full flex items-center gap-1.5 max-w-[calc(100%-40px)]">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="#2e0c20">
-            <use href={`#${icon}`} />
-          </svg>
-          {event.tagLabel}
+
+        <div className="relative z-10 flex flex-col items-center justify-center h-[180px]">
+          <div className="w-[86px] h-[86px] rounded-full flex items-center justify-center shadow-2xl" style={{ background: 'radial-gradient(circle at 35% 28%, rgba(255,255,255,.35), rgba(255,255,255,.06) 65%)' }}>
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="#fff">
+              <use href={`#${icon}`} />
+            </svg>
+          </div>
+          <div className="text-[11px] font-extrabold tracking-wide text-[#e4d4ff] mt-3.5">{event.tagLabel}</div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-5 pb-32 pt-5">
-        <h1 className="nm-marquee text-2xl md:text-3xl text-white">{event.title}</h1>
-        <div className="flex items-center gap-1.5 mt-1.5 text-[12.5px] text-gold-text font-extrabold">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-            <use href="#i-star" />
-          </svg>
-          {event.rating}{' '}
-          <span className="text-muted font-semibold">
-            ({event.reviewCount} reviews) · {event.eventsHosted} events hosted
-          </span>
+      <div className="relative -mt-5 bg-ink rounded-t-[24px] max-w-3xl mx-auto px-5 pb-32 pt-6">
+        <h1 className="nm-marquee text-2xl md:text-3xl text-white leading-tight">{event.title}</h1>
+        <div className="text-[11px] font-extrabold mt-2 px-3 py-1.5 rounded-full inline-block w-fit" style={{ background: 'rgba(139,63,251,.18)', color: '#c9a8ff' }}>
+          Approval required before entry
         </div>
 
-        {/* host card */}
-        <div className="nm-card rounded-2xl p-3.5 flex items-center gap-3 mt-4">
-          <div className="w-11 h-11 rounded-full bg-ruby text-white font-extrabold text-sm flex items-center justify-center shrink-0">
-            {event.host.initials}
-          </div>
-          <div className="flex-1">
-            <div className="font-extrabold text-[14px] flex items-center gap-1.5">
-              {event.host.name}
-              <svg width="13" height="13" viewBox="0 0 24 24">
-                <use href="#i-check" />
-              </svg>
-            </div>
-            <div className="text-[11px] text-muted font-semibold mt-0.5">
-              Host since {event.host.since} · ID verified
-            </div>
-          </div>
-          <button className="nm-btn bg-ink2 text-gold-text border border-gold/50 px-3.5 py-2 text-[11.5px]">
-            Message
-          </button>
-        </div>
-
-        {/* details grid */}
-        <div className="grid grid-cols-2 gap-2.5 mt-4">
-          <div className="nm-card rounded-2xl p-3.5">
-            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#c9a8ff" fill="none">
-              <use href="#i-clock" />
+        <div className="flex items-center gap-3 py-3 border-b border-white/[0.08]">
+          <div className="w-9 h-9 rounded-[11px] bg-white/[0.07] flex items-center justify-center shrink-0">
+            <svg width="17" height="17" viewBox="0 0 24 24" stroke="#c9a8ff" fill="none">
+              <use href="#i-calendar" />
             </svg>
-            <div className="text-[11px] text-muted font-bold mt-1.5">When</div>
-            <div className="text-[13px] font-extrabold mt-0.5">{event.schedule}</div>
           </div>
-          <div className="nm-card rounded-2xl p-3.5">
-            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#c9a8ff" fill="none">
+          <div>
+            <div className="text-[13.5px] font-bold">{event.schedule}</div>
+            <div className="text-[11.5px] text-[#a79ecb] font-semibold">Add to calendar</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 py-3 border-b border-white/[0.08]">
+          <div className="w-9 h-9 rounded-[11px] bg-white/[0.07] flex items-center justify-center shrink-0">
+            <svg width="17" height="17" viewBox="0 0 24 24" stroke="#5fd0ff" fill="none">
               <use href="#i-pin" />
             </svg>
-            <div className="text-[11px] text-muted font-bold mt-1.5">{event.area}</div>
-            <div className="text-[13px] font-extrabold mt-0.5">Exact spot shown after approval</div>
           </div>
-          <div className="nm-card rounded-2xl p-3.5">
-            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#c9a8ff" fill="none">
-              <use href="#i-seat" />
-            </svg>
-            <div className="text-[11px] text-muted font-bold mt-1.5">Seats</div>
-            <div className="text-[13px] font-extrabold mt-0.5">{event.seatsLabel}</div>
-          </div>
-          <div className="nm-card rounded-2xl p-3.5">
-            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#c9a8ff" fill="none">
-              <use href={`#${icon}`} />
-            </svg>
-            <div className="text-[11px] text-muted font-bold mt-1.5">Format</div>
-            <div className="text-[13px] font-extrabold mt-0.5">{event.format}</div>
+          <div>
+            <div className="text-[13.5px] font-bold">{event.area}</div>
+            <div className="text-[11.5px] text-[#a79ecb] font-semibold">Exact address shared after approval</div>
           </div>
         </div>
-
-        {/* who's at the table */}
-        <div className="mt-5">
-          <div className="text-[12px] font-extrabold text-[#e4d4ff] mb-2">Who&apos;s going</div>
-          <div className="flex items-center">
-            {event.guests.map((g, i) => (
-              <div
-                key={i}
-                className="w-8 h-8 rounded-full text-white text-[11px] font-extrabold flex items-center justify-center border-2 border-ink"
-                style={{ background: g.color, marginLeft: i === 0 ? 0 : -8 }}
-              >
-                {g.initials}
-              </div>
-            ))}
-            <div className="ml-2.5 text-[11.5px] text-muted font-semibold">
-              {event.seatsLeft} seat{event.seatsLeft === 1 ? '' : 's'} left · host approves requests
+        <div className="flex items-center gap-3 py-3">
+          <div className="w-9 h-9 rounded-[11px] bg-white/[0.07] flex items-center justify-center shrink-0">
+            <svg width="17" height="17" viewBox="0 0 24 24" stroke="#ff8fd1" fill="none">
+              <use href="#i-shield" />
+            </svg>
+          </div>
+          <div>
+            <div className="text-[13.5px] font-bold">Hosted by {event.host.name}</div>
+            <div className="text-[11.5px] text-[#a79ecb] font-semibold">
+              Verified host · {event.eventsHosted} events hosted
             </div>
           </div>
         </div>
 
-        {/* house rules */}
-        <div className="mt-5">
-          <div className="text-[12px] font-extrabold text-[#e4d4ff] mb-2">House rules</div>
-          <div className="nm-card rounded-2xl p-3.5 text-[12.5px] text-[#d8d2f0] leading-relaxed font-semibold">
-            {event.houseRules}
+        <div className="nm-glass rounded-[18px] p-4 mt-4">
+          <div className="text-[12px] font-extrabold text-muted mb-2 tracking-wide">WHO&apos;S GOING</div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              {event.guests.map((g, i) => (
+                <div
+                  key={i}
+                  className="w-[30px] h-[30px] rounded-full border-2 border-ink text-white text-[10px] font-extrabold flex items-center justify-center"
+                  style={{ background: g.color, marginLeft: i === 0 ? 0 : -9 }}
+                >
+                  {g.initials}
+                </div>
+              ))}
+            </div>
+            <div className="text-[12px] font-bold text-[#a79ecb]">{event.seatsLabel}</div>
           </div>
+        </div>
+
+        <div className="mt-5">
+          <div className="text-[12px] font-extrabold text-muted mb-2 tracking-wide">ABOUT THIS NIGHT</div>
+          <p className="text-[13px] text-muted font-medium leading-relaxed">{event.houseRules}</p>
         </div>
 
         {event.priceLabel && (
-          <div className="mt-5 nm-card rounded-2xl p-3.5 flex items-center justify-between">
+          <div className="mt-5 nm-glass rounded-2xl p-3.5 flex items-center justify-between">
             <div className="text-[12.5px] font-bold text-muted">Buy-in · set by host</div>
             <div className="text-[15px] font-extrabold text-gold-text">{event.priceLabel}</div>
           </div>
         )}
 
-        <div className="flex items-center gap-2 mt-4 text-[11px] text-muted2 font-semibold">
+        <div className="flex items-center gap-2 mt-5 text-[11px] text-muted2 font-semibold">
           <svg width="14" height="14" viewBox="0 0 24 24" stroke="#776fa0" fill="none">
             <use href="#i-shield" />
           </svg>
@@ -148,13 +121,10 @@ export default function EventDetailPage({ params }: { params: { slug: string } }
         </div>
       </div>
 
-      {/* sticky request bar */}
+      {/* sticky CTA */}
       <div className="sticky bottom-0 bg-gradient-to-t from-ink via-ink/95 to-transparent pt-6 pb-5 px-5">
-        <div className="max-w-3xl mx-auto flex items-center gap-3">
-          <div className="flex-1 text-[12.5px] text-muted font-semibold">
-            {event.seatsLeft} seat{event.seatsLeft === 1 ? '' : 's'} left for {event.title}
-          </div>
-          <button className="nm-btn nm-btn-gold px-7 py-3.5 text-[13.5px]">Request to join</button>
+        <div className="max-w-3xl mx-auto">
+          <button className="nm-btn nm-btn-gold w-full py-4 text-[14.5px]">Request to join →</button>
         </div>
       </div>
     </div>

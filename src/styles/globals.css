@@ -369,3 +369,52 @@ body {
     animation: none !important;
   }
 }
+
+/* ===== Shimmering logo chip (auth / mobile screens) ===== */
+.nm-logo-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.nm-logo-mark {
+  position: relative;
+  z-index: 1;
+  border-radius: 16px;
+  background: linear-gradient(125deg, #8b3ffb, #ff4f9e, #4cc9f0, #8b3ffb);
+  background-size: 260% 260%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-family: 'Unbounded', sans-serif;
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22) inset, 0 2px 0 rgba(255, 255, 255, 0.3) inset;
+  animation: nm-logo-shimmer 4s ease-in-out infinite, nm-logo-spin 7s ease-in-out infinite;
+}
+.nm-logo-wrap::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: 22px;
+  background: radial-gradient(circle, rgba(201, 104, 255, 0.65), transparent 70%);
+  filter: blur(9px);
+  z-index: 0;
+  animation: nm-logo-glow 2.3s ease-in-out infinite;
+}
+@keyframes nm-logo-shimmer {
+  0%, 100% { background-position: 0% 30%; }
+  50% { background-position: 100% 70%; }
+}
+@keyframes nm-logo-spin {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(8deg) scale(1.06); }
+}
+@keyframes nm-logo-glow {
+  0%, 100% { opacity: 0.45; transform: scale(0.88); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nm-logo-mark, .nm-logo-wrap::after {
+    animation: none !important;
+  }
+}

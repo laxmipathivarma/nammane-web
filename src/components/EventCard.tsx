@@ -15,13 +15,89 @@ export type EventCardData = {
   ctaLabel: string
 }
 
-const categoryHero: Record<EventCardData['category'], string> = {
-  poker: 'radial-gradient(70% 120% at 30% 0%, #8b3ffb 0%, #3d1a7a 60%, #16092e 100%)',
-  rummy: 'radial-gradient(70% 120% at 70% 0%, #b968ff 0%, #5a1fa8 60%, #1e0d3a 100%)',
-  drinks: 'radial-gradient(70% 120% at 30% 0%, #1a8fd1 0%, #0e3f66 60%, #081a2c 100%)',
-  dinner: 'radial-gradient(70% 120% at 30% 0%, #e8942c 0%, #7a4a12 60%, #2c1a06 100%)',
-  party: 'radial-gradient(70% 120% at 30% 0%, #ff4f9e 0%, #a01866 60%, #2e0c20 100%)',
-  other: 'radial-gradient(70% 120% at 30% 0%, #4a4a6e 0%, #241f38 60%, #0c0c18 100%)',
+type CardStyle = {
+  bg: string
+  color: string
+  iconBg: string
+  badgeBg: string
+  badgeColor: string
+  shadow: string
+  ctaBg: string
+  ctaColor: string
+  avatarRing: string
+  iconStroke?: boolean
+}
+
+const cardStyle: Record<EventCardData['category'], CardStyle> = {
+  poker: {
+    bg: 'linear-gradient(160deg,#ffffff,#e9e3f7)',
+    color: '#1b1030',
+    iconBg: 'rgba(27,16,48,.08)',
+    badgeBg: 'rgba(139,63,251,.12)',
+    badgeColor: '#6d1fd1',
+    shadow: '0 2px 0 rgba(255,255,255,.8) inset, 0 16px 30px rgba(139,63,251,.3)',
+    ctaBg: '#1b1030',
+    ctaColor: '#fff',
+    avatarRing: '#e9e3f7',
+  },
+  rummy: {
+    bg: 'linear-gradient(160deg,#c9a8ff,#8b3ffb)',
+    color: '#fff',
+    iconBg: 'rgba(255,255,255,.2)',
+    badgeBg: 'rgba(255,255,255,.22)',
+    badgeColor: '#fff',
+    shadow: '0 2px 0 rgba(255,255,255,.3) inset, 0 16px 30px rgba(107,30,220,.35)',
+    ctaBg: '#fff',
+    ctaColor: '#6d1fd1',
+    avatarRing: '#8b3ffb',
+  },
+  drinks: {
+    bg: 'linear-gradient(160deg,#8fe3ff,#1a8fd1)',
+    color: '#fff',
+    iconBg: 'rgba(255,255,255,.2)',
+    badgeBg: 'rgba(255,255,255,.22)',
+    badgeColor: '#fff',
+    shadow: '0 2px 0 rgba(255,255,255,.3) inset, 0 16px 30px rgba(26,100,209,.35)',
+    ctaBg: '#fff',
+    ctaColor: '#1a8fd1',
+    avatarRing: '#1a8fd1',
+    iconStroke: true,
+  },
+  dinner: {
+    bg: 'linear-gradient(160deg,#ffd37a,#e8942c)',
+    color: '#3a2608',
+    iconBg: 'rgba(58,38,8,.12)',
+    badgeBg: 'rgba(58,38,8,.12)',
+    badgeColor: '#3a2608',
+    shadow: '0 2px 0 rgba(255,255,255,.4) inset, 0 16px 30px rgba(180,110,20,.35)',
+    ctaBg: '#3a2608',
+    ctaColor: '#fff',
+    avatarRing: '#e8942c',
+    iconStroke: true,
+  },
+  party: {
+    bg: 'linear-gradient(160deg,#ff8fd1,#ff4f9e)',
+    color: '#fff',
+    iconBg: 'rgba(255,255,255,.22)',
+    badgeBg: 'rgba(255,255,255,.22)',
+    badgeColor: '#fff',
+    shadow: '0 2px 0 rgba(255,255,255,.35) inset, 0 16px 30px rgba(255,79,158,.35)',
+    ctaBg: '#fff',
+    ctaColor: '#ff4f9e',
+    avatarRing: '#ff4f9e',
+  },
+  other: {
+    bg: 'linear-gradient(160deg,#b9b4d6,#4a4a6e)',
+    color: '#fff',
+    iconBg: 'rgba(255,255,255,.18)',
+    badgeBg: 'rgba(255,255,255,.2)',
+    badgeColor: '#fff',
+    shadow: '0 2px 0 rgba(255,255,255,.3) inset, 0 16px 30px rgba(20,20,40,.35)',
+    ctaBg: '#fff',
+    ctaColor: '#4a4a6e',
+    avatarRing: '#4a4a6e',
+    iconStroke: true,
+  },
 }
 
 const categoryIcon: Record<EventCardData['category'], string> = {
@@ -35,56 +111,59 @@ const categoryIcon: Record<EventCardData['category'], string> = {
 
 export default function EventCard({ data }: { data: EventCardData }) {
   const icon = categoryIcon[data.category]
+  const s = cardStyle[data.category]
+  const badge = typeof data.seatsFilledPct === 'number' ? data.seatsLabel : 'Approval required'
+
   return (
-    <Link href={`/event/${data.slug}`} className="nm-card rounded-[20px] overflow-hidden flex flex-col hover:border-gold/30 transition-colors">
-      <div className="h-28 relative" style={{ background: categoryHero[data.category] }}>
-        <div className="absolute left-4 bottom-2.5 bg-black/55 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1.5 text-[11px] font-extrabold text-gold-text">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
-            <use href={`#${icon}`} />
-          </svg>
-          {data.tagLabel}
+    <Link
+      href={`/event/${data.slug}`}
+      className="rounded-[24px] overflow-hidden flex flex-col relative p-4.5 transition-transform hover:-translate-y-0.5"
+      style={{ background: s.bg, color: s.color, boxShadow: s.shadow, padding: 18 }}
+    >
+      <div
+        className="absolute inset-0 rounded-[24px] pointer-events-none"
+        style={{ background: 'linear-gradient(135deg, rgba(255,255,255,.35), transparent 45%)' }}
+      />
+
+      <div className="relative flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <div className="w-8.5 h-8.5 rounded-[11px] flex items-center justify-center shrink-0" style={{ width: 34, height: 34, background: s.iconBg }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={s.iconStroke ? 'none' : 'currentColor'} stroke={s.iconStroke ? 'currentColor' : 'none'} strokeWidth="1.7">
+              <use href={`#${icon}`} />
+            </svg>
+          </div>
+          <div className="text-[11px] font-extrabold tracking-wide opacity-70">{data.tagLabel}</div>
         </div>
-        {/* Pricing is host-controlled and hidden by default — never shown unless the host sets it. */}
+        <div className="text-[10.5px] font-extrabold px-2.5 py-1.5 rounded-full shrink-0" style={{ background: s.badgeBg, color: s.badgeColor }}>
+          {badge}
+        </div>
       </div>
-      <div className="p-3.5 flex-1 flex flex-col">
-        <div className="flex items-center justify-between gap-2">
-          <div className="font-extrabold text-[15px] text-white">{data.title}</div>
-          {data.rating && (
-            <div className="flex items-center gap-0.5 text-gold-text text-xs font-extrabold shrink-0">
-              {data.rating}
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
-                <use href="#i-star" />
-              </svg>
+
+      <div className="relative nm-marquee text-[17px] font-extrabold mt-3.5">{data.title}</div>
+      <div className="relative text-[12px] font-bold opacity-65 mt-1">{data.subtitle}</div>
+
+      <div className="relative flex items-center justify-between mt-4">
+        <div className="flex items-center">
+          <div
+            className="w-6.5 h-6.5 rounded-full flex items-center justify-center text-[9px] font-extrabold"
+            style={{ width: 26, height: 26, background: '#ff7fc2', border: `2px solid ${s.avatarRing}` }}
+          />
+          <div
+            className="w-6.5 h-6.5 rounded-full -ml-2 flex items-center justify-center text-[9px] font-extrabold"
+            style={{ width: 26, height: 26, background: '#5fd0ff', border: `2px solid ${s.avatarRing}` }}
+          />
+          {data.hostInitials && (
+            <div
+              className="w-6.5 h-6.5 rounded-full -ml-2 flex items-center justify-center text-[9px] font-extrabold text-white"
+              style={{ width: 26, height: 26, background: '#b968ff', border: `2px solid ${s.avatarRing}` }}
+            >
+              {data.hostInitials}
             </div>
           )}
         </div>
-        <div className="text-[11.5px] text-muted mt-1 font-semibold">{data.subtitle}</div>
-
-        {data.host && (
-          <div className="flex items-center gap-2 mt-2.5">
-            <div className="w-5.5 h-5.5 rounded-full bg-ruby text-white text-[10px] font-extrabold flex items-center justify-center" style={{ width: 22, height: 22 }}>
-              {data.hostInitials}
-            </div>
-            <div className="text-[11.5px] font-bold text-[#e4d4ff]">{data.host}</div>
-            <svg width="13" height="13" viewBox="0 0 24 24" style={{ marginLeft: -2 }}>
-              <use href="#i-check" />
-            </svg>
-          </div>
-        )}
-
-        {typeof data.seatsFilledPct === 'number' && (
-          <div className="flex items-center gap-1.5 mt-2.5">
-            <div className="flex-1 h-1.5 rounded-full bg-ink2 overflow-hidden">
-              <div
-                className="h-full rounded-full"
-                style={{ width: `${data.seatsFilledPct}%`, background: 'linear-gradient(90deg,#8b3ffb,#ff4f9e)' }}
-              />
-            </div>
-            <div className="text-[10.5px] text-muted font-bold whitespace-nowrap">{data.seatsLabel}</div>
-          </div>
-        )}
-
-        <div className="nm-btn nm-btn-gold w-full mt-3 py-3 text-[13.5px] text-center">{data.ctaLabel}</div>
+        <div className="nm-btn text-[12px] px-4 py-2.5" style={{ background: s.ctaBg, color: s.ctaColor }}>
+          {data.ctaLabel}
+        </div>
       </div>
     </Link>
   )
