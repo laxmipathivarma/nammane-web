@@ -16,19 +16,19 @@ export default function MarketingHome() {
           icon="i-ticket"
           title="Host an Event"
           description="Set up your night, approve who joins, and keep control of your guest list."
-          href="/host-an-event"
+          href="https://app.nammane.in/auth/login"
         />
         <NavTile
           icon="i-check"
           title="Join the Event"
           description="Request to join a night that fits your vibe and get approved by the host."
-          href="/join-the-event"
+          href="https://app.nammane.in/auth/login"
         />
         <NavTile
           icon="i-grid"
-          title="Find the Event"
+          title="Discover"
           description="Browse what's happening around you tonight, filtered by category and city."
-          href="/find-the-event"
+          href="https://app.nammane.in/auth/login"
         />
       </div>
     </>

@@ -3,11 +3,13 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
+const LOGIN_URL = 'https://app.nammane.in/auth/login'
+
 const navItems = [
-  { label: 'Home', href: '/' },
-  { label: 'Host an Event', href: '/host-an-event' },
-  { label: 'Join the Event', href: '/join-the-event' },
-  { label: 'Find the Event', href: '/find-the-event' },
+  { label: 'Home', href: '/', external: false },
+  { label: 'Host an Event', href: LOGIN_URL, external: true },
+  { label: 'Join the Event', href: LOGIN_URL, external: true },
+  { label: 'Discover', href: LOGIN_URL, external: true },
 ]
 
 export default function MarketingHeader() {
@@ -32,11 +34,17 @@ export default function MarketingHeader() {
         </Link>
 
         <nav className="hidden lg:flex items-center gap-7 text-[13.5px] font-semibold text-muted">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className="hover:text-gold-text transition-colors">
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) =>
+            item.external ? (
+              <a key={item.href + item.label} href={item.href} className="hover:text-gold-text transition-colors">
+                {item.label}
+              </a>
+            ) : (
+              <Link key={item.href} href={item.href} className="hover:text-gold-text transition-colors">
+                {item.label}
+              </Link>
+            )
+          )}
           <Link href="/mobile-app" className="hover:text-gold-text transition-colors">
             Mobile App
           </Link>
@@ -67,11 +75,17 @@ export default function MarketingHeader() {
 
       {mobileOpen && (
         <div className="lg:hidden border-t border-white/10 px-5 py-4 flex flex-col gap-3 text-[14px] font-semibold text-[#e4d4ff] bg-ink">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)}>
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) =>
+            item.external ? (
+              <a key={item.href + item.label} href={item.href} onClick={() => setMobileOpen(false)}>
+                {item.label}
+              </a>
+            ) : (
+              <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)}>
+                {item.label}
+              </Link>
+            )
+          )}
           <Link href="/mobile-app" onClick={() => setMobileOpen(false)}>Mobile App</Link>
           <a href="https://app.nammane.in" className="text-gold-text">Web App</a>
           <div className="border-t border-white/10 pt-3 flex gap-3">
