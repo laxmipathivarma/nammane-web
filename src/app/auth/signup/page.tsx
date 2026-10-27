@@ -35,58 +35,56 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Join NamMane</h1>
+    <div className="nm-root nm-bg min-h-screen flex items-center justify-center px-5 text-[#f5efe3]">
+      <div className="w-full max-w-md nm-card rounded-2xl p-8">
+        <div className="flex flex-col items-center mb-6">
+          <svg width="40" height="40" viewBox="0 0 120 120" className="mb-2">
+            <use href="#nm-mark" />
+          </svg>
+          <h1 className="nm-marquee text-2xl text-gold-text">Join NamMane</h1>
+          <p className="text-[12px] text-muted font-semibold mt-1">Find your table</p>
+        </div>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-ruby/10 border border-ruby/40 text-[#f3b3bc] px-4 py-3 rounded-xl mb-4 text-[13px] font-semibold">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
+            <label className="nm-label">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="nm-field"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
+            <label className="nm-label">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="nm-field"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition disabled:opacity-50"
-          >
-            {loading ? 'Signing up...' : 'Sign Up'}
+          <button type="submit" disabled={loading} className="nm-btn nm-btn-gold w-full py-3.5 text-[14px] disabled:opacity-50">
+            {loading ? 'Signing up…' : 'Sign up'}
           </button>
         </form>
 
-        <p className="text-center text-gray-600 mt-6">
+        <p className="text-center text-muted text-[13px] mt-6 font-medium">
           Already have an account?{' '}
-          <Link href="/auth/login" className="text-indigo-600 font-semibold">
-            Sign In
+          <Link href="/auth/login" className="text-gold-text font-bold">
+            Sign in
           </Link>
         </p>
       </div>

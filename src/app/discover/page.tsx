@@ -1,15 +1,112 @@
-export default function DiscoverPage() {
+'use client'
+
+import { useState } from 'react'
+import CategoryChips, { CATEGORIES } from '@/components/CategoryChips'
+import EventCard, { EventCardData } from '@/components/EventCard'
+
+const ALL_EVENTS: EventCardData[] = [
+  {
+    title: 'High Stakes Friday',
+    category: 'poker',
+    tagLabel: 'POKER',
+    subtitle: "Texas Hold'em · No-limit · Intermediate",
+    priceLabel: '₹500 buy-in',
+    host: 'Hosted by Rahul · verified',
+    hostInitials: 'RK',
+    rating: '4.9',
+    seatsLabel: '4/6 seats',
+    seatsFilledPct: 67,
+    ctaLabel: 'Request to join',
+  },
+  {
+    title: 'Sunday 13-Card Social',
+    category: 'rummy',
+    tagLabel: 'RUMMY',
+    subtitle: 'Points rummy · 2 tables · Casual',
+    priceLabel: 'Free entry',
+    host: 'Hosted by Meera · verified',
+    hostInitials: 'MS',
+    rating: '4.8',
+    seatsLabel: '10/12 seats',
+    seatsFilledPct: 83,
+    ctaLabel: 'Join waitlist',
+  },
+  {
+    title: 'Copper & Smoke',
+    category: 'drinks',
+    tagLabel: 'DRINKS',
+    subtitle: 'BYOB · Snacks on the house · 21+',
+    priceLabel: '₹600 contribution',
+    host: 'Hosted by Varun · verified',
+    hostInitials: 'VK',
+    rating: '4.7',
+    seatsLabel: '14/20 going',
+    seatsFilledPct: 70,
+    ctaLabel: 'Request to join',
+  },
+  {
+    title: 'An Evening Table',
+    category: 'dinner',
+    tagLabel: 'DINNER',
+    subtitle: 'Mediterranean set menu · Seats 8',
+    priceLabel: '₹1200 / guest',
+    host: 'Hosted by Priya · verified',
+    hostInitials: 'PS',
+    rating: '5.0',
+    seatsLabel: '6/8 seats',
+    seatsFilledPct: 75,
+    ctaLabel: 'Request to join',
+  },
+  {
+    title: 'Rooftop Neon Soirée',
+    category: 'party',
+    tagLabel: 'PARTY',
+    subtitle: 'Theme: Vegas lights · ₹800 contribution',
+    host: 'Hosted by Aisha · verified',
+    hostInitials: 'AJ',
+    rating: '4.9',
+    seatsLabel: '18/30 going',
+    seatsFilledPct: 60,
+    ctaLabel: 'Request to join',
+  },
+  {
+    title: 'Board Game Marathon',
+    category: 'other',
+    tagLabel: 'OTHER',
+    subtitle: 'Custom event · Snacks & chill music',
+    priceLabel: 'Free entry',
+    host: 'Hosted by Karthik · verified',
+    hostInitials: 'KN',
+    rating: '4.6',
+    seatsLabel: '5/10 seats',
+    seatsFilledPct: 50,
+    ctaLabel: 'Request to join',
+  },
+]
+
+export default function Discover() {
+  const [filter, setFilter] = useState<string>('poker')
+  const visible = ALL_EVENTS.filter((e) => e.category === filter)
+  const activeLabel = CATEGORIES.find((c) => c.key === filter)?.label ?? ''
+
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Discover Events</h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-white rounded-lg shadow p-6">
-              <div className="bg-gray-200 h-40 rounded mb-4"></div>
-              <h3 className="text-lg font-semibold text-gray-900">Event {i}</h3>
-              <p className="text-gray-600 text-sm">Coming soon...</p>
-            </div>
+    <div className="nm-root nm-bg min-h-screen text-[#f5efe3]">
+      <div className="px-5 pt-8 pb-4 max-w-5xl mx-auto">
+        <h1 className="nm-marquee text-2xl md:text-3xl text-gold-text font-extrabold">Discover</h1>
+        <p className="text-[12.5px] text-muted font-semibold mt-1">Tonight&apos;s hottest tables, your rules</p>
+      </div>
+
+      <div className="px-5 pb-6 max-w-5xl mx-auto">
+        <CategoryChips onChange={setFilter} />
+      </div>
+
+      <div className="px-5 pb-20 max-w-5xl mx-auto">
+        <div className="text-[13px] text-muted font-bold mb-4">
+          {visible.length} {activeLabel} {visible.length === 1 ? 'event' : 'events'} near you
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {visible.map((e) => (
+            <EventCard key={e.title} data={e} />
           ))}
         </div>
       </div>
