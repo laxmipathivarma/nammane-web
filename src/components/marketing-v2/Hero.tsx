@@ -6,36 +6,28 @@ import { usePointer, useReducedMotion } from './hooks'
 const LOGIN_URL = 'https://app.nammane.in/auth/login'
 
 const heroCards = [
-  { key: 'host', tag: 'Host an Event', title: 'Host', img: '/assets/cards/x8.jpeg', desc: 'Set up your night, approve who joins, and keep control of your guest list.', href: LOGIN_URL },
-  { key: 'join', tag: 'Join the Event', title: 'Join', img: '/assets/cards/x7.jpeg', desc: 'Request to join a night that fits your vibe and get approved by the host.', href: LOGIN_URL },
-  { key: 'discover', tag: 'Discover', title: 'Discover', img: '/assets/cards/x6.jpeg', desc: 'Browse what’s happening around you tonight, filtered by category and city.', href: LOGIN_URL },
+  { key: 'host', tag: 'Host an Event', title: 'Host', img: '/assets/cards/x8.jpeg', pos: '50% 20%', desc: 'Set up your night, approve who joins, and keep control of your guest list.' },
+  { key: 'join', tag: 'Join the Event', title: 'Join', img: '/assets/cards/x7.jpeg', pos: '50% 25%', desc: 'Request to join a night that fits your vibe and get approved by the host.' },
+  { key: 'discover', tag: 'Discover', title: 'Discover', img: '/assets/cards/x6.jpeg', pos: '50% 15%', desc: 'Browse what’s happening around you tonight, filtered by category and city.' },
 ]
 
 function Stars() {
   const stars = useRef<{ top: number; left: number; size: number; delay: number }[]>([])
   if (stars.current.length === 0) {
     for (let i = 0; i < 70; i++) {
-      stars.current.push({
-        top: Math.random() * 100,
-        left: Math.random() * 100,
-        size: Math.random() < 0.8 ? 1.5 : 2.5,
-        delay: Math.random() * 3,
-      })
+      stars.current.push({ top: Math.random() * 100, left: Math.random() * 100, size: Math.random() < 0.8 ? 1.5 : 2.5, delay: Math.random() * 3 })
     }
   }
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {stars.current.map((s, i) => (
-        <span
-          key={i}
-          className="nm2-star"
-          style={{ top: `${s.top}%`, left: `${s.left}%`, width: s.size, height: s.size, animationDelay: `${s.delay}s` }}
-        />
+        <span key={i} className="nm2-star" style={{ top: `${s.top}%`, left: `${s.left}%`, width: s.size, height: s.size, animationDelay: `${s.delay}s` }} />
       ))}
     </div>
   )
 }
 
+// Thumbnail on the left, tag/copy/CTA on the right -- side by side, never stacked.
 function HeroCard({ c, idx }: { c: (typeof heroCards)[number]; idx: number }) {
   const ref = useRef<HTMLAnchorElement>(null)
   const reduced = useReducedMotion()
@@ -51,12 +43,10 @@ function HeroCard({ c, idx }: { c: (typeof heroCards)[number]; idx: number }) {
       const my = (e.clientY - r.top) / r.height - 0.5
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(() => {
-        el.style.transform = `perspective(700px) rotateX(${-my * 14}deg) rotateY(${mx * 16}deg) translateY(-4px)`
+        el.style.transform = `perspective(700px) rotateX(${-my * 10}deg) rotateY(${mx * 12}deg) translateY(-3px)`
       })
     }
-    const onLeave = () => {
-      el.style.transform = ''
-    }
+    const onLeave = () => { el.style.transform = '' }
     el.addEventListener('mousemove', onMove)
     el.addEventListener('mouseleave', onLeave)
     return () => {
@@ -69,23 +59,25 @@ function HeroCard({ c, idx }: { c: (typeof heroCards)[number]; idx: number }) {
   return (
     <a
       ref={ref}
-      href={c.href}
-      className="nm2-glass nm2-card-fade-up rounded-[22px] p-4 flex flex-col gap-3 transition-transform duration-300"
-      style={{ animationDelay: `${0.4 + idx * 0.12}s` }}
+      href={LOGIN_URL}
+      className="nm2-glass nm2-card-fade-up relative grid items-center gap-4 rounded-[20px] p-3 transition-transform duration-300"
+      style={{ gridTemplateColumns: '112px 1fr', minHeight: 140, animationDelay: `${0.4 + idx * 0.12}s` }}
     >
-      <div className="relative w-full rounded-[14px] overflow-hidden nm2-image-grade" style={{ height: 118 }}>
-        <img src={c.img} alt="" className="w-full h-full object-cover" style={{ transform: 'scale(1.08)' }} />
+      <div className="relative overflow-hidden rounded-[14px] nm2-image-grade" style={{ height: 118 }}>
+        <img src={c.img} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: c.pos }} />
       </div>
-      <div>
-        <div className="nm2-kicker text-[var(--nm-blush)] mb-1">{c.tag}</div>
-        <p className="text-[13px] leading-snug text-[var(--nm-text-body)]">{c.desc}</p>
+      <div className="flex flex-col items-start gap-2">
+        <span className="nm2-kicker rounded-full border border-white/20 px-2.5 py-1 text-[10px] text-[var(--nm-text-body)] normal-case tracking-[.12em]">
+          {c.tag}
+        </span>
+        <p className="text-[13px] leading-[1.5] text-[var(--nm-text-body)]">{c.desc}</p>
+        <span className="nm2-heading inline-flex items-center gap-2 rounded-full bg-white pl-3 pr-1.5 py-1 text-[10px] font-extrabold text-[#0a081c]">
+          {c.title}
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c23ffb" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </span>
       </div>
-      <span className="mt-auto nm2-heading text-white text-[12px] font-bold inline-flex items-center gap-1.5">
-        {c.title}
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
-      </span>
     </a>
   )
 }
@@ -93,7 +85,7 @@ function HeroCard({ c, idx }: { c: (typeof heroCards)[number]; idx: number }) {
 export default function Hero() {
   const pointer = usePointer()
   const reduced = useReducedMotion()
-  const artRef = useRef<HTMLDivElement>(null)
+  const artRef = useRef<HTMLImageElement>(null)
   const lightRef = useRef<HTMLDivElement>(null)
   const wordmarkRef = useRef<HTMLDivElement>(null)
   const [scrollY, setScrollY] = useState(0)
@@ -110,7 +102,7 @@ export default function Hero() {
     const tick = () => {
       const { x: mx, y: my } = pointer.current
       if (artRef.current) {
-        artRef.current.style.transform = `perspective(900px) rotateX(${-my * 22}deg) rotateY(${mx * 26}deg) translate(${mx * 50}px, ${my * 30}px)`
+        artRef.current.style.transform = `translate(-50%, -50%) perspective(900px) rotateX(${-my * 22}deg) rotateY(${mx * 26}deg) translate(${mx * 50}px, ${my * 30}px)`
       }
       if (lightRef.current) {
         lightRef.current.style.background = `radial-gradient(38vmin circle at ${50 + mx * 70}% ${45 + my * 60}%, rgba(255,143,209,.22), rgba(139,63,251,.08) 45%, transparent 70%)`
@@ -126,107 +118,107 @@ export default function Hero() {
 
   return (
     <section
-      className="relative overflow-hidden flex items-center"
-      style={{
-        minHeight: '100dvh',
-        background:
-          'radial-gradient(70% 60% at 50% 62%, rgba(194,63,251,.28), rgba(28,18,64,.6) 40%, #06060F 80%)',
-      }}
+      className="relative overflow-hidden flex flex-col"
+      style={{ minHeight: '100dvh', background: 'radial-gradient(70% 60% at 50% 62%, rgba(194,63,251,.28), rgba(28,18,64,.6) 40%, #06060F 80%)' }}
     >
       <Stars />
 
+      {/* NAMMANE wordmark -- full-bleed, behind everything */}
       <div
         ref={wordmarkRef}
-        className="nm2-heading absolute inset-x-0 top-[6%] text-center font-black pointer-events-none select-none"
-        style={{
-          fontSize: 'clamp(64px,15vw,230px)',
-          color: 'transparent',
-          WebkitTextStroke: '1px rgba(255,255,255,.12)',
-          lineHeight: 1,
-        }}
+        className="nm2-heading absolute inset-x-0 top-[12%] text-center font-black pointer-events-none select-none"
+        style={{ fontSize: 'clamp(64px,15vw,230px)', color: 'transparent', WebkitTextStroke: '1px rgba(255,255,255,.12)', lineHeight: 1 }}
       >
         NAMMANE
       </div>
 
-      <div className="relative w-full max-w-6xl mx-auto px-5 grid lg:grid-cols-[380px_1fr] gap-10 items-center pt-16 pb-10">
-        {/* Left copy */}
-        <div className="nm2-intro relative z-10">
-          <div className="nm2-kicker text-[var(--nm-blush)] mb-4">Poker · Dinner · Drinks · Dance · Karaoke</div>
-          <h1 className="nm2-heading text-white font-black leading-[0.95]" style={{ fontSize: 'clamp(36px,5vw,56px)' }}>
-            FIND YOUR KIND OF <span className="nm2-grad-text">NIGHT OUT</span>
+      {/* Face art -- true full-section background layer, centred, cursor-reactive */}
+      <img
+        ref={artRef}
+        src="/assets/hero.jpeg"
+        alt=""
+        className="select-none pointer-events-none"
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '52%',
+          height: 'min(118vh,1200px)',
+          aspectRatio: '736/1104',
+          maxWidth: 'none',
+          mixBlendMode: 'lighten',
+          WebkitMaskImage: 'radial-gradient(ellipse 50% 46% at 50% 46%, #000 62%, transparent 100%)',
+          maskImage: 'radial-gradient(ellipse 50% 46% at 50% 46%, #000 62%, transparent 100%)',
+          transform: 'translate(-50%, -50%)',
+        }}
+      />
+      <div ref={lightRef} className="absolute inset-0 pointer-events-none" style={{ mixBlendMode: 'screen' }} />
+
+      {/* Left copy + orb CTA */}
+      <div className="relative z-[3] flex-1 flex items-center" style={{ padding: '24px clamp(18px,4vw,56px)' }}>
+        <div
+          className="nm2-intro flex flex-col gap-[18px] rounded-3xl"
+          style={{ maxWidth: 'min(380px,34vw)', minWidth: 260, padding: 20, margin: -20, background: 'radial-gradient(120% 100% at 0% 50%, rgba(6,6,15,.75), rgba(6,6,15,0) 80%)' }}
+        >
+          <div className="nm2-kicker text-[var(--nm-blush)]">Poker · Dinner · Drinks · Dance · Karaoke</div>
+          <h1 className="nm2-heading font-black leading-[0.98] text-white" style={{ fontSize: 'clamp(34px,4.4vw,60px)' }}>
+            Find your kind of <span className="nm2-grad-text">night out</span>
           </h1>
-          <p className="nm2-tagline relative pl-4 mt-6 text-white">
-            <span className="nm2-grad-bar absolute left-0 top-0 bottom-0 w-[3px] rounded-full" />
-            Bring your <b className="font-extrabold">poker face</b>, an <b className="font-extrabold">empty stomach</b> and your{' '}
-            <b className="nm2-grad-text font-extrabold">worst karaoke song</b>. We&rsquo;ll handle the rest &mdash;
-          </p>
-          <div className="mt-5 flex items-center gap-2.5 text-[14px] text-[var(--nm-text-body)]">
-            <span className="nm2-grad-pill w-5 h-5 rounded-full flex items-center justify-center shrink-0">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12l5 5L19 7" />
-              </svg>
-            </span>
-            hosted by real people, with approval before you show up.
-          </div>
-
-          <div className="mt-9 grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-[560px]">
-            {heroCards.map((c, i) => (
-              <HeroCard key={c.key} c={c} idx={i} />
-            ))}
+          <div className="flex items-stretch gap-3.5">
+            <span className="nm2-grad-bar w-[3px] rounded-sm shrink-0" />
+            <div className="flex flex-col gap-3">
+              <p className="nm2-tagline leading-[1.3] text-[var(--nm-text-meta)]">
+                Bring your <span className="text-white not-italic font-extrabold">poker face</span>, an{' '}
+                <span className="text-white not-italic font-extrabold">empty stomach</span> and your{' '}
+                <span className="nm2-grad-text not-italic font-extrabold">worst karaoke song</span>. We&rsquo;ll handle the rest &mdash;
+              </p>
+              <p className="flex items-center gap-2.5 text-[13px] font-bold leading-[1.4] text-[var(--nm-text-body)]">
+                <span className="nm2-grad-pill w-[22px] h-[22px] rounded-full flex items-center justify-center shrink-0">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12l5 5L19 7" />
+                  </svg>
+                </span>
+                hosted by real people, with approval before you show up.
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Hero art */}
-        <div className="relative hidden lg:flex items-center justify-center h-full">
-          <div
-            ref={artRef}
-            className="nm2-float relative"
-            style={{ height: 'min(70vh,620px)', transformStyle: 'preserve-3d' }}
+        {/* Orb CTA -- absolute right, vertically centred within this same wrapper */}
+        <a
+          href="https://app.nammane.in/discover"
+          className="nm2-bob absolute hidden sm:block"
+          style={{ right: 'clamp(18px,4vw,56px)', top: '50%', marginTop: -90, width: 180, height: 180 }}
+          aria-label="Find your night"
+        >
+          <span
+            className="nm2-spin-slow absolute inset-0 rounded-full"
+            style={{
+              background: 'conic-gradient(from 0deg, #8B3FFB, #C23FFB, #FF4F9E, #4CC9F0, #8B3FFB)',
+              WebkitMask: 'radial-gradient(circle, transparent 66%, #000 67%, #000 69%, transparent 70%)',
+              mask: 'radial-gradient(circle, transparent 66%, #000 67%, #000 69%, transparent 70%)',
+              filter: 'drop-shadow(0 0 8px #c23ffb)',
+            }}
+          />
+          <span className="nm2-ripple absolute rounded-full border border-[var(--nm-pink)]/50" style={{ inset: 40 }} />
+          <span
+            className="absolute rounded-full flex items-center justify-center"
+            style={{ inset: 40, background: 'radial-gradient(circle at 32% 28%, #F1D6FF, #C23FFB 38%, #8B3FFB 70%, #3A1466)', boxShadow: 'inset -10px -12px 24px rgba(10,8,28,.55), inset 8px 8px 18px rgba(255,255,255,.35), 0 16px 40px rgba(139,63,251,.55)' }}
           >
-            <img
-              src="/assets/hero.jpeg"
-              alt=""
-              className="h-full w-auto object-contain select-none pointer-events-none"
-              style={{
-                mixBlendMode: 'lighten',
-                WebkitMaskImage: 'radial-gradient(circle at 50% 45%, #000 60%, transparent 90%)',
-                maskImage: 'radial-gradient(circle at 50% 45%, #000 60%, transparent 90%)',
-              }}
-            />
-          </div>
-          <div ref={lightRef} className="absolute inset-0 pointer-events-none" style={{ mixBlendMode: 'screen' }} />
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M7 17L17 7M9 7h8v8" />
+            </svg>
+          </span>
+        </a>
+      </div>
 
-          {/* Orb CTA */}
-          <a
-            href="https://app.nammane.in/discover"
-            className="nm2-bob absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-center"
-            style={{ width: 180, height: 180 }}
-            aria-label="Find your night"
-          >
-            <span
-              className="nm2-spin-slow absolute inset-0 rounded-full"
-              style={{
-                background: 'conic-gradient(from 0deg, #8B3FFB, #C23FFB, #FF4F9E, #4CC9F0, #8B3FFB)',
-                WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 6px))',
-                mask: 'radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 6px))',
-              }}
-            />
-            <span className="nm2-ripple absolute inset-0 rounded-full border border-[var(--nm-pink)]/50" />
-            <span
-              className="absolute rounded-full flex items-center justify-center"
-              style={{
-                inset: 40,
-                background: 'radial-gradient(circle at 32% 28%, #F1D6FF, #C23FFB 38%, #8B3FFB 70%, #3A1466)',
-                boxShadow: 'inset 0 -8px 20px rgba(0,0,0,.35), inset 0 6px 14px rgba(255,255,255,.3)',
-              }}
-            >
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
-            </span>
-            <span className="absolute inset-x-0 -bottom-7 text-center nm2-heading text-white text-[11px] font-bold">Find your night</span>
-          </a>
-        </div>
+      {/* Hero cards -- side by side, auto-fit row (never a vertical column) */}
+      <div
+        className="relative z-[4] grid"
+        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%,280px),1fr))', gap: 14, padding: '0 clamp(18px,4vw,56px) 28px' }}
+      >
+        {heroCards.map((c, i) => (
+          <HeroCard key={c.key} c={c} idx={i} />
+        ))}
       </div>
     </section>
   )

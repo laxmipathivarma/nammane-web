@@ -24,8 +24,8 @@ const cards: Card[] = [
   { name: 'KARAOKE', rank: '10♠', tag: 'Open mic', tagline: 'One mic, zero shame, standing ovation.', cta: 'Grab the mic', img: '/assets/cards/u6.jpeg' },
   { name: 'DRINKS', rank: '9♦', tag: 'Rooftop bars', tagline: 'Rooftops, sunsets and second rounds.', cta: 'First round', img: '/assets/cards/u5.jpeg' },
   { name: 'PARTY', rank: '8♥', tag: 'House parties', tagline: 'Doors open late. Volume stays up.', cta: 'Get on the list', img: '/assets/cards/party.jpeg' },
-  { name: 'MOVIE', rank: '7♣', tag: 'Screenings', tagline: 'Big screen, small crowd, better snacks.', cta: 'Save a seat', gradient: 'linear-gradient(160deg,#1c1240,#3a1250 55%,#06060f)', icon: 'ph-film-slate' },
-  { name: 'GAMES', rank: '6♥', tag: 'Survival games', tagline: 'Play to win. Or at least to stay in.', cta: 'Enter the game', gradient: 'linear-gradient(160deg,#2a0e4a,#8b3ffb 70%,#1c1240)', icon: 'ph-game-controller' },
+  { name: 'MOVIE', rank: '7♣', tag: 'Screenings', tagline: 'Big screen, small crowd, better snacks.', cta: 'Save a seat', img: '/assets/cards/movie.jpeg' },
+  { name: 'GAMES', rank: '6♥', tag: 'Survival games', tagline: 'Play to win. Or at least to stay in.', cta: 'Enter the game', img: '/assets/cards/games.jpeg' },
   { name: 'OTHERS', rank: '?', tag: 'Secret plans', tagline: 'The nights nobody has named yet.', cta: 'Surprise me', img: '/assets/cards/others.jpeg' },
 ]
 
