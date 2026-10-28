@@ -22,7 +22,7 @@ const cards: FanCardData[] = [
   {
     key: 'cheers',
     rot: -16,
-    x: -222,
+    x: -24.13,
     z: 10,
     scale: 0.88,
     bg: 'linear-gradient(160deg,#5a9bff,#1c57d6)',
@@ -36,7 +36,7 @@ const cards: FanCardData[] = [
   {
     key: 'feast',
     rot: -8,
-    x: -112,
+    x: -12.17,
     z: 20,
     scale: 0.94,
     bg: 'linear-gradient(160deg,#ff78bd,#e22f82)',
@@ -65,7 +65,7 @@ const cards: FanCardData[] = [
   {
     key: 'dance',
     rot: 8,
-    x: 112,
+    x: 12.17,
     z: 20,
     scale: 0.94,
     bg: 'linear-gradient(160deg,#3fe0a0,#149a66)',
@@ -79,7 +79,7 @@ const cards: FanCardData[] = [
   {
     key: 'karaoke',
     rot: 16,
-    x: 222,
+    x: 24.13,
     z: 10,
     scale: 0.88,
     bg: 'linear-gradient(160deg,#b17bff,#7a2ee0)',
@@ -155,25 +155,37 @@ function AvatarBadge({ name, initials, color, delay }: { name: string; initials:
   )
 }
 
+// All sizing below is percentage-of-container or viewport-clamped so the
+// fanned deck scales smoothly at every screen width with no JS and no
+// fixed-pixel breakpoint hacks (which used to overlap/clip on mobile).
 function FanCard({ c, idx }: { c: FanCardData; idx: number }) {
-  const width = c.dark ? 222 : 192
-  const height = c.dark ? 332 : 286
-  const fontSize = c.dark ? 23 : 18
-  const titleSize = c.dark ? 27 : 20
+  const widthPct = c.dark ? 24.2 : 20.9
+  const heightPct = c.dark ? 79 : 68
+  const cornerFont = c.dark ? 'clamp(11px, 2.5vw, 23px)' : 'clamp(9px, 1.96vw, 18px)'
+  const titleFont = c.dark ? 'clamp(13px, 2.94vw, 27px)' : 'clamp(10px, 2.17vw, 20px)'
+  const subFont = 'clamp(6.5px, 1.05vw, 10px)'
+  const iconSize = c.dark ? 'clamp(36px, 11.3vw, 104px)' : 'clamp(24px, 6.74vw, 62px)'
+  const cornerSuit = 'clamp(7px, 1.41vw, 13px)'
+  const radius = 'clamp(10px, 2.2vw, 20px)'
 
   return (
     <div
-      className="absolute left-1/2 bottom-0"
-      style={{ transform: `translateX(calc(-50% + ${c.x}px))`, zIndex: c.z }}
+      className="absolute bottom-0"
+      style={{
+        left: `calc(50% + ${c.x}%)`,
+        transform: 'translateX(-50%)',
+        zIndex: c.z,
+        width: `${widthPct}%`,
+        height: `${heightPct}%`,
+      }}
     >
       <div
-        className="nm-fan-card rounded-[20px] relative overflow-hidden"
+        className="nm-fan-card relative overflow-hidden w-full h-full"
         style={
           {
-            width,
-            height,
             background: c.bg,
             border: `2px solid ${c.border}`,
+            borderRadius: radius,
             boxShadow: '0 26px 42px -14px rgba(0,0,0,.6)',
             '--rot': `${c.rot}deg`,
             '--scale': c.scale,
@@ -182,28 +194,27 @@ function FanCard({ c, idx }: { c: FanCardData; idx: number }) {
         }
       >
         <div
-          className="absolute top-3.5 left-3.5 font-black leading-none text-center"
-          style={{ color: c.dark ? '#e3b64c' : '#fff', fontSize }}
+          className="absolute font-black leading-none text-center"
+          style={{ color: c.dark ? '#e3b64c' : '#fff', fontSize: cornerFont, top: '6%', left: '7%' }}
         >
           <div>{c.rank}</div>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="mt-0.5 mx-auto">
+          <svg style={{ width: cornerSuit, height: cornerSuit }} viewBox="0 0 24 24" fill="currentColor" className="mt-0.5 mx-auto">
             <use href={`#${c.suit}`} />
           </svg>
         </div>
         <div
-          className="absolute bottom-3.5 right-3.5 font-black leading-none rotate-180 text-center"
-          style={{ color: c.dark ? '#e3b64c' : '#fff', fontSize }}
+          className="absolute font-black leading-none rotate-180 text-center"
+          style={{ color: c.dark ? '#e3b64c' : '#fff', fontSize: cornerFont, bottom: '6%', right: '7%' }}
         >
           <div>{c.rank}</div>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="mt-0.5 mx-auto">
+          <svg style={{ width: cornerSuit, height: cornerSuit }} viewBox="0 0 24 24" fill="currentColor" className="mt-0.5 mx-auto">
             <use href={`#${c.suit}`} />
           </svg>
         </div>
 
         <div className="absolute inset-0 flex items-center justify-center">
           <svg
-            width={c.dark ? 104 : 62}
-            height={c.dark ? 104 : 62}
+            style={{ width: iconSize, height: iconSize }}
             viewBox="0 0 24 24"
             fill={c.dark ? 'url(#g-gold-fill)' : 'rgba(255,255,255,.92)'}
           >
@@ -211,13 +222,13 @@ function FanCard({ c, idx }: { c: FanCardData; idx: number }) {
           </svg>
         </div>
 
-        <div className="absolute left-0 right-0 bottom-7 text-center px-2">
-          <div className="nm-head font-extrabold" style={{ color: c.dark ? '#e3b64c' : '#fff', fontSize: titleSize }}>
+        <div className="absolute left-0 right-0 text-center px-1" style={{ bottom: '8%' }}>
+          <div className="nm-head font-extrabold" style={{ color: c.dark ? '#e3b64c' : '#fff', fontSize: titleFont }}>
             {c.title}
           </div>
           <div
-            className="text-[10px] font-bold tracking-[1.6px] mt-1"
-            style={{ color: c.dark ? 'rgba(227,182,76,.75)' : 'rgba(255,255,255,.78)' }}
+            className="font-bold mt-1"
+            style={{ fontSize: subFont, letterSpacing: '1.2px', color: c.dark ? 'rgba(227,182,76,.75)' : 'rgba(255,255,255,.78)' }}
           >
             {c.sub}
           </div>
@@ -238,7 +249,7 @@ export default function MarketingHero() {
 
   return (
     <section
-      className="relative overflow-hidden px-5 pt-14 pb-6 md:pt-16"
+      className="relative overflow-hidden px-5 pt-14 pb-10 md:pt-16"
       style={{
         background: 'radial-gradient(130% 70% at 50% -15%, #241a4d 0%, #0a081c 50%, #05050f 100%)',
       }}
@@ -272,10 +283,10 @@ export default function MarketingHero() {
         ))}
       </div>
 
-      <div className="hidden lg:block absolute left-[7%] top-[168px] z-30">
+      <div className="hidden lg:block absolute left-[7%] top-[104px] z-30">
         <AvatarBadge name="Riya" initials="RK" color="#ff6fb0" />
       </div>
-      <div className="hidden lg:block absolute right-[7%] top-[168px] z-30">
+      <div className="hidden lg:block absolute right-[7%] top-[104px] z-30">
         <AvatarBadge name="Arjun" initials="AJ" color="#5fc6ff" delay="1.2s" />
       </div>
 
@@ -284,7 +295,7 @@ export default function MarketingHero() {
           <span>🏆</span> POKER · DINNER · DRINKS · DANCE · KARAOKE
         </div>
 
-        <h1 className="nm-head text-[2.5rem] leading-[1.1] md:text-[3.1rem] font-extrabold text-white m-0">
+        <h1 className="nm-head text-[2.3rem] leading-[1.1] sm:text-[2.6rem] md:text-[3.1rem] font-extrabold text-white m-0">
           {line1.split(' ').slice(0, 2).join(' ')}{' '}
           <span
             style={{
@@ -320,11 +331,8 @@ export default function MarketingHero() {
         </div>
       </div>
 
-      <div className="relative mt-12 md:mt-14">
-        <div
-          className="relative h-[300px] sm:h-[360px] md:h-[420px] mx-auto scale-[0.56] xs:scale-[0.68] sm:scale-[0.85] md:scale-100 origin-top"
-          style={{ width: 920 }}
-        >
+      <div className="relative mt-10 md:mt-14">
+        <div className="relative w-full max-w-[860px] mx-auto" style={{ aspectRatio: '860 / 400' }}>
           {cards.map((c, idx) => (
             <FanCard key={c.key} c={c} idx={idx} />
           ))}
