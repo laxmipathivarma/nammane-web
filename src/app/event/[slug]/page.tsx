@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { EVENTS, categoryHero, categoryIcon } from '@/lib/sampleEvents'
+import BackButton from '@/components/BackButton'
 
 export function generateStaticParams() {
   return Object.keys(EVENTS).map((slug) => ({ slug }))
@@ -19,11 +19,7 @@ export default function EventDetailPage({ params }: { params: { slug: string } }
         <div className="absolute w-[300px] h-[300px] -right-[100px] -top-[80px] rounded-full opacity-60 blur-sm" style={{ background: 'radial-gradient(circle,#ff4f9e,transparent 70%)' }} />
 
         <div className="relative z-10 max-w-3xl mx-auto px-5 pt-5 flex items-center justify-between">
-          <Link href="/discover" className="nm-glass w-9 h-9 rounded-full flex items-center justify-center">
-            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#fff" fill="none">
-              <use href="#i-back" />
-            </svg>
-          </Link>
+          <BackButton variant="circle" fallbackHref="/discover" label="Back" />
           <button className="nm-glass w-9 h-9 rounded-full flex items-center justify-center" aria-label="Share event">
             <svg width="16" height="16" viewBox="0 0 24 24" stroke="#fff" fill="none">
               <use href="#i-share" />

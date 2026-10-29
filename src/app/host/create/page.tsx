@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { CATEGORIES } from '@/components/CategoryChips'
+import BackButton from '@/components/BackButton'
 
 export default function CreateEventPage() {
   const [category, setCategory] = useState('poker')
@@ -12,11 +12,12 @@ export default function CreateEventPage() {
     <div className="nm-bg min-h-screen text-white">
       <div className="max-w-2xl mx-auto px-5 pt-7 pb-28">
         <div className="flex items-center gap-3 mb-6">
-          <Link href="/discover" className="w-8 h-8 rounded-full bg-ink2 flex items-center justify-center shrink-0">
-            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#fff" fill="none">
-              <use href="#i-back" />
-            </svg>
-          </Link>
+          <BackButton
+            variant="circle"
+            fallbackHref="/discover"
+            label="Back"
+            className="!w-8 !h-8 bg-ink2 border-0"
+          />
           <h1 className="nm-marquee text-xl text-gold-text">Host · New Event</h1>
         </div>
 

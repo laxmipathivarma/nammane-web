@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import BackButton from '@/components/BackButton'
 
 export default function ProfilePage() {
   const [mode, setMode] = useState<'guest' | 'host'>('host')
@@ -12,6 +13,9 @@ export default function ProfilePage() {
           className="absolute inset-0 pointer-events-none"
           style={{ background: 'conic-gradient(from 180deg at 50% 0%, rgba(178,58,74,.13), rgba(205,168,88,.09), transparent 50%)' }}
         />
+        <div className="relative z-10 flex justify-start max-w-md mx-auto mb-2">
+          <BackButton fallbackHref="/" />
+        </div>
         <div className="nm-marquee relative z-10 text-[15px] text-gold-text">My Profile</div>
       </div>
 

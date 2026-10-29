@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 
 type Tab = 'requested' | 'approved' | 'waitlist'
 
@@ -54,6 +55,7 @@ export default function BookingsPage() {
   return (
     <div className="nm-bg min-h-screen text-white">
       <div className="max-w-2xl mx-auto px-5 pt-8 pb-16">
+        <BackButton fallbackHref="/" className="mb-4" />
         <h1 className="nm-marquee text-2xl text-gold-text">My Bookings</h1>
         <p className="text-[12px] text-muted font-semibold mt-1">Track every table you&apos;re on</p>
 

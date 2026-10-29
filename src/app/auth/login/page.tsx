@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import AuthShell from '@/components/AuthShell'
+import BackButton from '@/components/BackButton'
 
 const blobs = [
   {
@@ -68,6 +69,9 @@ export default function LoginPage() {
   return (
     <AuthShell blobs={blobs}>
       <div className="flex flex-col items-center text-center">
+        <div className="self-start mb-5">
+          <BackButton fallbackHref="/" />
+        </div>
         <div className="nm-logo-mark w-16 h-16 text-[28px]" style={{ width: 64, height: 64 }}>N</div>
 
         <h1 className="nm-marquee text-[27px] text-white mt-6 mb-1.5">
