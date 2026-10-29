@@ -6,10 +6,14 @@ import { useState } from 'react'
 const LOGIN_URL = 'https://app.nammane.in/auth/login'
 const SIGNUP_URL = 'https://app.nammane.in/auth/signup'
 
+// Kept in sync with Footer.tsx's "Explore" column -- same items, same
+// order, same destinations, so the nav and the footer never drift apart.
 const navItems = [
+  { label: 'Home', href: '/', external: false },
   { label: 'Host', href: LOGIN_URL, external: true },
   { label: 'Join', href: LOGIN_URL, external: true },
   { label: 'Discover', href: LOGIN_URL, external: true },
+  { label: 'Web App', href: 'https://app.nammane.in', external: true },
   { label: 'Mobile App', href: '/mobile-app', external: false },
 ]
 

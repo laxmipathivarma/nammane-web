@@ -5,8 +5,8 @@ import IconSprite from '@/components/IconSprite'
 import SiteChrome from '@/components/SiteChrome'
 
 export const metadata: Metadata = {
-  title: 'NamMane - Find Your Table',
-  description: 'Discover amazing people and great gatherings. Find interesting events or host your own gathering.',
+  title: 'NamMane — Gather better. Live closer.',
+  description: 'Poker faces, full plates, louder karaoke. Real hosts, real nights, zero awkward intros.',
   // No favicon.ico ever existed in public/ -- that's why the logo was
   // missing when the site got added to a phone home screen (iOS/Android
   // both read these tags to pick the bookmark icon, and fell back to a
