@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { NAV_LABELS, type NavKey } from '@/lib/navMenu'
 import { WEBAPP_VERSION_LABEL } from '@/lib/version'
+import { useAuth } from '@/lib/AuthProvider'
 
 // Destinations for the shared NAV_LABELS list (src/lib/navMenu.ts), which
 // also drives the marketing site's Nav.tsx and Footer.tsx -- same items,
@@ -24,6 +25,11 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [appMenuOpen, setAppMenuOpen] = useState(false)
   const appMenuRef = useRef<HTMLDivElement>(null)
+  const { user, loading, signOut } = useAuth()
+
+  // Short label for the signed-in pill -- email local-part, or the phone
+  // number, whichever the person actually signed in with.
+  const accountLabel = user?.email?.split('@')[0] ?? user?.phone ?? 'Account'
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -118,12 +124,37 @@ export default function Header() {
             )}
           </div>
 
-          <Link href="/auth/login" className="hidden sm:inline-flex text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors">
-            Sign in
-          </Link>
-          <Link href="/auth/signup" className="nm-btn nm-btn-gold px-4 py-2 text-[13px]">
-            Sign up
-          </Link>
+          {!loading && (
+            user ? (
+              <>
+                <Link
+                  href="/profile"
+                  className="hidden sm:flex items-center gap-2 text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors"
+                >
+                  <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white shrink-0" style={{ background: 'linear-gradient(160deg,#ff8fd1,#8b3ffb)' }}>
+                    {accountLabel.charAt(0).toUpperCase()}
+                  </span>
+                  {accountLabel}
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => signOut()}
+                  className="nm-btn bg-ink2 text-white border border-white/10 px-4 py-2 text-[13px]"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login" className="hidden sm:inline-flex text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors">
+                  Sign in
+                </Link>
+                <Link href="/auth/signup" className="nm-btn nm-btn-gold px-4 py-2 text-[13px]">
+                  Sign up
+                </Link>
+              </>
+            )
+          )}
 
           {/* mobile menu toggle */}
           <button
@@ -163,14 +194,31 @@ export default function Header() {
 
           <div className="text-[10.5px] font-semibold text-muted2">{WEBAPP_VERSION_LABEL}</div>
 
-          <div className="border-t border-white/10 pt-3 flex gap-3">
-            <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="flex-1 nm-btn bg-ink2 text-white py-2.5 text-[13px]">
-              Sign in
-            </Link>
-            <Link href="/auth/signup" onClick={() => setMobileOpen(false)} className="flex-1 nm-btn nm-btn-gold py-2.5 text-[13px]">
-              Sign up
-            </Link>
-          </div>
+          {!loading && (
+            user ? (
+              <div className="border-t border-white/10 pt-3 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileOpen(false)
+                    signOut()
+                  }}
+                  className="flex-1 nm-btn bg-ink2 text-white py-2.5 text-[13px]"
+                >
+                  Sign out ({accountLabel})
+                </button>
+              </div>
+            ) : (
+              <div className="border-t border-white/10 pt-3 flex gap-3">
+                <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="flex-1 nm-btn bg-ink2 text-white py-2.5 text-[13px]">
+                  Sign in
+                </Link>
+                <Link href="/auth/signup" onClick={() => setMobileOpen(false)} className="flex-1 nm-btn nm-btn-gold py-2.5 text-[13px]">
+                  Sign up
+                </Link>
+              </div>
+            )
+          )}
         </div>
       )}
     </header>

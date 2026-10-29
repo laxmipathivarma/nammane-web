@@ -1,10 +1,38 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import BackButton from '@/components/BackButton'
+import { useAuth } from '@/lib/AuthProvider'
 
 export default function ProfilePage() {
   const [mode, setMode] = useState<'guest' | 'host'>('host')
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  // This page previously showed a hardcoded "Laxmipathi Varma" regardless
+  // of whether anyone was actually signed in. Send a signed-out visitor to
+  // sign in instead of showing them someone else's placeholder profile.
+  useEffect(() => {
+    if (!loading && !user) router.replace('/auth/login')
+  }, [loading, user, router])
+
+  const displayName =
+    (user?.user_metadata?.full_name as string | undefined) ||
+    user?.email?.split('@')[0] ||
+    user?.phone ||
+    ''
+  const initials = displayName
+    ? displayName.slice(0, 2).toUpperCase()
+    : '··'
+
+  if (loading || !user) {
+    return (
+      <div className="nm-bg min-h-screen text-white flex items-center justify-center">
+        <div className="text-muted text-[13px] font-semibold">Loading your profile…</div>
+      </div>
+    )
+  }
 
   return (
     <div className="nm-bg min-h-screen text-white">
@@ -21,15 +49,12 @@ export default function ProfilePage() {
 
       <div className="max-w-md mx-auto px-5 -mt-14 flex flex-col items-center relative z-10">
         <div className="w-21 h-21 rounded-full border-[3px] border-ink flex items-center justify-center text-2xl font-extrabold text-white shadow-xl" style={{ width: 84, height: 84, background: 'linear-gradient(160deg,#ff8fd1,#8b3ffb)' }}>
-          LV
+          {initials}
         </div>
         <div className="flex items-center gap-1.5 mt-2.5">
-          <div className="text-[17px] font-extrabold">Laxmipathi Varma</div>
-          <svg width="16" height="16" viewBox="0 0 24 24">
-            <use href="#i-check" />
-          </svg>
+          <div className="text-[17px] font-extrabold">{displayName}</div>
         </div>
-        <div className="text-[11.5px] text-muted font-semibold mt-0.5">Bengaluru · member since 2026</div>
+        <div className="text-[11.5px] text-muted font-semibold mt-0.5">{user.email ?? user.phone}</div>
 
         <div className="flex bg-ink2 border border-white/10 rounded-full p-[3px] gap-[3px] mt-3.5">
           <button
