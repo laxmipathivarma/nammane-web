@@ -3,6 +3,22 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import { NAV_LABELS, type NavKey } from '@/lib/navMenu'
+
+// Destinations for the shared NAV_LABELS list (src/lib/navMenu.ts), which
+// also drives the marketing site's Nav.tsx and Footer.tsx -- same items,
+// same order, same labels in both places. Only the destination differs:
+// the marketing site sends Host/Join/Discover through a login gate since
+// the visitor isn't signed in yet; here, already inside the app, they go
+// straight to the real page.
+const HREFS: Record<NavKey, string> = {
+  home: '/',
+  host: '/host/create',
+  join: '/discover',
+  discover: '/discover',
+  webapp: '/',
+  mobile: 'https://nammane.in/mobile-app',
+}
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -45,14 +61,22 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* nav links -- "Home" first, matching the marketing Nav's menu
-            (Home, Host, Join, Discover, Web App, Mobile App). */}
+        {/* nav links -- the exact same item set, labels and order as the
+            marketing site's Nav.tsx (Home, Host, Join, Discover, Web App,
+            Mobile App), from the shared src/lib/navMenu.ts list. */}
         <nav className="hidden lg:flex items-center gap-7 text-[13.5px] font-semibold text-muted">
-          <Link href="/" className="hover:text-gold-text transition-colors">Home</Link>
-          <Link href="/discover" className="hover:text-gold-text transition-colors">Discover</Link>
-          <Link href="/#how-it-works" className="hover:text-gold-text transition-colors">How it works</Link>
-          <Link href="/host/create" className="hover:text-gold-text transition-colors">Host an event</Link>
-          <Link href="/bookings" className="hover:text-gold-text transition-colors">Bookings</Link>
+          {NAV_LABELS.map((item) => {
+            const href = HREFS[item.key]
+            return href.startsWith('http') ? (
+              <a key={item.key} href={href} className="hover:text-gold-text transition-colors">
+                {item.label}
+              </a>
+            ) : (
+              <Link key={item.key} href={href} className="hover:text-gold-text transition-colors">
+                {item.label}
+              </Link>
+            )
+          })}
         </nav>
 
         {/* right controls */}
@@ -123,14 +147,27 @@ export default function Header() {
 
       {mobileOpen && (
         <div className="lg:hidden border-t border-white/10 px-5 py-4 flex flex-col gap-3 text-[14px] font-semibold text-[#e4d4ff] bg-ink">
-          <Link href="/" onClick={() => setMobileOpen(false)}>Home</Link>
-          <Link href="/discover" onClick={() => setMobileOpen(false)}>Discover</Link>
-          <Link href="/#how-it-works" onClick={() => setMobileOpen(false)}>How it works</Link>
-          <Link href="/host/create" onClick={() => setMobileOpen(false)}>Host an event</Link>
-          <a href="https://app.nammane.in" className="text-gold-text">Web App</a>
-          <Link href="/bookings" onClick={() => setMobileOpen(false)}>Bookings</Link>
-          <Link href="/profile" onClick={() => setMobileOpen(false)}>Profile</Link>
-          <span className="text-muted text-[13px]">Mobile App — coming soon for Android &amp; iOS</span>
+          {/* same primary item set as desktop, matching the marketing site */}
+          {NAV_LABELS.map((item) => {
+            const href = HREFS[item.key]
+            return href.startsWith('http') ? (
+              <a key={item.key} href={href} onClick={() => setMobileOpen(false)}>
+                {item.label}
+              </a>
+            ) : (
+              <Link key={item.key} href={href} onClick={() => setMobileOpen(false)}>
+                {item.label}
+              </Link>
+            )
+          })}
+
+          {/* account-only pages -- kept out of the primary list above so
+              it stays identical to the marketing site's menu */}
+          <div className="border-t border-white/10 pt-3 flex flex-col gap-3">
+            <Link href="/bookings" onClick={() => setMobileOpen(false)}>Bookings</Link>
+            <Link href="/profile" onClick={() => setMobileOpen(false)}>Profile</Link>
+          </div>
+
           <div className="border-t border-white/10 pt-3 flex gap-3">
             <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="flex-1 nm-btn bg-ink2 text-white py-2.5 text-[13px]">
               Sign in

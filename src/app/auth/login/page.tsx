@@ -34,14 +34,34 @@ const blobs = [
 ]
 
 export default function LoginPage() {
+  // Email/password and mobile+OTP are two separate ways in -- same account,
+  // same destination after sign-in, just a different first step.
+  const [method, setMethod] = useState<'email' | 'mobile'>('email')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [phone, setPhone] = useState('')
+  const [otp, setOtp] = useState('')
+  const [otpSent, setOtpSent] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     // Sign-in wiring lands with Supabase Auth session support.
+    window.location.href = '/discover'
+  }
+
+  const handleSendOtp = (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    // OTP delivery wiring lands with Supabase Auth phone-session support.
+    setOtpSent(true)
+    setLoading(false)
+  }
+
+  const handleVerifyOtp = (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
     window.location.href = '/discover'
   }
 
@@ -56,43 +76,111 @@ export default function LoginPage() {
             back
           </span>
         </h1>
-        <p className="text-[13.5px] text-muted font-medium mb-7 max-w-[300px] leading-relaxed">
+        <p className="text-[13.5px] text-muted font-medium mb-6 max-w-[300px] leading-relaxed">
           Sign in to see your next approved night out.
         </p>
 
-        <form onSubmit={handleSubmit} className="w-full space-y-4 text-left">
-          <div>
-            <label className="nm-label">EMAIL ADDRESS</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@email.com"
-              required
-              className="nm-field"
-            />
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="nm-label !mb-0">PASSWORD</label>
-              <Link href="/auth/forgot" className="text-[12px] font-bold text-[#ff8fd1]">
-                Forgot password?
-              </Link>
-            </div>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Your password"
-              required
-              className="nm-field"
-            />
-          </div>
-
-          <button type="submit" disabled={loading} className="nm-btn nm-btn-gold w-full py-4 text-[14.5px] disabled:opacity-50">
-            {loading ? 'Signing in…' : 'Sign in →'}
+        {/* email / mobile number -- same account, pick how you want in */}
+        <div className="flex bg-ink2 border border-white/10 rounded-full p-[3px] gap-[3px] mb-6">
+          <button
+            type="button"
+            onClick={() => {
+              setMethod('email')
+              setOtpSent(false)
+            }}
+            className={method === 'email' ? 'nm-btn nm-btn-gold text-[11.5px]' : 'nm-btn text-[11.5px] font-bold text-muted'}
+            style={{ padding: '6px 18px' }}
+          >
+            Email
           </button>
-        </form>
+          <button
+            type="button"
+            onClick={() => setMethod('mobile')}
+            className={method === 'mobile' ? 'nm-btn nm-btn-gold text-[11.5px]' : 'nm-btn text-[11.5px] font-bold text-muted'}
+            style={{ padding: '6px 18px' }}
+          >
+            Mobile number
+          </button>
+        </div>
+
+        {method === 'email' ? (
+          <form onSubmit={handleEmailSubmit} className="w-full space-y-4 text-left">
+            <div>
+              <label className="nm-label">EMAIL ADDRESS</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@email.com"
+                required
+                className="nm-field"
+              />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="nm-label !mb-0">PASSWORD</label>
+                <Link href="/auth/forgot" className="text-[12px] font-bold text-[#ff8fd1]">
+                  Forgot password?
+                </Link>
+              </div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Your password"
+                required
+                className="nm-field"
+              />
+            </div>
+
+            <button type="submit" disabled={loading} className="nm-btn nm-btn-gold w-full py-4 text-[14.5px] disabled:opacity-50">
+              {loading ? 'Signing in…' : 'Sign in →'}
+            </button>
+          </form>
+        ) : !otpSent ? (
+          <form onSubmit={handleSendOtp} className="w-full space-y-4 text-left">
+            <div>
+              <label className="nm-label">MOBILE NUMBER</label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+91 98765 43210"
+                required
+                className="nm-field"
+              />
+            </div>
+
+            <button type="submit" disabled={loading} className="nm-btn nm-btn-gold w-full py-4 text-[14.5px] disabled:opacity-50">
+              {loading ? 'Sending code…' : 'Send OTP →'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerifyOtp} className="w-full space-y-4 text-left">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="nm-label !mb-0">ENTER OTP</label>
+                <button type="button" onClick={() => setOtpSent(false)} className="text-[12px] font-bold text-[#ff8fd1]">
+                  Change number
+                </button>
+              </div>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="6-digit code"
+                required
+                className="nm-field"
+              />
+              <p className="text-[12px] text-muted font-medium mt-2">Code sent to {phone}</p>
+            </div>
+
+            <button type="submit" disabled={loading} className="nm-btn nm-btn-gold w-full py-4 text-[14.5px] disabled:opacity-50">
+              {loading ? 'Verifying…' : 'Verify & sign in →'}
+            </button>
+          </form>
+        )}
 
         <div className="flex items-center gap-2.5 my-6 w-full">
           <div className="flex-1 h-px bg-white/10" />
@@ -100,12 +188,13 @@ export default function LoginPage() {
           <div className="flex-1 h-px bg-white/10" />
         </div>
 
+        {/* Apple removed -- Google + Instagram are the social options. */}
         <div className="flex gap-3 w-full">
           <button type="button" className="nm-btn nm-btn-ghost flex-1 py-3.5 text-[13px]">
             Google
           </button>
           <button type="button" className="nm-btn nm-btn-ghost flex-1 py-3.5 text-[13px]">
-            Apple
+            Instagram
           </button>
         </div>
 

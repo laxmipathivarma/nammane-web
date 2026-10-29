@@ -2,20 +2,28 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { NAV_LABELS, type NavKey } from '@/lib/navMenu'
 
 const LOGIN_URL = 'https://app.nammane.in/auth/login'
 const SIGNUP_URL = 'https://app.nammane.in/auth/signup'
 
-// Kept in sync with Footer.tsx's "Explore" column -- same items, same
-// order, same destinations, so the nav and the footer never drift apart.
-const navItems = [
-  { label: 'Home', href: '/', external: false },
-  { label: 'Host', href: LOGIN_URL, external: true },
-  { label: 'Join', href: LOGIN_URL, external: true },
-  { label: 'Discover', href: LOGIN_URL, external: true },
-  { label: 'Web App', href: 'https://app.nammane.in', external: true },
-  { label: 'Mobile App', href: '/mobile-app', external: false },
-]
+// Destinations for the shared NAV_LABELS list (src/lib/navMenu.ts), which
+// also drives Footer.tsx's "Explore" column and the app's Header.tsx --
+// same items, same order, same labels everywhere, so no two menus on the
+// site can ever drift into showing a different set again.
+const HREFS: Record<NavKey, string> = {
+  home: '/',
+  host: LOGIN_URL,
+  join: LOGIN_URL,
+  discover: LOGIN_URL,
+  webapp: 'https://app.nammane.in',
+  mobile: '/mobile-app',
+}
+const navItems = NAV_LABELS.map((item) => ({
+  label: item.label,
+  href: HREFS[item.key],
+  external: item.key !== 'home' && item.key !== 'mobile',
+}))
 
 function Logo() {
   return (
