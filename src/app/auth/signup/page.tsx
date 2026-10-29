@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import AuthShell from '@/components/AuthShell'
+import BackButton from '@/components/BackButton'
 
 export default function SignupPage() {
   // Email/password and mobile+OTP are two separate ways to create the same
@@ -59,6 +60,9 @@ export default function SignupPage() {
 
   return (
     <AuthShell>
+      <div className="mb-5">
+        <BackButton fallbackHref="/" />
+      </div>
       <div className="flex items-center gap-3 mb-7">
         <div className="relative inline-flex">
           <div className="nm-logo-mark w-13 h-13 text-[23px]" style={{ width: 52, height: 52 }}>N</div>

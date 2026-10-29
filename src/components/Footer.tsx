@@ -18,29 +18,34 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
     title: 'Explore',
     links: NAV_LABELS.map((item) => ({ label: item.label, href: EXPLORE_HREFS[item.key] })),
   },
+  // Company/Support/Legal pages only exist under the marketing site's
+  // /marketing/* route group (see src/app/marketing/...), so these point
+  // there with absolute URLs -- that keeps them working whether this
+  // Footer renders on nammane.in or on app.nammane.in (which has no
+  // /about, /terms etc. of its own).
   {
     title: 'Company',
     links: [
-      { label: 'About NamMane', href: '/about' },
-      { label: 'Careers', href: '/careers' },
-      { label: 'Blog', href: '/blog' },
-      { label: 'Contact us', href: '/contact' },
+      { label: 'About NamMane', href: 'https://nammane.in/about' },
+      { label: 'Careers', href: 'https://nammane.in/careers' },
+      { label: 'Blog', href: 'https://nammane.in/blog' },
+      { label: 'Contact us', href: 'https://nammane.in/contact' },
     ],
   },
   {
     title: 'Support',
     links: [
-      { label: 'Help center', href: '/help' },
-      { label: 'Community guidelines', href: '/guidelines' },
-      { label: 'Report an issue', href: '/report' },
+      { label: 'Help center', href: 'https://nammane.in/help' },
+      { label: 'Community guidelines', href: 'https://nammane.in/guidelines' },
+      { label: 'Report an issue', href: 'https://nammane.in/report' },
     ],
   },
   {
     title: 'Legal',
     links: [
-      { label: 'Terms of service', href: '/terms' },
-      { label: 'Privacy policy', href: '/privacy' },
-      { label: 'Cookie policy', href: '/cookies' },
+      { label: 'Terms of service', href: 'https://nammane.in/terms' },
+      { label: 'Privacy policy', href: 'https://nammane.in/privacy' },
+      { label: 'Cookie policy', href: 'https://nammane.in/cookies' },
     ],
   },
 ]
@@ -131,8 +136,8 @@ export default function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-white/10 text-[12px] text-muted2">
           <div>© {new Date().getFullYear()} NamMane. All rights reserved.</div>
           <div className="flex items-center gap-5">
-            <Link href="/terms" className="hover:text-gold-text transition-colors">Terms</Link>
-            <Link href="/privacy" className="hover:text-gold-text transition-colors">Privacy</Link>
+            <Link href="https://nammane.in/terms" className="hover:text-gold-text transition-colors">Terms</Link>
+            <Link href="https://nammane.in/privacy" className="hover:text-gold-text transition-colors">Privacy</Link>
             <span>Made with ♥ in Bengaluru</span>
           </div>
         </div>
