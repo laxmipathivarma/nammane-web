@@ -138,8 +138,16 @@ export default function AppPromo() {
           </div>
         </div>
 
-        {/* Right: phone mock */}
-        <div className="relative flex justify-center">
+        {/* Right: phone mock -- this wrapper is sized to exactly the
+            phone's own footprint (270px) and centered with mx-auto,
+            instead of being a full-width flex row. That keeps the toast
+            (a sibling, not nested inside the rotated phone) anchored to
+            where the phone actually sits on every screen size, including
+            mobile, rather than drifting toward the section's edge. Siblings
+            also means the toast doesn't inherit the phone's -3deg
+            transform, so it stays level and doesn't appear to sink below
+            the device like it did when it was a child of the rotated box. */}
+        <div className="relative mx-auto" style={{ width: 270 }}>
           <div
             className="nm2-float-slow relative"
             style={{ width: 270, height: 550, borderRadius: 44, background: '#120f26', border: '1px solid rgba(255,255,255,.12)', boxShadow: '0 40px 80px rgba(0,0,0,.5)', transform: 'rotate(-3deg)' }}
@@ -160,29 +168,28 @@ export default function AppPromo() {
                 </div>
               </div>
             </div>
-
-            {/* Toast -- a child of the phone mockup itself (not the full-
-                width outer wrapper) so "-left-4 bottom-10" sits at the
-                phone's own corner on every screen size, including mobile,
-                instead of drifting off toward the viewport's edge. Keyed
-                by toastIndex so the pop-in animation replays each time the
-                sample notification cycles. */}
-            {toastOn && (
-              <div
-                key={toastIndex}
-                className="nm2-toast-pop nm2-glass absolute -left-4 bottom-10 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl"
-                style={{ maxWidth: 220 }}
-              >
-                <span className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: 'var(--nm-grad)' }}>
-                  <ToastIconGlyph icon={toast.icon} />
-                </span>
-                <div className="text-white text-[12px] leading-snug font-semibold">
-                  {toast.title}<br />
-                  <span className="text-[var(--nm-text-meta)] font-normal">{toast.subtitle}</span>
-                </div>
-              </div>
-            )}
           </div>
+
+          {/* Toast -- sibling of the phone, positioned within this same
+              270px box, so it sits over the phone's own bottom-left corner
+              without inheriting its rotation. Keyed by toastIndex so the
+              pop-in animation replays each time the sample notification
+              cycles. */}
+          {toastOn && (
+            <div
+              key={toastIndex}
+              className="nm2-toast-pop nm2-glass absolute left-0 bottom-6 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl"
+              style={{ maxWidth: 220 }}
+            >
+              <span className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: 'var(--nm-grad)' }}>
+                <ToastIconGlyph icon={toast.icon} />
+              </span>
+              <div className="text-white text-[12px] leading-snug font-semibold">
+                {toast.title}<br />
+                <span className="text-[var(--nm-text-meta)] font-normal">{toast.subtitle}</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
