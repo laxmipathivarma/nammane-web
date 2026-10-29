@@ -1,19 +1,22 @@
 import Link from 'next/link'
+import { NAV_LABELS, type NavKey } from '@/lib/navMenu'
 
-// "Explore" mirrors the main Nav's menu exactly -- same items, same order,
-// same destinations (src/components/marketing-v2/Nav.tsx) -- so the footer
-// never lists a different set of links than the header does.
+// "Explore" mirrors the shared nav menu exactly -- same items, same order,
+// same destinations (src/lib/navMenu.ts, also used by Nav.tsx and the app's
+// Header.tsx) -- so the footer never lists a different set of links than
+// the header does, on either site.
+const EXPLORE_HREFS: Record<NavKey, string> = {
+  home: '/',
+  host: 'https://app.nammane.in/auth/login',
+  join: 'https://app.nammane.in/auth/login',
+  discover: 'https://app.nammane.in/auth/login',
+  webapp: 'https://app.nammane.in',
+  mobile: '/mobile-app',
+}
 const columns: { title: string; links: { label: string; href: string }[] }[] = [
   {
     title: 'Explore',
-    links: [
-      { label: 'Home', href: '/' },
-      { label: 'Host', href: 'https://app.nammane.in/auth/login' },
-      { label: 'Join', href: 'https://app.nammane.in/auth/login' },
-      { label: 'Discover', href: 'https://app.nammane.in/auth/login' },
-      { label: 'Web App', href: 'https://app.nammane.in' },
-      { label: 'Mobile App', href: '/mobile-app' },
-    ],
+    links: NAV_LABELS.map((item) => ({ label: item.label, href: EXPLORE_HREFS[item.key] })),
   },
   {
     title: 'Company',
