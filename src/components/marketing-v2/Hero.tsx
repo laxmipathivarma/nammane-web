@@ -213,8 +213,8 @@ export default function Hero() {
 
       {/* Hero cards -- side by side, auto-fit row (never a vertical column) */}
       <div
-        className="relative z-[4] grid"
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%,280px),1fr))', gap: 14, padding: '0 clamp(18px,4vw,56px) 28px' }}
+        className="nm2-hero-cards relative z-[4]"
+        style={{ padding: '0 clamp(18px,4vw,56px) 28px' }}
       >
         {heroCards.map((c, i) => (
           <HeroCard key={c.key} c={c} idx={i} />
