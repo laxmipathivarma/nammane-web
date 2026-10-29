@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { NAV_LABELS, type NavKey } from '@/lib/navMenu'
+import { WEBAPP_VERSION_LABEL } from '@/lib/version'
 
 // Destinations for the shared NAV_LABELS list (src/lib/navMenu.ts), which
 // also drives the marketing site's Nav.tsx and Footer.tsx -- same items,
@@ -98,6 +99,7 @@ export default function Header() {
                   <div>
                     <div className="text-[13px] font-bold text-white">Web App</div>
                     <div className="text-[11px] text-muted">Use NamMane right now</div>
+                    <div className="text-[10px] font-semibold text-muted2 mt-0.5">{WEBAPP_VERSION_LABEL}</div>
                   </div>
                 </a>
                 <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 opacity-60 cursor-default">
@@ -158,6 +160,8 @@ export default function Header() {
             <Link href="/bookings" onClick={() => setMobileOpen(false)}>Bookings</Link>
             <Link href="/profile" onClick={() => setMobileOpen(false)}>Profile</Link>
           </div>
+
+          <div className="text-[10.5px] font-semibold text-muted2">{WEBAPP_VERSION_LABEL}</div>
 
           <div className="border-t border-white/10 pt-3 flex gap-3">
             <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="flex-1 nm-btn bg-ink2 text-white py-2.5 text-[13px]">
