@@ -9,6 +9,44 @@ const avatars = [
   { img: '/assets/cards/x6.jpeg', pos: '50% 30%' },
 ]
 
+type ToastIcon = 'check' | 'heart' | 'star' | 'bell' | 'person' | 'cards'
+
+// 12 sample notifications cycling through the kinds of things actually
+// happen on NamMane -- host approvals, guest requests, ratings, likes, new
+// events and new games -- instead of one static "Riya approved you" toast.
+const TOASTS: { icon: ToastIcon; title: string; subtitle: string }[] = [
+  { icon: 'check', title: 'Riya approved you', subtitle: "You're in for Poker Night." },
+  { icon: 'person', title: 'Varun requested to join', subtitle: 'Friday Drinks Night' },
+  { icon: 'star', title: 'Priya rated you 5★', subtitle: 'Great host, smooth night!' },
+  { icon: 'bell', title: 'New event near you', subtitle: 'Rooftop Karaoke · Indiranagar' },
+  { icon: 'heart', title: 'Meera liked your event', subtitle: 'Sunday Rummy Social' },
+  { icon: 'person', title: 'Karthik joined as guest', subtitle: 'Board Game Marathon' },
+  { icon: 'bell', title: 'Aisha hosted a new night', subtitle: 'Neon Soirée · Koramangala' },
+  { icon: 'check', title: 'You were approved!', subtitle: 'An Evening Table · Dinner' },
+  { icon: 'person', title: '3 new requests to join', subtitle: 'High Stakes Friday' },
+  { icon: 'star', title: 'Rahul rated the night 5★', subtitle: 'High Stakes Friday' },
+  { icon: 'cards', title: 'New game added', subtitle: "Texas Hold'em · Thursday" },
+  { icon: 'heart', title: 'Vikram liked your profile', subtitle: 'Verified host' },
+]
+
+function ToastIconGlyph({ icon }: { icon: ToastIcon }) {
+  const common = { width: 14, height: 14, viewBox: '0 0 24 24', fill: 'none', stroke: '#fff', strokeWidth: 3, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const }
+  switch (icon) {
+    case 'heart':
+      return <svg {...common}><path d="M12 21s-7.5-4.6-10-9.3C.5 8 2.2 4.5 5.7 4a5 5 0 0 1 6.3 2.3A5 5 0 0 1 18.3 4c3.5.5 5.2 4 3.7 7.7C19.5 16.4 12 21 12 21Z" /></svg>
+    case 'star':
+      return <svg {...common}><path d="M12 2.5 15 9l7 1-5 5 1.3 7-6.3-3.3L5.7 22 7 15 2 10l7-1Z" /></svg>
+    case 'bell':
+      return <svg {...common}><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z" /><path d="M10 20a2 2 0 0 0 4 0" /></svg>
+    case 'person':
+      return <svg {...common}><circle cx="12" cy="8" r="3.5" /><path d="M5 20c1-3.5 4-5.5 7-5.5s6 2 7 5.5" /></svg>
+    case 'cards':
+      return <svg {...common}><rect x="3" y="7" width="12" height="15" rx="2" transform="rotate(-8 9 14.5)" /><rect x="9" y="5" width="12" height="15" rx="2" /></svg>
+    default:
+      return <svg {...common}><path d="M5 12l5 5L19 7" /></svg>
+  }
+}
+
 function MountainSilhouettes() {
   return (
     <div className="absolute inset-x-0 bottom-0 h-[40%] pointer-events-none overflow-hidden">
@@ -24,10 +62,19 @@ function MountainSilhouettes() {
 
 export default function AppPromo() {
   const [toastOn, setToastOn] = useState(true)
+  const [toastIndex, setToastIndex] = useState(0)
 
   useEffect(() => {
     setToastOn(true)
+    // Cycle through the sample notifications so this reads as a live feed
+    // rather than one frozen screenshot.
+    const id = setInterval(() => {
+      setToastIndex((i) => (i + 1) % TOASTS.length)
+    }, 3200)
+    return () => clearInterval(id)
   }, [])
+
+  const toast = TOASTS[toastIndex]
 
   return (
     <section
@@ -110,25 +157,29 @@ export default function AppPromo() {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Toast */}
-          {toastOn && (
-            <div
-              className="nm2-toast-pop nm2-glass absolute -left-4 bottom-10 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl"
-              style={{ maxWidth: 220 }}
-            >
-              <span className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: 'var(--nm-grad)' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12l5 5L19 7" />
-                </svg>
-              </span>
-              <div className="text-white text-[12px] leading-snug font-semibold">
-                Riya approved you<br />
-                <span className="text-[var(--nm-text-meta)] font-normal">You&rsquo;re in for Poker Night.</span>
+            {/* Toast -- a child of the phone mockup itself (not the full-
+                width outer wrapper) so "-left-4 bottom-10" sits at the
+                phone's own corner on every screen size, including mobile,
+                instead of drifting off toward the viewport's edge. Keyed
+                by toastIndex so the pop-in animation replays each time the
+                sample notification cycles. */}
+            {toastOn && (
+              <div
+                key={toastIndex}
+                className="nm2-toast-pop nm2-glass absolute -left-4 bottom-10 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl"
+                style={{ maxWidth: 220 }}
+              >
+                <span className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: 'var(--nm-grad)' }}>
+                  <ToastIconGlyph icon={toast.icon} />
+                </span>
+                <div className="text-white text-[12px] leading-snug font-semibold">
+                  {toast.title}<br />
+                  <span className="text-[var(--nm-text-meta)] font-normal">{toast.subtitle}</span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </section>
