@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import BackButton from '@/components/BackButton'
+import { useAuth } from '@/lib/AuthProvider'
 
 type Tab = 'requested' | 'approved' | 'waitlist'
 
@@ -51,6 +53,20 @@ const tabs: { key: Tab; label: string }[] = [
 export default function BookingsPage() {
   const [tab, setTab] = useState<Tab>('requested')
   const items = bookings[tab]
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !user) router.replace('/auth/login')
+  }, [loading, user, router])
+
+  if (loading || !user) {
+    return (
+      <div className="nm-bg min-h-screen text-white flex items-center justify-center">
+        <div className="text-muted text-[13px] font-semibold">Loading your bookings…</div>
+      </div>
+    )
+  }
 
   return (
     <div className="nm-bg min-h-screen text-white">

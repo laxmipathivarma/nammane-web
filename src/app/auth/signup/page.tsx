@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import AuthShell from '@/components/AuthShell'
 import BackButton from '@/components/BackButton'
+import { createClient } from '@/lib/supabase'
 
 export default function SignupPage() {
   // Email/password and mobile+OTP are two separate ways to create the same
@@ -44,18 +45,50 @@ export default function SignupPage() {
     }
   }
 
-  const handleSendOtp = (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    // OTP delivery wiring lands with Supabase Auth phone-session support.
-    setOtpSent(true)
+    setError('')
+
+    const supabase = createClient()
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      phone,
+      options: { shouldCreateUser: true, data: { full_name: mobileName } },
+    })
+
     setLoading(false)
+    if (otpError) {
+      setError(otpError.message)
+      return
+    }
+    setOtpSent(true)
   }
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError('')
+
+    const supabase = createClient()
+    const { error: verifyError } = await supabase.auth.verifyOtp({ phone, token: otp, type: 'sms' })
+
+    if (verifyError) {
+      setError(verifyError.message)
+      setLoading(false)
+      return
+    }
+
     window.location.href = '/discover'
+  }
+
+  const handleOAuth = async (provider: 'google' | 'facebook') => {
+    setError('')
+    const supabase = createClient()
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/discover` },
+    })
+    if (oauthError) setError(oauthError.message)
   }
 
   return (
@@ -229,13 +262,16 @@ export default function SignupPage() {
         <div className="flex-1 h-px bg-white/10" />
       </div>
 
-      {/* Apple removed -- Google + Instagram are the social options. */}
+      {/* Apple removed. Instagram has no standalone consumer login API
+          since Meta discontinued it for third-party apps -- Facebook Login
+          (same Meta account most Instagram users already have) is the
+          real working equivalent via Supabase's OAuth providers. */}
       <div className="flex gap-3">
-        <button type="button" className="nm-btn nm-btn-ghost flex-1 py-3.5 text-[13px]">
+        <button type="button" onClick={() => handleOAuth('google')} className="nm-btn nm-btn-ghost flex-1 py-3.5 text-[13px]">
           Google
         </button>
-        <button type="button" className="nm-btn nm-btn-ghost flex-1 py-3.5 text-[13px]">
-          Instagram
+        <button type="button" onClick={() => handleOAuth('facebook')} className="nm-btn nm-btn-ghost flex-1 py-3.5 text-[13px]">
+          Facebook
         </button>
       </div>
 

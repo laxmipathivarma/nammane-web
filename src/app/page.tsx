@@ -5,6 +5,18 @@ import Link from 'next/link'
 import CategoryChips, { CATEGORIES } from '@/components/CategoryChips'
 import EventCard, { EventCardData } from '@/components/EventCard'
 import WebAppHero3D from '@/components/WebAppHero3D'
+import { useAuth } from '@/lib/AuthProvider'
+
+// Quick links for a signed-in person -- previously these only lived inside
+// the hamburger menu, so there was nothing on the home screen itself
+// pointing at Host/Join/Discover/Bookings/Profile once you were logged in.
+const QUICK_ACTIONS: { label: string; href: string; icon: string }[] = [
+  { label: 'Host an event', href: '/host/create', icon: 'i-plus' },
+  { label: 'Join an event', href: '/discover', icon: 'i-party' },
+  { label: 'Discover', href: '/discover', icon: 'i-spade' },
+  { label: 'Bookings', href: '/bookings', icon: 'i-ticket' },
+  { label: 'Profile', href: '/profile', icon: 'i-user' },
+]
 
 // One sample event per category so every chip in CategoryChips has
 // something to show -- previously this list only had poker/rummy/party
@@ -94,6 +106,7 @@ const ALL_EVENTS: EventCardData[] = [
 export default function Home() {
   const [role, setRole] = useState<'guest' | 'host'>('guest')
   const [filter, setFilter] = useState<string>('poker')
+  const { user } = useAuth()
 
   const visible = ALL_EVENTS.filter((e) => e.category === filter)
   const activeLabel = CATEGORIES.find((c) => c.key === filter)?.label ?? ''
@@ -104,6 +117,31 @@ export default function Home() {
           space scene (cave, Saturn, Jupiter, a drifting astronaut) with the
           sign in / create account CTAs built in. */}
       <WebAppHero3D />
+
+      {/* post-login quick actions -- previously Host/Join/Discover/Bookings/
+          Profile only lived inside the hamburger menu, so a signed-in
+          person landed on the home screen with nothing to tap straight
+          into those. Shown only once a session actually exists. */}
+      {user && (
+        <div className="px-5 pt-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+            {QUICK_ACTIONS.map((a) => (
+              <Link
+                key={a.label}
+                href={a.href}
+                className="nm-card rounded-2xl flex flex-col items-center justify-center gap-2 py-4 px-2 text-center hover:border-gold/30 transition-colors"
+              >
+                <span className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center text-gold-text shrink-0">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <use href={`#${a.icon}`} />
+                  </svg>
+                </span>
+                <span className="text-[11.5px] font-bold text-white leading-tight">{a.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* role toggle -- these were plain <div>s with no onClick, so nothing
           happened on tap. Now a real toggle: Guest mode browses and filters

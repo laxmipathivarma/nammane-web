@@ -3,6 +3,7 @@ import { headers } from 'next/headers'
 import '@/styles/globals.css'
 import IconSprite from '@/components/IconSprite'
 import SiteChrome from '@/components/SiteChrome'
+import AuthProvider from '@/lib/AuthProvider'
 
 export const metadata: Metadata = {
   // Absolute base so the og:image / twitter:image tags below resolve to a
@@ -67,9 +68,11 @@ export default function RootLayout({
       </head>
       <body className="antialiased bg-ink">
         <IconSprite />
-        <SiteChrome isMarketing={isMarketing}>
-          <main>{children}</main>
-        </SiteChrome>
+        <AuthProvider>
+          <SiteChrome isMarketing={isMarketing}>
+            <main>{children}</main>
+          </SiteChrome>
+        </AuthProvider>
       </body>
     </html>
   )
