@@ -7,9 +7,36 @@ import SiteChrome from '@/components/SiteChrome'
 export const metadata: Metadata = {
   title: 'NamMane - Find Your Table',
   description: 'Discover amazing people and great gatherings. Find interesting events or host your own gathering.',
+  // No favicon.ico ever existed in public/ -- that's why the logo was
+  // missing when the site got added to a phone home screen (iOS/Android
+  // both read these tags to pick the bookmark icon, and fell back to a
+  // blank/generic one with nothing here to find). Full icon set now lives
+  // in public/ and public/brand/ (from the brand handoff), wired up below.
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-48.png', sizes: '48x48', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [{ url: '/brand/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
+  manifest: '/site.webmanifest',
+  openGraph: {
+    title: 'NamMane — Gather better. Live closer.',
+    description: 'Poker faces, full plates, louder karaoke. Real hosts, real nights, zero awkward intros.',
+    images: ['/og-image.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NamMane — Gather better. Live closer.',
+    description: 'Poker faces, full plates, louder karaoke. Real hosts, real nights, zero awkward intros.',
+    images: ['/og-image.png'],
+  },
+}
+
+export const viewport = {
+  themeColor: '#8B3FFB',
 }
 
 export default function RootLayout({

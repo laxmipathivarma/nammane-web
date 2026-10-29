@@ -88,6 +88,7 @@ export default function Hero() {
   const artRef = useRef<HTMLImageElement>(null)
   const lightRef = useRef<HTMLDivElement>(null)
   const wordmarkRef = useRef<HTMLDivElement>(null)
+  const mobileArtRef = useRef<HTMLDivElement>(null)
   const [scrollY, setScrollY] = useState(0)
 
   useEffect(() => {
@@ -110,6 +111,13 @@ export default function Hero() {
       if (wordmarkRef.current) {
         wordmarkRef.current.style.transform = `translateY(${scrollY * 0.35}px) translateX(${-mx * 30}px)`
       }
+      if (mobileArtRef.current) {
+        // No cursor on a phone, so pointer.current is driven entirely by the
+        // idle sine-drift in usePointer() once 2.5s have passed -- this is
+        // what makes the mobile face gently rotate/sway on its own instead
+        // of sitting dead still like a plain photo.
+        mobileArtRef.current.style.transform = `perspective(600px) rotateY(${mx * 20}deg) rotateX(${-my * 10}deg) translateX(${mx * 16}px) scale(1.02)`
+      }
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
@@ -118,7 +126,7 @@ export default function Hero() {
 
   return (
     <section
-      className="relative overflow-hidden flex flex-col min-h-[620px] sm:min-h-[100dvh]"
+      className="relative overflow-hidden flex flex-col sm:min-h-[100dvh]"
       style={{ background: 'radial-gradient(70% 60% at 50% 62%, rgba(194,63,251,.28), rgba(28,18,64,.6) 40%, #06060F 80%)' }}
     >
       <Stars />
@@ -160,9 +168,16 @@ export default function Hero() {
 
       {/* Mobile face banner -- sits in normal document flow, fully visible,
           ABOVE the heading/copy (never overlapping it). Once this image ends,
-          the text begins. */}
-      <div className="sm:hidden relative z-[2] mx-auto mt-5 w-[86%] max-w-[360px]">
-        <div className="relative overflow-hidden rounded-[28px] nm2-image-grade" style={{ aspectRatio: '4/5' }}>
+          the text begins. Cursor-reactive on desktop has no equivalent on a
+          phone, so it gets its own gentle auto-rotating tilt (driven by the
+          same idle sine-drift the desktop face idles into when the pointer's
+          been still) instead of sitting there static. */}
+      <div className="sm:hidden relative z-[2] mx-auto mt-5 w-[86%] max-w-[360px]" style={{ perspective: 600 }}>
+        <div
+          ref={mobileArtRef}
+          className="relative overflow-hidden rounded-[28px] nm2-image-grade"
+          style={{ aspectRatio: '4/5', willChange: 'transform' }}
+        >
           <img
             src="/assets/hero.jpeg"
             alt=""
@@ -173,8 +188,14 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Left copy + orb CTA */}
-      <div className="relative z-[3] flex-1 flex items-center pt-5 sm:pt-0" style={{ padding: '20px clamp(18px,4vw,56px) 24px' }}>
+      {/* Left copy + orb CTA -- flex-1 (which vertically centres and
+          stretches to fill the section) only applies at sm+, where the
+          section is pinned to 100dvh on purpose. On mobile the section has
+          no forced height, so flex-1 here would stretch this block to fill
+          whatever blank space min-h left over and shove the cards row down
+          -- that's what was blowing out the gap between the copy and the
+          cards below it. */}
+      <div className="relative z-[3] flex sm:flex-1 items-start sm:items-center pt-5 sm:pt-0" style={{ padding: '20px clamp(18px,4vw,56px) 24px' }}>
         <div
           className="nm2-hero-copy-backing nm2-intro flex flex-col gap-[14px] sm:gap-[18px] max-w-full"
           style={{ width: '100%', maxWidth: 'min(420px, max(300px, 34vw))' }}
