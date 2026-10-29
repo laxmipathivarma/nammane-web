@@ -1,13 +1,18 @@
 import Link from 'next/link'
 
+// "Explore" mirrors the main Nav's menu exactly -- same items, same order,
+// same destinations (src/components/marketing-v2/Nav.tsx) -- so the footer
+// never lists a different set of links than the header does.
 const columns: { title: string; links: { label: string; href: string }[] }[] = [
   {
-    title: 'Product',
+    title: 'Explore',
     links: [
-      { label: 'Discover events', href: '/discover' },
-      { label: 'Host an event', href: '/#host' },
-      { label: 'How it works', href: '/#how-it-works' },
-      { label: 'Trust & safety', href: '/#trust' },
+      { label: 'Home', href: '/' },
+      { label: 'Host', href: 'https://app.nammane.in/auth/login' },
+      { label: 'Join', href: 'https://app.nammane.in/auth/login' },
+      { label: 'Discover', href: 'https://app.nammane.in/auth/login' },
+      { label: 'Web App', href: 'https://app.nammane.in' },
+      { label: 'Mobile App', href: '/mobile-app' },
     ],
   },
   {
