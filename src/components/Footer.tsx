@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { NAV_LABELS, type NavKey } from '@/lib/navMenu'
+import { APP_VERSION } from '@/lib/version'
 
 // "Explore" mirrors the shared nav menu exactly -- same items, same order,
 // same destinations (src/lib/navMenu.ts, also used by Nav.tsx and the app's
@@ -134,7 +135,12 @@ export default function Footer() {
 
         {/* bottom bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-white/10 text-[12px] text-muted2">
-          <div>© {new Date().getFullYear()} NamMane. All rights reserved.</div>
+          <div className="flex items-center gap-2.5">
+            <span>© {new Date().getFullYear()} NamMane. All rights reserved.</span>
+            <span className="text-[10.5px] font-semibold px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-muted">
+              {APP_VERSION}
+            </span>
+          </div>
           <div className="flex items-center gap-5">
             <Link href="https://nammane.in/terms" className="hover:text-gold-text transition-colors">Terms</Link>
             <Link href="https://nammane.in/privacy" className="hover:text-gold-text transition-colors">Privacy</Link>
