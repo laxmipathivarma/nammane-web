@@ -647,3 +647,42 @@ body {
   .nm2-deck > * { min-height: 80px; }
   .nm2-deck > .nm2-card-active { flex: 5 !important; min-height: 320px; }
 }
+
+/* Hero copy backing panel: plain on mobile (the big soft radial box reads
+   as a rendering glitch at near-full viewport width), restored at sm+ where
+   it's narrow enough to read as an intentional vignette behind the text. */
+.nm2-hero-copy-backing {
+  background: transparent;
+}
+@media (min-width: 640px) {
+  .nm2-hero-copy-backing {
+    background: radial-gradient(120% 100% at 0% 50%, rgba(6,6,15,.75), rgba(6,6,15,0) 80%);
+    padding: 20px;
+    margin: -20px;
+    border-radius: 24px;
+  }
+}
+
+/* Hero cards: a swipeable row on mobile (side by side, never stacked),
+   the auto-fit grid once there's room for it. */
+.nm2-hero-cards {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+}
+.nm2-hero-cards::-webkit-scrollbar { display: none; }
+.nm2-hero-card {
+  flex: 0 0 82%;
+  scroll-snap-align: start;
+}
+@media (min-width: 640px) {
+  .nm2-hero-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%,280px),1fr));
+    overflow: visible;
+  }
+  .nm2-hero-card { flex: unset; }
+}
