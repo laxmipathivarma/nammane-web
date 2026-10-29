@@ -5,6 +5,7 @@ import { useState } from 'react'
 import AuthShell from '@/components/AuthShell'
 import BackButton from '@/components/BackButton'
 import { createClient } from '@/lib/supabase'
+import { toE164India, sanitizeIndianMobileInput } from '@/lib/phone'
 
 export default function SignupPage() {
   // Email/password and mobile+OTP are two separate ways to create the same
@@ -52,7 +53,7 @@ export default function SignupPage() {
 
     const supabase = createClient()
     const { error: otpError } = await supabase.auth.signInWithOtp({
-      phone,
+      phone: toE164India(phone),
       options: { shouldCreateUser: true, data: { full_name: mobileName } },
     })
 
@@ -70,7 +71,7 @@ export default function SignupPage() {
     setError('')
 
     const supabase = createClient()
-    const { error: verifyError } = await supabase.auth.verifyOtp({ phone, token: otp, type: 'sms' })
+    const { error: verifyError } = await supabase.auth.verifyOtp({ phone: toE164India(phone), token: otp, type: 'sms' })
 
     if (verifyError) {
       setError(verifyError.message)
@@ -208,14 +209,21 @@ export default function SignupPage() {
           </div>
           <div>
             <label className="nm-label">MOBILE NUMBER</label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+91 98765 43210"
-              required
-              className="nm-field"
-            />
+            {/* India-only for now -- +91 is fixed, not typed, so there's no
+                way to pick the wrong country code or omit it by mistake. */}
+            <div className="nm-field flex items-center gap-2 !px-0">
+              <span className="pl-4 pr-2 text-[#a79ecb] font-bold border-r border-white/10">+91</span>
+              <input
+                type="tel"
+                inputMode="numeric"
+                value={phone}
+                onChange={(e) => setPhone(sanitizeIndianMobileInput(e.target.value))}
+                placeholder="98765 43210"
+                maxLength={10}
+                required
+                className="flex-1 bg-transparent outline-none pr-4 py-0"
+              />
+            </div>
           </div>
 
           <label className="flex items-start gap-2.5 pt-1">
@@ -247,7 +255,7 @@ export default function SignupPage() {
               required
               className="nm-field"
             />
-            <p className="text-[12px] text-muted font-medium mt-2">Code sent to {phone}</p>
+            <p className="text-[12px] text-muted font-medium mt-2">Code sent to {toE164India(phone)}</p>
           </div>
 
           <button type="submit" disabled={loading} className="nm-btn nm-btn-gold w-full py-4 text-[14.5px] disabled:opacity-50">
