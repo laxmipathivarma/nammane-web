@@ -132,7 +132,7 @@ export default function WebAppHero3D() {
 
   return (
     <section
-      className="relative overflow-hidden flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-10 px-5 lg:px-[clamp(18px,5vw,80px)] py-8 lg:py-0 lg:min-h-[100dvh]"
+      className="relative overflow-hidden flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-10 px-5 lg:px-[clamp(18px,5vw,80px)] py-6 lg:py-0 lg:min-h-[100dvh]"
       style={{ background: '#06060F' }}
     >
       <Stars />
@@ -140,11 +140,10 @@ export default function WebAppHero3D() {
       {/* Copy column */}
       <div
         ref={copyRef}
-        className="relative z-[6] order-2 lg:order-1 flex flex-col gap-[22px] mx-auto lg:mx-0"
+        className="relative z-[6] order-2 lg:order-1 flex flex-col gap-[22px] mx-auto lg:mx-0 -mt-20 lg:mt-0"
         style={{
           maxWidth: 'min(460px, 88vw)',
           padding: 24,
-          margin: '-24px auto 0',
           borderRadius: 28,
           background: 'radial-gradient(120% 90% at 0% 50%, rgba(6,6,15,.78), rgba(6,6,15,0) 80%)',
         }}
@@ -155,7 +154,7 @@ export default function WebAppHero3D() {
         </div>
         <h1
           className="nm2-heading font-black uppercase text-white"
-          style={{ fontSize: 'clamp(34px,5vw,72px)', lineHeight: 0.95, letterSpacing: '-0.02em', textShadow: '0 6px 30px rgba(6,6,15,.8)' }}
+          style={{ fontSize: 'clamp(44px,9vw,72px)', lineHeight: 0.95, letterSpacing: '-0.02em', textShadow: '0 6px 30px rgba(6,6,15,.8)' }}
         >
           Gather better.
           <br />
@@ -163,7 +162,7 @@ export default function WebAppHero3D() {
         </h1>
         <div className="flex items-stretch gap-3.5">
           <span className="nm2-grad-bar w-[3px] rounded-sm shrink-0" />
-          <p className="italic font-extrabold leading-[1.3] text-[var(--nm-text-meta)]" style={{ fontSize: 'clamp(17px,1.6vw,22px)' }}>
+          <p className="italic font-extrabold leading-[1.3] text-[var(--nm-text-meta)]" style={{ fontSize: 'clamp(19px,4.2vw,22px)' }}>
             <span className="text-white not-italic">Strangers at seven,</span>{' '}
             <span className="nm2-grad-text not-italic">friends by dessert.</span>
           </p>
@@ -189,11 +188,13 @@ export default function WebAppHero3D() {
         </div>
       </div>
 
-      {/* 3D scene */}
+      {/* 3D scene -- notably smaller on mobile (w-[58vw], capped at 260px)
+          than desktop (min(86vw,420px)) so it doesn't dominate the first
+          screen and push the headline below the fold; aspect-ratio is
+          untouched so the art itself never looks stretched or cropped. */}
       <div
-        className="relative z-[3] order-1 lg:order-2 mx-auto lg:mx-0 shrink-0"
+        className="relative z-[3] order-1 lg:order-2 mx-auto lg:mx-0 shrink-0 w-[min(58vw,260px)] lg:w-[min(86vw,420px)]"
         style={{
-          width: 'min(86vw, 420px)',
           aspectRatio: '736/1380',
           perspective: 1200,
           overflow: 'clip',
