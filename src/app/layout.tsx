@@ -5,33 +5,36 @@ import IconSprite from '@/components/IconSprite'
 import SiteChrome from '@/components/SiteChrome'
 
 export const metadata: Metadata = {
+  // Absolute base so the og:image / twitter:image tags below resolve to a
+  // full https://nammane.in/... URL -- social apps fetch share-card images
+  // from an absolute URL, a relative one won't be picked up.
+  metadataBase: new URL('https://nammane.in'),
   title: 'NamMane — Gather better. Live closer.',
   description: 'Poker faces, full plates, louder karaoke. Real hosts, real nights, zero awkward intros.',
-  // No favicon.ico ever existed in public/ -- that's why the logo was
-  // missing when the site got added to a phone home screen (iOS/Android
-  // both read these tags to pick the bookmark icon, and fell back to a
-  // blank/generic one with nothing here to find). Full icon set now lives
-  // in public/ and public/brand/ (from the brand handoff), wired up below.
+  // Full icon set (favicons, PWA icons, apple-touch-icon, the og share
+  // card) lives under public/brand/, from the brand handoff -- refreshed
+  // with the new sparkle "N" mark and kept all in one place instead of
+  // split between public/ and public/brand/.
   icons: {
     icon: [
-      { url: '/favicon-16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon-48.png', sizes: '48x48', type: 'image/png' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/brand/favicon-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/brand/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/brand/favicon-48.png', sizes: '48x48', type: 'image/png' },
+      { url: '/brand/favicon.svg', type: 'image/svg+xml' },
     ],
     apple: [{ url: '/brand/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
-  manifest: '/site.webmanifest',
+  manifest: '/brand/site.webmanifest',
   openGraph: {
     title: 'NamMane — Gather better. Live closer.',
     description: 'Poker faces, full plates, louder karaoke. Real hosts, real nights, zero awkward intros.',
-    images: ['/og-image.png'],
+    images: [{ url: '/brand/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'NamMane — Gather better. Live closer.',
     description: 'Poker faces, full plates, louder karaoke. Real hosts, real nights, zero awkward intros.',
-    images: ['/og-image.png'],
+    images: ['/brand/og-image.png'],
   },
 }
 
