@@ -60,7 +60,7 @@ function HeroCard({ c, idx }: { c: (typeof heroCards)[number]; idx: number }) {
     <a
       ref={ref}
       href={LOGIN_URL}
-      className="nm2-glass nm2-card-fade-up relative grid items-center gap-4 rounded-[20px] p-3 transition-transform duration-300"
+      className="nm2-hero-card nm2-glass nm2-card-fade-up relative grid items-center gap-4 rounded-[20px] p-3 transition-transform duration-300"
       style={{ gridTemplateColumns: '112px 1fr', minHeight: 140, animationDelay: `${0.4 + idx * 0.12}s` }}
     >
       <div className="relative overflow-hidden rounded-[14px] nm2-image-grade" style={{ height: 118 }}>
@@ -118,8 +118,8 @@ export default function Hero() {
 
   return (
     <section
-      className="relative overflow-hidden flex flex-col"
-      style={{ minHeight: '100dvh', background: 'radial-gradient(70% 60% at 50% 62%, rgba(194,63,251,.28), rgba(28,18,64,.6) 40%, #06060F 80%)' }}
+      className="relative overflow-hidden flex flex-col min-h-[620px] sm:min-h-[100dvh]"
+      style={{ background: 'radial-gradient(70% 60% at 50% 62%, rgba(194,63,251,.28), rgba(28,18,64,.6) 40%, #06060F 80%)' }}
     >
       <Stars />
 
@@ -154,10 +154,10 @@ export default function Hero() {
       <div ref={lightRef} className="absolute inset-0 pointer-events-none" style={{ mixBlendMode: 'screen' }} />
 
       {/* Left copy + orb CTA */}
-      <div className="relative z-[3] flex-1 flex items-center" style={{ padding: '24px clamp(18px,4vw,56px)' }}>
+      <div className="relative z-[3] flex-1 flex items-center pt-6 sm:pt-0" style={{ padding: '24px clamp(18px,4vw,56px)' }}>
         <div
-          className="nm2-intro flex flex-col gap-[18px] rounded-3xl"
-          style={{ maxWidth: 'min(380px,34vw)', minWidth: 260, padding: 20, margin: -20, background: 'radial-gradient(120% 100% at 0% 50%, rgba(6,6,15,.75), rgba(6,6,15,0) 80%)' }}
+          className="nm2-hero-copy-backing nm2-intro flex flex-col gap-[14px] sm:gap-[18px] max-w-full"
+          style={{ width: '100%', maxWidth: 'min(420px, max(300px, 34vw))' }}
         >
           <div className="nm2-kicker text-[var(--nm-blush)]">Poker · Dinner · Drinks · Dance · Karaoke</div>
           <h1 className="nm2-heading font-black leading-[0.98] text-white" style={{ fontSize: 'clamp(34px,4.4vw,60px)' }}>

@@ -123,7 +123,7 @@ export default function CategoryDeck() {
 
   return (
     <section
-      className="relative py-24 px-5"
+      className="relative py-10 sm:py-14 lg:py-24 px-5"
       style={{ background: 'radial-gradient(60% 70% at 50% 40%, rgba(28,18,64,.55), #06060F 72%)' }}
     >
       <div className="max-w-6xl mx-auto">

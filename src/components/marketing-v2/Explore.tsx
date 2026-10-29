@@ -53,7 +53,7 @@ export default function Explore() {
   const [ref, inView] = useInView<HTMLElement>(0.2)
 
   return (
-    <section ref={ref} className="relative py-24 px-5 bg-[var(--nm-base)]">
+    <section ref={ref} className="relative py-12 sm:py-16 lg:py-24 px-5 bg-[var(--nm-base)]">
       <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
         {/* Left: two tilt panels */}
         <div className="grid grid-cols-[0.8fr_1.2fr] gap-4" style={{ height: 'clamp(380px,46vw,560px)' }}>
