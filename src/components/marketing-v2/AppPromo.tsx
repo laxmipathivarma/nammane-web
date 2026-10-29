@@ -67,10 +67,13 @@ export default function AppPromo() {
   useEffect(() => {
     setToastOn(true)
     // Cycle through the sample notifications so this reads as a live feed
-    // rather than one frozen screenshot.
+    // rather than one frozen screenshot. The nm2-toast-pop CSS animation
+    // (fade in -> hold -> fade out) runs a full 6s per mount, so advancing
+    // on exactly that cadence lets each toast finish its own fade before
+    // the next one pops in, instead of cutting it off mid-cycle.
     const id = setInterval(() => {
       setToastIndex((i) => (i + 1) % TOASTS.length)
-    }, 3200)
+    }, 6000)
     return () => clearInterval(id)
   }, [])
 
