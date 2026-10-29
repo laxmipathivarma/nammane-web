@@ -19,7 +19,12 @@ function Logo() {
       <div className="nm2-logo-mark w-10 h-10 rounded-[28%] flex items-center justify-center shrink-0">
         <span className="nm2-heading text-white text-lg font-black">N</span>
       </div>
-      <span className="nm2-heading text-white text-[18px] font-extrabold normal-case">NamMane</span>
+      <span
+        className="nm2-heading text-white text-[18px] font-extrabold"
+        style={{ textTransform: 'none' }}
+      >
+        NamMane
+      </span>
     </Link>
   )
 }

@@ -648,6 +648,42 @@ body {
   .nm2-deck > .nm2-card-active { flex: 5 !important; min-height: 320px; }
 }
 
+/* Collapsed CategoryDeck card title: a narrow vertical strip on desktop reads
+   fine with the name rotated sideways, but once the deck stacks into full-
+   width horizontal bars on mobile that same vertical text has nowhere to sit
+   and gets clipped out of the 80px-tall bar -- switch it to a normal
+   horizontal row, rank on the left and name on the right, centered in the bar. */
+.nm2-card-rank {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.nm2-card-name {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  transform: translateX(-50%) rotate(180deg);
+}
+@media (max-width: 760px) {
+  .nm2-card-rank {
+    top: 50%;
+    left: 16px;
+    transform: translateY(-50%);
+  }
+  .nm2-card-name {
+    top: 50%;
+    bottom: auto;
+    left: auto;
+    right: 16px;
+    writing-mode: horizontal-tb;
+    transform: translateY(-50%);
+    letter-spacing: 0.04em;
+  }
+}
+
 /* Hero copy backing panel: plain on mobile (the big soft radial box reads
    as a rendering glitch at near-full viewport width), restored at sm+ where
    it's narrow enough to read as an intentional vignette behind the text. */

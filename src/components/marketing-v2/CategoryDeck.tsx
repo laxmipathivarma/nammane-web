@@ -62,16 +62,11 @@ function CardFace({ c, active }: { c: Card; active: boolean }) {
 
       {!active && (
         <>
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(0deg, rgba(5,5,15,.75), transparent 60%)' }} />
-          <span
-            className="nm2-heading absolute top-3 left-1/2 -translate-x-1/2 text-white/70 font-bold text-[13px]"
-          >
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(0deg, rgba(5,5,15,.8), transparent 60%)' }} />
+          <span className="nm2-heading nm2-card-rank text-white/70 font-bold text-[13px]">
             {c.rank}
           </span>
-          <span
-            className="nm2-heading absolute bottom-4 left-1/2 -translate-x-1/2 text-white font-extrabold text-[13px] whitespace-nowrap"
-            style={{ writingMode: 'vertical-rl', transform: 'translateX(-50%) rotate(180deg)' }}
-          >
+          <span className="nm2-heading nm2-card-name text-white font-extrabold text-[13px]">
             {c.name}
           </span>
         </>
