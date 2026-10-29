@@ -1,10 +1,10 @@
-import { createServerClient } from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 type CookieToSet = {
   name: string
   value: string
-  options?: Record<string, unknown>
+  options?: CookieOptions
 }
 
 export const createServerSupabaseClient = async () => {
@@ -18,13 +18,28 @@ export const createServerSupabaseClient = async () => {
         getAll() {
           return cookieStore.getAll()
         },
+        // The `options` Supabase passes here (maxAge, path, sameSite, and
+        // crucially maxAge:0 when it wants to CLEAR a stale cookie) were
+        // being dropped -- cookieStore.set(name, value) alone writes every
+        // cookie as a default session cookie and never actually deletes
+        // anything. That's what was silently breaking the post-OAuth
+        // session: exchangeCodeForSession() succeeded server-side (the
+        // user really was created/signed in -- see Supabase's own auth
+        // logs), but the session cookie it tried to set never reliably
+        // reached the browser with the right attributes, so the very next
+        // page load found no session and rendered as signed-out --
+        // bouncing the person back to the login screen even though their
+        // account had already been created.
         setAll(cookiesToSet: CookieToSet[]) {
           try {
-            cookiesToSet.forEach(({ name, value }) =>
-              cookieStore.set(name, value)
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
             )
           } catch {
-            // Handle cookies in middleware
+            // Called from a Server Component render (not a Route Handler
+            // or Server Action) -- cookies() is read-only there, so this
+            // only ever throws in a context where there was never going
+            // to be a response to attach Set-Cookie headers to anyway.
           }
         },
       },
