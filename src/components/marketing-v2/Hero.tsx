@@ -123,38 +123,58 @@ export default function Hero() {
     >
       <Stars />
 
-      {/* NAMMANE wordmark -- full-bleed, behind everything */}
-      <div
-        ref={wordmarkRef}
-        className="nm2-heading absolute inset-x-0 top-[12%] text-center font-black pointer-events-none select-none"
-        style={{ fontSize: 'clamp(64px,15vw,230px)', color: 'transparent', WebkitTextStroke: '1px rgba(255,255,255,.12)', lineHeight: 1 }}
-      >
-        NAMMANE
+      {/* Desktop decorative layer: wordmark + full-bleed cursor-reactive face,
+          both sitting BEHIND the copy so the design can let text float over
+          the face. Hidden on mobile -- on a narrow screen there's no room for
+          text to share space with a life-size face without covering it, so
+          mobile gets its own sequential layout below instead. */}
+      <div className="hidden sm:block">
+        <div
+          ref={wordmarkRef}
+          className="nm2-heading absolute inset-x-0 top-[12%] text-center font-black pointer-events-none select-none"
+          style={{ fontSize: 'clamp(64px,15vw,230px)', color: 'transparent', WebkitTextStroke: '1px rgba(255,255,255,.12)', lineHeight: 1 }}
+        >
+          NAMMANE
+        </div>
+
+        <img
+          ref={artRef}
+          src="/assets/hero.jpeg"
+          alt=""
+          className="select-none pointer-events-none"
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '52%',
+            height: 'min(118vh,1200px)',
+            aspectRatio: '736/1104',
+            maxWidth: 'none',
+            mixBlendMode: 'lighten',
+            WebkitMaskImage: 'radial-gradient(ellipse 50% 46% at 50% 46%, #000 62%, transparent 100%)',
+            maskImage: 'radial-gradient(ellipse 50% 46% at 50% 46%, #000 62%, transparent 100%)',
+            transform: 'translate(-50%, -50%)',
+          }}
+        />
+        <div ref={lightRef} className="absolute inset-0 pointer-events-none" style={{ mixBlendMode: 'screen' }} />
       </div>
 
-      {/* Face art -- true full-section background layer, centred, cursor-reactive */}
-      <img
-        ref={artRef}
-        src="/assets/hero.jpeg"
-        alt=""
-        className="select-none pointer-events-none"
-        style={{
-          position: 'absolute',
-          left: '50%',
-          top: '52%',
-          height: 'min(118vh,1200px)',
-          aspectRatio: '736/1104',
-          maxWidth: 'none',
-          mixBlendMode: 'lighten',
-          WebkitMaskImage: 'radial-gradient(ellipse 50% 46% at 50% 46%, #000 62%, transparent 100%)',
-          maskImage: 'radial-gradient(ellipse 50% 46% at 50% 46%, #000 62%, transparent 100%)',
-          transform: 'translate(-50%, -50%)',
-        }}
-      />
-      <div ref={lightRef} className="absolute inset-0 pointer-events-none" style={{ mixBlendMode: 'screen' }} />
+      {/* Mobile face banner -- sits in normal document flow, fully visible,
+          ABOVE the heading/copy (never overlapping it). Once this image ends,
+          the text begins. */}
+      <div className="sm:hidden relative z-[2] mx-auto mt-5 w-[86%] max-w-[360px]">
+        <div className="relative overflow-hidden rounded-[28px] nm2-image-grade" style={{ aspectRatio: '4/5' }}>
+          <img
+            src="/assets/hero.jpeg"
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+            style={{ objectPosition: '50% 18%' }}
+          />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(0deg, rgba(6,6,15,.55) 0%, transparent 42%)' }} />
+        </div>
+      </div>
 
       {/* Left copy + orb CTA */}
-      <div className="relative z-[3] flex-1 flex items-center pt-6 sm:pt-0" style={{ padding: '24px clamp(18px,4vw,56px)' }}>
+      <div className="relative z-[3] flex-1 flex items-center pt-5 sm:pt-0" style={{ padding: '20px clamp(18px,4vw,56px) 24px' }}>
         <div
           className="nm2-hero-copy-backing nm2-intro flex flex-col gap-[14px] sm:gap-[18px] max-w-full"
           style={{ width: '100%', maxWidth: 'min(420px, max(300px, 34vw))' }}
