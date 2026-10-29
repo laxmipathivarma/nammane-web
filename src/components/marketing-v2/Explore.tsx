@@ -68,9 +68,9 @@ export default function Explore() {
             <div className="absolute top-4 right-4 w-16 h-16 rounded-full bg-white flex items-center justify-center nm2-pulse">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="#1C1240"><path d="M8 5v14l11-7z" /></svg>
             </div>
-            <div className="absolute left-5 bottom-6">
+            <div className="absolute left-5 right-4 bottom-6">
               <div
-                className="nm2-heading font-black text-white text-[13vw] sm:text-[44px] leading-none relative"
+                className="nm2-heading font-black text-white text-[7.5vw] sm:text-[34px] leading-none relative whitespace-nowrap"
                 style={{ WebkitTextStroke: '1.5px rgba(255,79,158,.7)' }}
               >
                 TONIGHT
@@ -92,7 +92,7 @@ export default function Explore() {
                   <path id="nm2-badge-circle" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" />
                 </defs>
                 <text fill="var(--nm-text-meta)" fontSize="7.3" fontWeight={700} letterSpacing="2">
-                  <textPath href="#nm2-badge-circle">FIND YOUR TABLE • NAMMANE • FIND YOUR TABLE • NAMMANE •</textPath>
+                  <textPath href="#nm2-badge-circle">GATHER BETTER • LIVE CLOSER • GATHER BETTER • LIVE CLOSER •</textPath>
                 </text>
               </svg>
               <span
