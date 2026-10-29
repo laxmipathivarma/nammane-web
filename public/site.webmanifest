@@ -1,0 +1,27 @@
+{
+  "name": "NamMane",
+  "short_name": "NamMane",
+  "description": "Strangers at seven, friends by dessert. Poker, dinners, drinks, karaoke and many more.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#06060F",
+  "theme_color": "#8B3FFB",
+  "icons": [
+    {
+      "src": "/brand/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/brand/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/brand/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

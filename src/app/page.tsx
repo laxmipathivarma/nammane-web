@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import CategoryChips from '@/components/CategoryChips'
 import EventCard from '@/components/EventCard'
+import WebAppHero3D from '@/components/WebAppHero3D'
 
 const featured = [
   {
@@ -49,29 +50,13 @@ const featured = [
 export default function Home() {
   return (
     <div className="nm-root nm-bg min-h-screen text-white">
-      {/* login / signup */}
-      <div className="px-5 pt-10 pb-8 max-w-5xl mx-auto">
-        <div className="nm-card rounded-[28px] p-7 md:p-9 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="text-center md:text-left">
-            <div className="nm-marquee text-2xl md:text-3xl text-white mb-2">Welcome to NamMane</div>
-            <p className="text-muted text-[14px] font-medium leading-relaxed max-w-md">
-              Sign in to request to join a night out, or create an account to get started —
-              you can still browse tonight&apos;s tables below either way.
-            </p>
-          </div>
-          <div className="flex gap-3 shrink-0">
-            <Link href="/auth/login" className="nm-btn bg-ink2 text-white border border-white/10 px-6 py-3 text-[13.5px]">
-              Sign in
-            </Link>
-            <Link href="/auth/signup" className="nm-btn nm-btn-gold px-6 py-3 text-[13.5px]">
-              Sign up
-            </Link>
-          </div>
-        </div>
-      </div>
+      {/* 3D animated entry hero -- from the webapp design handoff: paper-cut
+          space scene (cave, Saturn, Jupiter, a drifting astronaut) with the
+          sign in / create account CTAs built in. */}
+      <WebAppHero3D />
 
       {/* role toggle */}
-      <div className="flex justify-center px-5 pb-4">
+      <div className="flex justify-center px-5 pb-4 pt-8">
         <div className="flex bg-ink2 border border-white/10 rounded-full p-[3px] gap-[3px]">
           <div className="nm-btn nm-btn-gold px-4.5 py-1.5 text-[11.5px]" style={{ padding: '6px 18px' }}>
             Guest mode
