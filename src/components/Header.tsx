@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { NAV_LABELS, type NavKey } from '@/lib/navMenu'
 
@@ -24,7 +23,6 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [appMenuOpen, setAppMenuOpen] = useState(false)
   const appMenuRef = useRef<HTMLDivElement>(null)
-  const pathname = usePathname()
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -36,30 +34,23 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', onClick)
   }, [])
 
-  // Next.js doesn't re-navigate (or scroll) on a Link click to the page
-  // you're already on, so clicking the logo while already on "/" looked
-  // like it did nothing. Scroll back to the top in that case, and let
-  // Link handle the normal case of navigating home from elsewhere.
-  const onLogoClick = () => {
-    if (pathname === '/') {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  }
-
   return (
     <header className="sticky top-0 z-50 bg-ink/90 backdrop-blur-md border-b border-white/10">
       <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
         {/* logo -- same mark + mixed-case wordmark as the marketing site's
             Nav (src/components/marketing-v2/Nav.tsx), so the app and the
-            marketing site never show two different logos. */}
-        <Link href="/" onClick={onLogoClick} className="flex items-center gap-2.5 shrink-0">
+            marketing site never show two different logos. Links back out
+            to nammane.in (the marketing site), not to the app's own home --
+            that's where people expect the logo to take them from inside
+            the app, same as clicking a brand mark on any product site. */}
+        <a href="https://nammane.in" className="flex items-center gap-2.5 shrink-0">
           <div className="nm2-logo-mark w-8 h-8 rounded-[28%] flex items-center justify-center shrink-0">
             <span className="nm2-heading text-white text-base font-black">N</span>
           </div>
           <span className="nm2-heading text-[#e4d4ff] text-lg font-extrabold" style={{ textTransform: 'none' }}>
             NamMane
           </span>
-        </Link>
+        </a>
 
         {/* nav links -- the exact same item set, labels and order as the
             marketing site's Nav.tsx (Home, Host, Join, Discover, Web App,
