@@ -200,6 +200,10 @@ export default function Hero() {
           className="nm2-hero-copy-backing nm2-intro flex flex-col gap-[14px] sm:gap-[18px] max-w-full"
           style={{ width: '100%', maxWidth: 'min(420px, max(300px, 34vw))' }}
         >
+          <div className="flex items-center gap-1.5 text-[11.5px] font-extrabold tracking-[0.12em] uppercase">
+            <span className="text-white">Gather better.</span>
+            <span className="nm2-grad-text">Live closer.</span>
+          </div>
           <div className="nm2-kicker text-[var(--nm-blush)]">Poker · Dinner · Drinks · Dance · Karaoke</div>
           <h1 className="nm2-heading font-black leading-[0.98] text-white" style={{ fontSize: 'clamp(34px,4.4vw,60px)' }}>
             Find your kind of <span className="nm2-grad-text">night out</span>
