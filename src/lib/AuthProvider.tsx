@@ -21,7 +21,7 @@ const AuthContext = createContext<AuthContextValue>({
 // Whenever a session appears (fresh sign-in, OAuth redirect, OTP verify, or
 // just the browser restoring a saved session on page load), make sure a row
 // exists for this person in `profiles`. This is the one place that runs for
-// every auth method (email, phone, Google, Facebook) instead of duplicating
+// every auth method (email, phone, Google) instead of duplicating
 // the upsert in each login/signup form.
 async function ensureProfile() {
   try {

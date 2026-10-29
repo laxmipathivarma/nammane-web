@@ -1,7 +1,7 @@
 import { createServerSupabaseClient } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 
-// Google/Facebook sign-in redirects the browser here with a `?code=...`
+// Google sign-in redirects the browser here with a `?code=...`
 // after the person approves on the provider's own page. Exchanging it for
 // a session has to happen server-side (it sets the auth cookies on the
 // response), which is why this is a route handler rather than something

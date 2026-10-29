@@ -81,7 +81,7 @@ export default function SignupPage() {
     window.location.href = '/discover'
   }
 
-  const handleOAuth = async (provider: 'google' | 'facebook') => {
+  const handleOAuth = async (provider: 'google') => {
     setError('')
     const supabase = createClient()
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
@@ -262,16 +262,11 @@ export default function SignupPage() {
         <div className="flex-1 h-px bg-white/10" />
       </div>
 
-      {/* Apple removed. Instagram has no standalone consumer login API
-          since Meta discontinued it for third-party apps -- Facebook Login
-          (same Meta account most Instagram users already have) is the
-          real working equivalent via Supabase's OAuth providers. */}
+      {/* Only Google OAuth for now -- Facebook/Meta and WhatsApp login
+          were dropped to avoid Meta Business verification overhead. */}
       <div className="flex gap-3">
         <button type="button" onClick={() => handleOAuth('google')} className="nm-btn nm-btn-ghost flex-1 py-3.5 text-[13px]">
           Google
-        </button>
-        <button type="button" onClick={() => handleOAuth('facebook')} className="nm-btn nm-btn-ghost flex-1 py-3.5 text-[13px]">
-          Facebook
         </button>
       </div>
 

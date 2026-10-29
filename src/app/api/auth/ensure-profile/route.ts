@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabaseAdmin'
 import { NextResponse } from 'next/server'
 
 // Called once per sign-in (from AuthProvider's onAuthStateChange) so every
-// auth method -- email/password, phone OTP, Google, Facebook -- ends up
+// auth method -- email/password, phone OTP, Google -- ends up
 // with a real row in `profiles`, not just a Supabase Auth user. Reads the
 // caller's own session server-side (so nobody can upsert a profile for a
 // user that isn't them), then writes with the service-role client so it
