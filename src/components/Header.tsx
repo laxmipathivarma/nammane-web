@@ -1,12 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [appMenuOpen, setAppMenuOpen] = useState(false)
   const appMenuRef = useRef<HTMLDivElement>(null)
+  const pathname = usePathname()
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -18,27 +20,35 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', onClick)
   }, [])
 
+  // Next.js doesn't re-navigate (or scroll) on a Link click to the page
+  // you're already on, so clicking the logo while already on "/" looked
+  // like it did nothing. Scroll back to the top in that case, and let
+  // Link handle the normal case of navigating home from elsewhere.
+  const onLogoClick = () => {
+    if (pathname === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
   return (
     <header className="sticky top-0 z-50 bg-ink/90 backdrop-blur-md border-b border-white/10">
       <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
-        {/* logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <svg width="28" height="28" viewBox="0 0 120 120">
-            <defs>
-              <linearGradient id="hdr-gold" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#e4d4ff" />
-                <stop offset=".5" stopColor="#b968ff" />
-                <stop offset="1" stopColor="#6d1fd1" />
-              </linearGradient>
-            </defs>
-            <circle cx="60" cy="60" r="58" fill="none" stroke="url(#hdr-gold)" strokeWidth="2.4" />
-            <text x="60" y="78" textAnchor="middle" fontFamily="Unbounded, sans-serif" fontWeight="800" fontSize="58" fill="url(#hdr-gold)">N</text>
-          </svg>
-          <span className="nm-marquee text-lg text-[#e4d4ff] font-extrabold">NamMane</span>
+        {/* logo -- same mark + mixed-case wordmark as the marketing site's
+            Nav (src/components/marketing-v2/Nav.tsx), so the app and the
+            marketing site never show two different logos. */}
+        <Link href="/" onClick={onLogoClick} className="flex items-center gap-2.5 shrink-0">
+          <div className="nm2-logo-mark w-8 h-8 rounded-[28%] flex items-center justify-center shrink-0">
+            <span className="nm2-heading text-white text-base font-black">N</span>
+          </div>
+          <span className="nm2-heading text-[#e4d4ff] text-lg font-extrabold" style={{ textTransform: 'none' }}>
+            NamMane
+          </span>
         </Link>
 
-        {/* nav links */}
+        {/* nav links -- "Home" first, matching the marketing Nav's menu
+            (Home, Host, Join, Discover, Web App, Mobile App). */}
         <nav className="hidden lg:flex items-center gap-7 text-[13.5px] font-semibold text-muted">
+          <Link href="/" className="hover:text-gold-text transition-colors">Home</Link>
           <Link href="/discover" className="hover:text-gold-text transition-colors">Discover</Link>
           <Link href="/#how-it-works" className="hover:text-gold-text transition-colors">How it works</Link>
           <Link href="/host/create" className="hover:text-gold-text transition-colors">Host an event</Link>
@@ -113,6 +123,7 @@ export default function Header() {
 
       {mobileOpen && (
         <div className="lg:hidden border-t border-white/10 px-5 py-4 flex flex-col gap-3 text-[14px] font-semibold text-[#e4d4ff] bg-ink">
+          <Link href="/" onClick={() => setMobileOpen(false)}>Home</Link>
           <Link href="/discover" onClick={() => setMobileOpen(false)}>Discover</Link>
           <Link href="/#how-it-works" onClick={() => setMobileOpen(false)}>How it works</Link>
           <Link href="/host/create" onClick={() => setMobileOpen(false)}>Host an event</Link>
