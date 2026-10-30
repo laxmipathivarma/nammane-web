@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation'
-import { EVENTS, categoryHero, categoryIcon } from '@/lib/sampleEvents'
+import { EVENTS, categoryHero, categoryIcon, type EventCategory } from '@/lib/sampleEvents'
 import BackButton from '@/components/BackButton'
 import { createAdminClient } from '@/lib/supabaseAdmin'
+import { createServerSupabaseClient } from '@/lib/auth'
 
 export function generateStaticParams() {
   return Object.keys(EVENTS).map((slug) => ({ slug }))
@@ -11,15 +12,17 @@ export function generateStaticParams() {
 // identified by UUID, not one of the handful of static demo slugs this
 // page was originally built around -- look them up and map them onto the
 // same shape the rest of this page already renders, rather than 404ing
-// on every real event.
-async function fetchLiveEvent(id: string) {
+// on every real event. isHost compares the signed-in viewer's own id
+// against host_id so the sticky CTA below can stop showing a host
+// "Request to join" their own party.
+async function fetchLiveEvent(id: string, viewerId: string | null) {
   const admin = createAdminClient()
   const { data } = await admin.from('events').select('*').eq('id', id).maybeSingle()
   if (!data) return null
 
   return {
     title: data.title,
-    category: data.category,
+    category: data.category as EventCategory,
     tagLabel: String(data.category).toUpperCase(),
     schedule: data.starts_at
       ? new Date(data.starts_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
@@ -31,11 +34,18 @@ async function fetchLiveEvent(id: string) {
     seatsLabel: data.capacity ? `0/${data.capacity} seats` : 'Open seats',
     houseRules: data.description || 'No details added yet.',
     priceLabel: data.contribution_amount ? `₹${data.contribution_amount}` : undefined,
+    isHost: viewerId != null && data.host_id === viewerId,
   }
 }
 
 export default async function EventDetailPage({ params }: { params: { slug: string } }) {
-  const event = EVENTS[params.slug] ?? (await fetchLiveEvent(params.slug))
+  const supabase = await createServerSupabaseClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const demoEvent = EVENTS[params.slug]
+  const event = demoEvent ? { ...demoEvent, isHost: false } : await fetchLiveEvent(params.slug, user?.id ?? null)
   if (!event) notFound()
 
   const icon = categoryIcon[event.category]
@@ -146,19 +156,30 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
       </div>
 
       {/* sticky CTA -- poker events also get a link to the host-only
-          toolkit (invitations, tables, buy-ins, settle-up, games history);
-          /api/events/[id]/poker itself rejects anyone who isn't the host,
-          so this link is safe to show to everyone rather than needing a
-          server-side session check on a page that's otherwise statically
-          generated. */}
+          toolkit (invitations, tables, buy-ins, settle-up, games history).
+          /api/events/[id]/poker still rejects anyone who isn't the host
+          server-side (the real gate), but the viewer's own id is now
+          looked up above so the host sees their own tools instead of a
+          "Request to join" button for a party they're throwing. */}
       <div className="sticky bottom-0 bg-gradient-to-t from-ink via-ink/95 to-transparent pt-6 pb-5 px-5">
         <div className="max-w-3xl mx-auto flex flex-col gap-2.5">
           {event.category === 'poker' && (
-            <a href={`/event/${params.slug}/poker`} className="nm-btn w-full py-3.5 text-[13.5px] bg-ink2 text-white border border-white/10 text-center">
-              Poker host tools (host only)
+            <a
+              href={`/event/${params.slug}/poker`}
+              className={`nm-btn w-full py-3.5 text-[13.5px] text-center ${
+                event.isHost ? 'nm-btn-gold' : 'bg-ink2 text-white border border-white/10'
+              }`}
+            >
+              Poker host tools{event.isHost ? '' : ' (host only)'}
             </a>
           )}
-          <button className="nm-btn nm-btn-gold w-full py-4 text-[14.5px]">Request to join →</button>
+          {event.isHost ? (
+            <a href="/host" className="nm-btn w-full py-3.5 text-[13.5px] bg-ink2 text-white border border-white/10 text-center">
+              Back to my events
+            </a>
+          ) : (
+            <button className="nm-btn nm-btn-gold w-full py-4 text-[14.5px]">Request to join →</button>
+          )}
         </div>
       </div>
     </div>

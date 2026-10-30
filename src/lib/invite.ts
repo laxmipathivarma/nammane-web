@@ -25,6 +25,43 @@ function formatWhen(startsAt: string | null): string {
   return `${date} · ${time}`
 }
 
+// Builds the invite message from the structured "Create Invitation" form
+// (title, date, time, venue, gate pass, notes, entry cost) instead of the
+// bare event record -- used once a host has actually filled that form in;
+// inviteText() below stays as the fallback for an event that hasn't.
+export function inviteTextFromDetails(
+  d: { title: string; date: string; time: string; venueName: string; venueAddress: string; gatePass: string; notesForPlayers: string; entryCost: string },
+  guestName?: string
+): string {
+  const when =
+    d.date &&
+    (() => {
+      const dt = new Date(d.time ? `${d.date}T${d.time}` : d.date)
+      if (Number.isNaN(dt.getTime())) return ''
+      const date = dt.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+      const time = d.time ? dt.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) : ''
+      return time ? `${date} · ${time}` : date
+    })()
+  const venue = [d.venueName, d.venueAddress].filter(Boolean).join(' — ')
+  const maps = d.venueAddress ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.venueAddress)}` : null
+
+  const lines = [
+    `♠ *NamMane* · Where every hand feels like Vegas 🎰`,
+    '',
+    `Hey${guestName ? ` ${guestName}` : ''}! You're invited to a friendly evening of cards.`,
+    '',
+    `*${d.title || 'Poker Night'}*`,
+  ]
+  if (when) lines.push(`📅 ${when}`)
+  if (venue) lines.push(`📍 ${venue}`)
+  if (maps) lines.push(maps)
+  if (d.gatePass) lines.push(`🎫 Gate pass: ${d.gatePass}`)
+  if (d.entryCost) lines.push(`💰 Entry: ₹${d.entryCost}`)
+  if (d.notesForPlayers) lines.push('', d.notesForPlayers)
+  lines.push('', `See you at the table!`)
+  return lines.join('\n')
+}
+
 export function inviteText(e: InviteEventInfo, guestName?: string): string {
   const m = mapsLinkFor(e)
   const when = formatWhen(e.startsAt)

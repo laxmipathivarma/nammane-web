@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { newId, type Invitee } from '@/lib/pokerLedger'
-import { inviteText, waLink } from '@/lib/invite'
+import { emptyInvitationDetails, newId, type Invitee, type InvitationDetails } from '@/lib/pokerLedger'
+import { inviteText, inviteTextFromDetails, waLink } from '@/lib/invite'
 import type { PokerTabProps } from './types'
 
 export type InvitationSubTab = 'create' | 'preview' | 'guests' | 'approvals'
@@ -15,6 +15,22 @@ const subTabs: { key: SubTab; label: string }[] = [
   { key: 'approvals', label: 'Guest Approvals' },
 ]
 
+// The event's own title/date/address (set once at /host/create) seed the
+// form the first time a host opens Create Invitation, so they aren't
+// retyping what they already told us -- after that, whatever's saved in
+// data.invitationDetails wins.
+function seedFromEvent(eventInfo: PokerTabProps['eventInfo']): InvitationDetails {
+  const d = eventInfo.startsAt ? new Date(eventInfo.startsAt) : null
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return {
+    ...emptyInvitationDetails(),
+    title: eventInfo.title ?? '',
+    date: d && !Number.isNaN(d.getTime()) ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` : '',
+    time: d && !Number.isNaN(d.getTime()) ? `${pad(d.getHours())}:${pad(d.getMinutes())}` : '',
+    venueAddress: eventInfo.address ?? '',
+  }
+}
+
 export default function InvitationHub({
   data,
   save,
@@ -23,37 +39,42 @@ export default function InvitationHub({
   sub,
   setSub,
 }: PokerTabProps & { sub: SubTab; setSub: (s: SubTab) => void }) {
-  const defaultMessage = inviteText(eventInfo)
-  const [draft, setDraft] = useState(data.invitationMessage ?? defaultMessage)
-  const [draftStatus, setDraftStatus] = useState('')
+  const [details, setDetails] = useState<InvitationDetails>(data.invitationDetails ?? seedFromEvent(eventInfo))
+  const [savedStatus, setSavedStatus] = useState('')
   const [copyStatus, setCopyStatus] = useState('')
   const [inviteName, setInviteName] = useState('')
   const [invitePhone, setInvitePhone] = useState('')
   const [contactPickerSupported, setContactPickerSupported] = useState(false)
 
   useEffect(() => {
-    setDraft(data.invitationMessage ?? defaultMessage)
+    if (data.invitationDetails) setDetails(data.invitationDetails)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.invitationMessage])
+  }, [data.invitationDetails])
 
   useEffect(() => {
     const nav = navigator as unknown as { contacts?: { select?: unknown } }
     setContactPickerSupported(!!(nav.contacts && typeof nav.contacts.select === 'function'))
   }, [])
 
-  const effectiveMessage = data.invitationMessage ?? defaultMessage
+  // Once the host has actually filled this form in, the message is built
+  // from it; before that, fall back to the bare event record so Preview
+  // never shows completely empty.
+  const defaultMessage = inviteText(eventInfo)
+  const effectiveMessage =
+    data.invitationMessage ?? (data.invitationDetails ? inviteTextFromDetails(data.invitationDetails) : defaultMessage)
 
-  const saveMessage = () => {
-    save({ ...data, invitationMessage: draft.trim() || undefined })
-    setDraftStatus('Saved.')
-    setTimeout(() => setDraftStatus(''), 2000)
+  const field = (k: keyof InvitationDetails, v: string) => setDetails((d) => ({ ...d, [k]: v }))
+
+  const createInvitation = () => {
+    save({ ...data, invitationDetails: details, invitationMessage: inviteTextFromDetails(details) })
+    setSavedStatus('Invitation created.')
+    setTimeout(() => setSavedStatus(''), 2000)
+    setSub('preview')
   }
 
-  const resetMessage = () => {
-    setDraft(defaultMessage)
-    save({ ...data, invitationMessage: undefined })
-    setDraftStatus('Reset to default.')
-    setTimeout(() => setDraftStatus(''), 2000)
+  const findOnMaps = () => {
+    const q = details.venueAddress || details.venueName
+    window.open(q ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}` : 'https://www.google.com/maps', '_blank', 'noopener,noreferrer')
   }
 
   const copyMessage = async () => {
@@ -132,25 +153,93 @@ export default function InvitationHub({
       </div>
 
       {sub === 'create' && (
-        <div className="flex flex-col gap-3">
-          <label className="nm-label">Invitation message</label>
-          <textarea
-            className="nm-field min-h-[220px] text-[12.5px] leading-relaxed font-medium"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-          />
-          <div className="flex items-center gap-3">
-            <button type="button" onClick={saveMessage} className="nm-btn nm-btn-gold px-5 py-2.5 text-[12.5px]">
-              Save
-            </button>
-            <button type="button" onClick={resetMessage} className="nm-btn px-4 py-2.5 text-[12px] bg-ink2 text-white border border-white/10">
-              Reset to default
-            </button>
-            {draftStatus && <span className="text-[11px] text-muted2 font-semibold">{draftStatus}</span>}
+        <div className="flex flex-col gap-4">
+          <div>
+            <label className="nm-label">Title</label>
+            <input className="nm-field" placeholder="e.g. High Stakes Friday" value={details.title} onChange={(e) => field('title', e.target.value)} />
           </div>
-          <p className="text-[11.5px] text-muted2 font-medium leading-relaxed">
-            Built from this event&apos;s own title, date and address. Edit it however you like -- guests get exactly this text.
-          </p>
+
+          <div className="grid grid-cols-2 gap-2.5">
+            <div>
+              <label className="nm-label">Date</label>
+              <input type="date" className="nm-field" value={details.date} onChange={(e) => field('date', e.target.value)} />
+            </div>
+            <div>
+              <label className="nm-label">Time</label>
+              <input type="time" className="nm-field" value={details.time} onChange={(e) => field('time', e.target.value)} />
+            </div>
+          </div>
+
+          <div>
+            <label className="nm-label">Venue name</label>
+            <input className="nm-field" placeholder="e.g. Rahul's Terrace" value={details.venueName} onChange={(e) => field('venueName', e.target.value)} />
+          </div>
+
+          <div>
+            <label className="nm-label">Venue address</label>
+            <textarea
+              className="nm-field resize-none"
+              rows={2}
+              placeholder="Add the address manually, or find it on Google Maps first"
+              value={details.venueAddress}
+              onChange={(e) => field('venueAddress', e.target.value)}
+            />
+            <button type="button" onClick={findOnMaps} className="nm-btn mt-2 px-3.5 py-2 text-[11.5px] bg-ink2 text-white border border-white/10 flex items-center gap-1.5">
+              <svg width="13" height="13" viewBox="0 0 24 24" stroke="#5fd0ff" fill="none"><use href="#i-pin" /></svg>
+              Find on Google Maps
+            </button>
+            <p className="text-[10.5px] text-muted2 font-medium mt-1.5">
+              Opens Google Maps in a new tab to search and confirm the exact spot -- copy the address back here, or just type it directly.
+            </p>
+          </div>
+
+          <div>
+            <label className="nm-label">Venue gate pass (optional)</label>
+            <input className="nm-field" placeholder="e.g. Flat 4B, tell security you're here for Poker Night" value={details.gatePass} onChange={(e) => field('gatePass', e.target.value)} />
+          </div>
+
+          <div>
+            <label className="nm-label">Notes for players</label>
+            <textarea
+              className="nm-field resize-none"
+              rows={2}
+              placeholder="BYO snacks, chips only, no real-money wagering…"
+              value={details.notesForPlayers}
+              onChange={(e) => field('notesForPlayers', e.target.value)}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2.5">
+            <div>
+              <label className="nm-label">Event entry cost (optional)</label>
+              <div className="nm-field flex items-center gap-1.5">
+                <span className="text-muted2 font-bold">₹</span>
+                <input
+                  type="number"
+                  className="bg-transparent outline-none w-full"
+                  placeholder="Leave blank if free"
+                  value={details.entryCost}
+                  onChange={(e) => field('entryCost', e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="nm-label">No. of invites</label>
+              <input
+                type="number"
+                min={0}
+                className="nm-field"
+                placeholder="e.g. 10"
+                value={details.numInvites}
+                onChange={(e) => field('numInvites', e.target.value)}
+              />
+            </div>
+          </div>
+
+          <button type="button" onClick={createInvitation} className="nm-btn nm-btn-gold w-full py-3.5 text-[13.5px] mt-1">
+            Create invitation
+          </button>
+          {savedStatus && <span className="text-[11px] text-muted2 font-semibold text-center">{savedStatus}</span>}
         </div>
       )}
 
@@ -166,7 +255,7 @@ export default function InvitationHub({
               Copy message
             </button>
             <button type="button" onClick={() => setSub('create')} className="text-[11.5px] font-bold text-[#ff8fd1]">
-              Edit message
+              Edit invitation details
             </button>
             {copyStatus && <span className="text-[11px] text-muted2 font-semibold">{copyStatus}</span>}
           </div>
@@ -226,7 +315,11 @@ export default function InvitationHub({
                       <span className="text-[11px] font-bold text-[#7fe3a1]">Invited ✓</span>
                     ) : inv.phone ? (
                       <a
-                        href={waLink(inv.phone, data.invitationMessage ?? inviteText(eventInfo, inv.name))}
+                        href={waLink(
+                          inv.phone,
+                          data.invitationMessage ??
+                            (data.invitationDetails ? inviteTextFromDetails(data.invitationDetails, inv.name) : inviteText(eventInfo, inv.name))
+                        )}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => markInvited(inv.id)}

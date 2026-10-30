@@ -86,12 +86,36 @@ export function emptyTable(name: string, maxPlayers = 10): PokerTable {
   return { id: newId(), name, maxPlayers, status: 'running', createdAt: Date.now(), ledger: emptyLedger() }
 }
 
+// The structured fields behind "Create Invitation" -- separate from the
+// event's own title/date/venue (set once at /host/create) because the
+// invite itself needs a few things the create form never asked for (gate
+// pass, notes for players, how many invites the host is planning to send)
+// and the host may want the invite to say something slightly different
+// from the event record itself (e.g. a friendlier venue name). Starts
+// blank; the UI pre-fills it from the event's own fields on first open.
+export type InvitationDetails = {
+  title: string
+  date: string // yyyy-mm-dd, <input type="date"> value
+  time: string // HH:mm, <input type="time"> value
+  venueName: string
+  venueAddress: string
+  gatePass: string
+  notesForPlayers: string
+  entryCost: string // free text so it can stay blank -- "optional"
+  numInvites: string
+}
+
+export function emptyInvitationDetails(): InvitationDetails {
+  return { title: '', date: '', time: '', venueName: '', venueAddress: '', gatePass: '', notesForPlayers: '', entryCost: '', numInvites: '' }
+}
+
 // Everything poker-related for one event: the shared invite list (not
 // per-table -- an invitee gets seated at whichever table once approved)
 // plus every table ever run.
 export type PokerEventData = {
   invitees: Invitee[]
   invitationMessage?: string // host's own edit of the invite text; undefined = use the auto-generated one
+  invitationDetails?: InvitationDetails
   tables: PokerTable[]
 }
 
