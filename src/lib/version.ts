@@ -4,7 +4,7 @@
 // what's on screen always matches what's actually live -- it isn't
 // derived automatically from git because the production build has no
 // access to tag history at build time.
-export const APP_VERSION = 'v1.6.11'
+export const APP_VERSION = 'v1.6.12'
 
 // Display helpers so every place that shows the version uses the same
 // wording -- just update APP_VERSION above and these follow.

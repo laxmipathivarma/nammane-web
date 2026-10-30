@@ -45,7 +45,7 @@ function Stars() {
  * into a gentle auto-drift (same mechanism as the marketing hero) when
  * nothing's moving it, which is also what keeps it animated on mobile.
  */
-export default function WebAppHero3D() {
+export default function WebAppHero3D({ signedIn = false }: { signedIn?: boolean }) {
   const pointer = usePointer()
   const clock = useClock()
   const reduced = useReducedMotion()
@@ -190,25 +190,27 @@ export default function WebAppHero3D() {
             <span className="nm2-grad-text not-italic">friends by dessert.</span>
           </p>
         </div>
-        <div className="flex flex-wrap gap-3 pt-1.5">
-          <a
-            href={SIGNUP_URL}
-            className="nm2-grad-pill inline-flex items-center gap-3 rounded-full pl-6 pr-1.5 h-[52px] text-[13px] font-extrabold uppercase tracking-[.12em] text-white hover:-translate-y-0.5 transition-transform"
-          >
-            Create account
-            <span className="w-9 h-9 rounded-full bg-white flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c23ffb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
-            </span>
-          </a>
-          <a
-            href={LOGIN_URL}
-            className="nm2-glass nm2-btn-ghost inline-flex items-center rounded-full px-6 h-[52px] text-[13px] font-extrabold uppercase tracking-[.12em] text-white hover:border-[var(--nm-cyan)] transition-colors"
-          >
-            I have an account
-          </a>
-        </div>
+        {!signedIn && (
+          <div className="flex flex-wrap gap-3 pt-1.5">
+            <a
+              href={SIGNUP_URL}
+              className="nm2-grad-pill inline-flex items-center gap-3 rounded-full pl-6 pr-1.5 h-[52px] text-[13px] font-extrabold uppercase tracking-[.12em] text-white hover:-translate-y-0.5 transition-transform"
+            >
+              Create account
+              <span className="w-9 h-9 rounded-full bg-white flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c23ffb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </span>
+            </a>
+            <a
+              href={LOGIN_URL}
+              className="nm2-glass nm2-btn-ghost inline-flex items-center rounded-full px-6 h-[52px] text-[13px] font-extrabold uppercase tracking-[.12em] text-white hover:border-[var(--nm-cyan)] transition-colors"
+            >
+              I have an account
+            </a>
+          </div>
+        )}
       </div>
 
       {/* 3D scene -- notably smaller on mobile (w-[58vw], capped at 260px)

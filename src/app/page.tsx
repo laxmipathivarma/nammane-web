@@ -116,7 +116,7 @@ export default function Home() {
       {/* 3D animated entry hero -- from the webapp design handoff: paper-cut
           space scene (cave, Saturn, Jupiter, a drifting astronaut) with the
           sign in / create account CTAs built in. */}
-      <WebAppHero3D />
+      <WebAppHero3D signedIn={!!user} />
 
       {/* post-login quick actions -- previously Host/Join/Discover/Bookings/
           Profile only lived inside the hamburger menu, so a signed-in
