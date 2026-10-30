@@ -10,7 +10,11 @@ import { NextRequest, NextResponse } from 'next/server'
 // confirm the event is actually a poker event before touching it.
 
 async function loadEvent(supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>, id: string) {
-  const { data } = await supabase.from('events').select('id,host_id,category,event_details').eq('id', id).maybeSingle()
+  const { data } = await supabase
+    .from('events')
+    .select('id,host_id,category,event_details,title,address,starts_at,lat,lng')
+    .eq('id', id)
+    .maybeSingle()
   return data
 }
 
@@ -26,8 +30,18 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   if (event.host_id !== user.id) return NextResponse.json({ error: 'Only the host can open the ledger' }, { status: 403 })
   if (event.category !== 'poker') return NextResponse.json({ error: 'Not a poker event' }, { status: 400 })
 
-  const ledger: PokerLedger = (event.event_details && event.event_details.poker) || emptyLedger()
-  return NextResponse.json({ ledger })
+  // Spread over emptyLedger() so a ledger saved before the invite list
+  // existed (or before any other future field) still comes back with a
+  // valid shape instead of `invitees` being undefined on the client.
+  const ledger: PokerLedger = { ...emptyLedger(), ...((event.event_details && event.event_details.poker) || {}) }
+  const eventInfo = {
+    title: event.title as string,
+    address: event.address as string | null,
+    startsAt: event.starts_at as string | null,
+    lat: event.lat as number | null,
+    lng: event.lng as number | null,
+  }
+  return NextResponse.json({ ledger, event: eventInfo })
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
@@ -43,11 +57,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   const body = await req.json()
   const ledger: PokerLedger = body.ledger
-  if (!ledger || !Array.isArray(ledger.players)) {
+  if (!ledger || !Array.isArray(ledger.players) || (ledger.invitees && !Array.isArray(ledger.invitees))) {
     return NextResponse.json({ error: 'Malformed ledger payload' }, { status: 400 })
   }
 
-  const nextDetails = { ...(event.event_details || {}), poker: ledger }
+  const nextDetails = { ...(event.event_details || {}), poker: { ...ledger, invitees: ledger.invitees || [] } }
   const { error } = await supabase.from('events').update({ event_details: nextDetails }).eq('id', params.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
 

@@ -13,6 +13,7 @@ import {
   sumBuyins,
   type PokerLedger,
 } from '@/lib/pokerLedger'
+import { inviteText, mapsLinkFor, waLink, type InviteEventInfo } from '@/lib/invite'
 
 const nid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4)
 
@@ -21,6 +22,7 @@ export default function PokerLedgerPage() {
   const { user, loading: authLoading } = useAuth()
 
   const [ledger, setLedger] = useState<PokerLedger | null>(null)
+  const [eventInfo, setEventInfo] = useState<InviteEventInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -30,6 +32,9 @@ export default function PokerLedgerPage() {
   const [rakeAmt, setRakeAmt] = useState('')
   const [expLabel, setExpLabel] = useState('')
   const [expAmt, setExpAmt] = useState('')
+  const [inviteName, setInviteName] = useState('')
+  const [invitePhone, setInvitePhone] = useState('')
+  const [copyStatus, setCopyStatus] = useState('')
 
   useEffect(() => {
     if (authLoading) return
@@ -43,6 +48,7 @@ export default function PokerLedgerPage() {
         const j = await r.json()
         if (!r.ok) throw new Error(j.error || 'Could not load ledger')
         setLedger(j.ledger as PokerLedger)
+        setEventInfo(j.event as InviteEventInfo)
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false))
@@ -82,6 +88,36 @@ export default function PokerLedgerPage() {
   const c = calc(g)
   const nets = settleNets(g)
   const transfers = g.settle ? g.settle.list : nets ? minTransfers(nets) : []
+  const groupMessage = eventInfo ? inviteText(eventInfo) : ''
+  const mapsLink = eventInfo ? mapsLinkFor(eventInfo) : null
+
+  const addInvitee = () => {
+    if (!inviteName.trim()) return
+    save({
+      ...g,
+      invitees: [...g.invitees, { id: nid(), name: inviteName.trim(), phone: invitePhone.trim() || undefined, invitedAt: null }],
+    })
+    setInviteName('')
+    setInvitePhone('')
+  }
+
+  const removeInvitee = (id: string) => {
+    save({ ...g, invitees: g.invitees.filter((inv) => inv.id !== id) })
+  }
+
+  const markInvited = (id: string) => {
+    save({ ...g, invitees: g.invitees.map((inv) => (inv.id === id ? { ...inv, invitedAt: Date.now() } : inv)) })
+  }
+
+  const copyGroupMessage = async () => {
+    try {
+      await navigator.clipboard.writeText(groupMessage)
+      setCopyStatus('Copied.')
+    } catch {
+      setCopyStatus('Could not copy -- select and copy manually.')
+    }
+    setTimeout(() => setCopyStatus(''), 2500)
+  }
 
   const addPlayer = () => {
     if (!newName.trim()) return
@@ -147,6 +183,83 @@ export default function PokerLedgerPage() {
             {error}
           </div>
         )}
+
+        {/* Invite -- ported from lucky-poker's "Invite" tab: a shareable
+            message built from the event's own date/venue/maps link, sent
+            per-person over WhatsApp, with who's been sent one tracked
+            alongside the ledger. */}
+        <div className="nm-field bg-ink2 mb-6 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <label className="nm-label !mb-0">Invite players</label>
+            {mapsLink && (
+              <a href={mapsLink} target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold text-[#ff8fd1]">
+                Check venue on Maps
+              </a>
+            )}
+          </div>
+          <pre className="text-[11.5px] text-muted font-medium whitespace-pre-wrap leading-relaxed bg-ink rounded-xl p-3 border border-white/10">
+            {groupMessage}
+          </pre>
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={copyGroupMessage} className="nm-btn px-4 py-2 text-[11.5px] bg-ink text-white border border-white/10">
+              Copy message
+            </button>
+            {copyStatus && <span className="text-[11px] text-muted2 font-semibold">{copyStatus}</span>}
+          </div>
+
+          <div className="flex gap-2 pt-1">
+            <input
+              className="nm-field flex-1 !py-2 text-[12.5px]"
+              placeholder="Name"
+              value={inviteName}
+              onChange={(e) => setInviteName(e.target.value)}
+            />
+            <input
+              className="nm-field w-36 !py-2 text-[12.5px]"
+              placeholder="Mobile number"
+              value={invitePhone}
+              onChange={(e) => setInvitePhone(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && addInvitee()}
+            />
+            <button type="button" onClick={addInvitee} className="nm-btn nm-btn-gold px-4 text-[12.5px]">
+              Invite
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            {g.invitees.length === 0 && <div className="text-[12px] text-muted2 font-semibold">Nobody invited yet.</div>}
+            {g.invitees.map((inv) => (
+              <div key={inv.id} className="flex items-center justify-between gap-2 bg-ink rounded-xl border border-white/10 px-3 py-2.5">
+                <div className="min-w-0">
+                  <div className="font-bold text-[12.5px] truncate">{inv.name}</div>
+                  {inv.phone && <div className="text-[11px] text-muted2 font-semibold">{inv.phone}</div>}
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {inv.invitedAt ? (
+                    <span className="text-[11px] font-bold text-[#7fe3a1]">Invited ✓</span>
+                  ) : inv.phone ? (
+                    <a
+                      href={waLink(inv.phone, inviteText(eventInfo as InviteEventInfo, inv.name))}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => markInvited(inv.id)}
+                      className="nm-btn px-3 py-1.5 text-[11px] bg-ink2 text-white border border-white/10"
+                    >
+                      Send on WhatsApp
+                    </a>
+                  ) : (
+                    <button type="button" onClick={() => markInvited(inv.id)} className="nm-btn px-3 py-1.5 text-[11px] bg-ink2 text-white border border-white/10">
+                      Mark invited
+                    </button>
+                  )}
+                  <button type="button" onClick={() => removeInvitee(inv.id)} className="text-[10.5px] text-muted2 font-semibold hover:text-[#ff9ecb]">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Add player */}
         <label className="nm-label">Add a player</label>

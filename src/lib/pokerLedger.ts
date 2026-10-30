@@ -26,16 +26,26 @@ export type PokerPlayer = {
   out: number | null // cash-out amount, null while still playing
 }
 export type Transfer = { from: string; to: string; amt: number; done: boolean }
+// Invite list, ported from lucky-poker's "Invite" tab (index.html's
+// invitees/invList/inviteText) -- host adds people by name + phone, sends
+// each a WhatsApp message built from the event's own details, and the app
+// just tracks who's been sent one. Not ported: the player-side RSVP
+// (accept/decline) that lucky-poker tracks through its own phone-based
+// player accounts -- Nammane already has its own join/approve flow for
+// that, so an invite here is "I sent this person a message" rather than a
+// tracked yes/no.
+export type Invitee = { id: string; name: string; phone?: string; invitedAt: number | null }
 export type PokerLedger = {
   currency: string
   players: PokerPlayer[]
   rake: number
   expenses: Expense[]
   settle: { at: number; list: Transfer[] } | null
+  invitees: Invitee[]
 }
 
 export function emptyLedger(): PokerLedger {
-  return { currency: '₹', players: [], rake: 0, expenses: [], settle: null }
+  return { currency: '₹', players: [], rake: 0, expenses: [], settle: null, invitees: [] }
 }
 
 const r2 = (n: number) => Math.round(n * 100) / 100
