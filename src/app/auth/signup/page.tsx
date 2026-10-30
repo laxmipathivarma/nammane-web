@@ -4,8 +4,10 @@ import Link from 'next/link'
 import { useState } from 'react'
 import AuthShell from '@/components/AuthShell'
 import BackButton from '@/components/BackButton'
+import OtpInput from '@/components/OtpInput'
 import { createClient } from '@/lib/supabase'
 import { toE164India, sanitizeIndianMobileInput } from '@/lib/phone'
+import { EMAIL_OTP_LENGTH } from '@/lib/otp'
 
 export default function SignupPage() {
   // Email/password and mobile+OTP are two separate ways to create the same
@@ -69,6 +71,10 @@ export default function SignupPage() {
 
   const handleVerifyEmailOtp = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (emailOtp.length !== EMAIL_OTP_LENGTH) {
+      setError(`Enter the full ${EMAIL_OTP_LENGTH}-digit code.`)
+      return
+    }
     setLoading(true)
     setError('')
 
@@ -206,15 +212,7 @@ export default function SignupPage() {
                 Change email
               </button>
             </div>
-            <input
-              type="text"
-              inputMode="numeric"
-              value={emailOtp}
-              onChange={(e) => setEmailOtp(e.target.value)}
-              placeholder="6-digit code"
-              required
-              className="nm-field"
-            />
+            <OtpInput length={EMAIL_OTP_LENGTH} value={emailOtp} onChange={setEmailOtp} />
             <p className="text-[12px] text-muted font-medium mt-2">
               Code sent to {email}.{' '}
               <button type="button" onClick={handleResendEmailOtp} className="text-[#ff8fd1] font-bold">
