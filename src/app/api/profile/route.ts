@@ -6,6 +6,109 @@ import { avatarByKey } from '@/lib/avatars'
 import { isMinorDob } from '@/lib/age'
 import { NextRequest, NextResponse } from 'next/server'
 
+type Stats = {
+  eventsHosted: number
+  hostRating: number | null
+  reviewCount: number
+  repeatGuestPct: number | null
+}
+
+type RecentReview = {
+  rating: number
+  comment: string | null
+  createdAt: string
+  reviewerName: string
+  reviewerInitial: string
+} | null
+
+// The profile view page used to show the same "12 events / 4.9 rating /
+// 68% repeat guests" and a fixed "Aisha J." review for every account,
+// signed-in or not. Real numbers, computed here from the actual
+// events/bookings/reviews tables, scoped to this signed-in user's own id
+// (never anything client-supplied).
+//
+// Uses the admin (service-role) client, not the session-scoped one GET
+// otherwise uses for the profile row itself: `bookings` has row-level
+// security turned on but no SELECT policy defined yet (events/profiles
+// do, bookings doesn't -- see database/001_initial_schema.sql), so the
+// session-scoped client silently gets zero rows back for it. Each query
+// is wrapped so a schema hiccup degrades to an honest empty/zero state
+// instead of taking the whole profile page down.
+async function loadStats(userId: string): Promise<{ stats: Stats; recentReview: RecentReview }> {
+  const admin = createAdminClient()
+  const stats: Stats = { eventsHosted: 0, hostRating: null, reviewCount: 0, repeatGuestPct: null }
+  let recentReview: RecentReview = null
+
+  try {
+    const { count } = await admin
+      .from('events')
+      .select('id', { count: 'exact', head: true })
+      .eq('host_id', userId)
+      .eq('status', 'published')
+    stats.eventsHosted = count ?? 0
+  } catch (e) {
+    console.error('profile stats: events count failed', e)
+  }
+
+  try {
+    const { data: reviewRows } = await admin
+      .from('reviews')
+      .select('rating, comment, created_at, reviewer_id')
+      .eq('reviewed_id', userId)
+      .order('created_at', { ascending: false })
+
+    if (reviewRows && reviewRows.length > 0) {
+      stats.reviewCount = reviewRows.length
+      const total = reviewRows.reduce((sum, r) => sum + (r.rating ?? 0), 0)
+      stats.hostRating = Math.round((total / reviewRows.length) * 10) / 10
+
+      const latest = reviewRows[0]
+      const { data: reviewer } = await admin
+        .from('profiles')
+        .select('display_name, email')
+        .eq('id', latest.reviewer_id)
+        .maybeSingle()
+      const reviewerName = reviewer?.display_name || reviewer?.email?.split('@')[0] || 'A guest'
+      recentReview = {
+        rating: latest.rating ?? 0,
+        comment: latest.comment,
+        createdAt: latest.created_at,
+        reviewerName,
+        reviewerInitial: reviewerName.charAt(0).toUpperCase(),
+      }
+    }
+  } catch (e) {
+    console.error('profile stats: reviews failed', e)
+  }
+
+  try {
+    const { data: hostEvents } = await admin.from('events').select('id').eq('host_id', userId)
+    const eventIds = (hostEvents ?? []).map((e) => e.id)
+    if (eventIds.length > 0) {
+      const { data: bookingRows } = await admin
+        .from('bookings')
+        .select('guest_id, event_id')
+        .in('event_id', eventIds)
+        .in('status', ['approved', 'attended'])
+      if (bookingRows && bookingRows.length > 0) {
+        const perGuest = new Map<string, Set<string>>()
+        for (const b of bookingRows) {
+          const set = perGuest.get(b.guest_id) ?? new Set<string>()
+          set.add(b.event_id)
+          perGuest.set(b.guest_id, set)
+        }
+        const totalGuests = perGuest.size
+        const repeatGuests = [...perGuest.values()].filter((s) => s.size > 1).length
+        stats.repeatGuestPct = totalGuests > 0 ? Math.round((repeatGuests / totalGuests) * 100) : null
+      }
+    }
+  } catch (e) {
+    console.error('profile stats: repeat guests failed', e)
+  }
+
+  return { stats, recentReview }
+}
+
 export async function GET() {
   const supabase = await createServerSupabaseClient()
   const {
@@ -21,7 +124,9 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json({ profile: data })
+  const { stats, recentReview } = await loadStats(user.id)
+
+  return NextResponse.json({ profile: data, stats, recentReview })
 }
 
 // Everything on the edit form, validated server-side too (not just in the

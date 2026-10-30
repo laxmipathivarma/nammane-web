@@ -32,7 +32,7 @@ type Profile = {
 const AVATAR_GROUPS: AvatarGroup[] = ['people', 'animals', 'funny', 'heroes']
 
 export default function EditProfilePage() {
-  const { user, loading: authLoading } = useAuth()
+  const { user, loading: authLoading, refreshProfile } = useAuth()
   const router = useRouter()
 
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -146,6 +146,11 @@ export default function EditProfilePage() {
       if (!res.ok) throw new Error(j.error || 'Could not save your profile')
       setProfile(j.profile)
       setSaveOk(true)
+      // The header's account pill reads its avatar from AuthProvider, not
+      // from this page's own profile state -- without this it kept
+      // showing whatever avatar (or letter fallback) was there when the
+      // app first loaded, until a full page reload.
+      refreshProfile()
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Could not save your profile')
     } finally {
