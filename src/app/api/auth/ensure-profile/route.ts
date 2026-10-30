@@ -20,11 +20,20 @@ export async function POST() {
 
   const admin = createAdminClient()
 
+  // Supabase's `user.phone` is '' (not null/undefined) for anyone who
+  // didn't sign in by phone -- `?? null` only catches null/undefined, so
+  // every email/Google sign-in was writing phone_number: '' here. profiles
+  // has a UNIQUE constraint on phone_number, so only the very first such
+  // user could ever upsert successfully; every other email/Google sign-in
+  // hit "duplicate key value violates unique constraint" (Postgres code
+  // 23505) and this whole call silently 500'd (confirmed in Vercel's
+  // runtime logs -- every single ensure-profile call was failing this
+  // way). `|| null` treats '' the same as null/undefined.
   const { error } = await admin.from('profiles').upsert(
     {
       id: user.id,
       email: user.email ?? null,
-      phone_number: user.phone ?? null,
+      phone_number: user.phone || null,
       phone_verified: Boolean(user.phone),
       display_name:
         (user.user_metadata?.full_name as string | undefined) ??
