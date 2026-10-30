@@ -47,9 +47,15 @@ body {
   font-weight: 800;
 }
 
+/* ---------- NeoPOP-style buttons ----------
+   Borrowed mechanic (not palette) from CRED's NeoPOP: a button is a flat
+   color face sitting on top of a solid, hard-edged "depth" shadow -- no
+   blur, offset down-right -- and pressing it collapses that offset so the
+   face slides down onto its own shadow, like a real pressable button
+   rather than a floating glow. Kept in Nammane's own violet/pink/ink
+   palette rather than CRED's black-and-neon one. */
 .nm-btn {
   appearance: none;
-  border: none;
   cursor: pointer;
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 800;
@@ -58,32 +64,39 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border: 2px solid transparent;
+  transform: translate(0, 0);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
 .nm-btn-gold {
   background: linear-gradient(120deg, #8b3ffb 0%, #c23ffb 45%, #ff4f9e 100%);
   color: #fff;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12) inset, 0 10px 24px rgba(180, 60, 250, 0.45),
-    0 2px 0 rgba(255, 255, 255, 0.25) inset;
-  border: none;
+  border-color: #1b0a3d;
+  box-shadow: 0 4px 0 0 #4a1397, 0 4px 0 2px #1b0a3d;
 }
 .nm-btn-gold:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16) inset, 0 14px 30px rgba(180, 60, 250, 0.55),
-    0 2px 0 rgba(255, 255, 255, 0.25) inset;
+  transform: translate(0, -1px);
+  box-shadow: 0 5px 0 0 #4a1397, 0 5px 0 2px #1b0a3d;
 }
 .nm-btn-gold:active {
-  transform: translateY(1px);
+  transform: translate(0, 4px);
+  box-shadow: 0 0 0 0 #4a1397, 0 0 0 2px #1b0a3d;
 }
 
 .nm-btn-outline {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--nm-ink-2);
   color: #fff;
-  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 4px 0 0 #000000, 0 4px 0 2px rgba(255, 255, 255, 0.1);
 }
 .nm-btn-outline:hover {
-  background: rgba(255, 255, 255, 0.1);
+  transform: translate(0, -1px);
+  background: #1d1840;
+}
+.nm-btn-outline:active {
+  transform: translate(0, 4px);
+  box-shadow: 0 0 0 0 #000000, 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .nm-glass {
@@ -101,10 +114,14 @@ body {
   white-space: nowrap;
   border: 1.5px solid rgba(255, 255, 255, 0.14);
   cursor: pointer;
-  transition: transform 0.15s ease;
+  transform: translate(0, 0);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 .nm-chip:hover {
-  transform: translateY(-1px);
+  transform: translate(0, -1px);
+}
+.nm-chip:active {
+  transform: translate(0, 2px);
 }
 
 .nm-card {
@@ -429,10 +446,17 @@ body {
 }
 .nm-btn-ghost {
   background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.14);
+  border: 1.5px solid rgba(255,255,255,.18);
   border-radius: 999px;
   color: #fff;
   font-weight: 700;
+  box-shadow: 0 3px 0 0 #000, 0 3px 0 2px rgba(255,255,255,.1);
+  transform: translate(0, 0);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.nm-btn-ghost:active {
+  transform: translate(0, 3px);
+  box-shadow: 0 0 0 0 #000, 0 0 0 2px rgba(255,255,255,.1);
 }
 @media (prefers-reduced-motion: reduce) {
   .nm-hero-card-anim { animation: none; }
@@ -526,7 +550,14 @@ body {
   background-size: 220%;
   background-position: 0% 50%;
   animation: nm2-shimmer 5s ease-in-out infinite;
-  box-shadow: 0 10px 24px rgba(180,60,250,.45), inset 0 2px 0 rgba(255,255,255,.25);
+  border: 2px solid #1b0a3d;
+  box-shadow: 0 5px 0 0 #4a1397, 0 5px 0 2px #1b0a3d;
+  transform: translate(0, 0);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.nm2-grad-pill:active {
+  transform: translate(0, 5px);
+  box-shadow: 0 0 0 0 #4a1397, 0 0 0 2px #1b0a3d;
 }
 @keyframes nm2-shimmer {
   0%, 100% { background-position: 0% 50%; }

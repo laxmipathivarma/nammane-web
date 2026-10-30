@@ -172,11 +172,11 @@ export default function Hero() {
           phone, so it gets its own gentle auto-rotating tilt (driven by the
           same idle sine-drift the desktop face idles into when the pointer's
           been still) instead of sitting there static. */}
-      <div className="sm:hidden relative z-[2] mx-auto mt-5 w-[86%] max-w-[360px]" style={{ perspective: 600 }}>
+      <div className="sm:hidden relative z-[2] mx-auto mt-5 w-[96%] max-w-[480px]" style={{ perspective: 600 }}>
         <div
           ref={mobileArtRef}
           className="relative overflow-hidden rounded-[28px] nm2-image-grade"
-          style={{ aspectRatio: '4/5', willChange: 'transform' }}
+          style={{ aspectRatio: '3/4', willChange: 'transform' }}
         >
           <img
             src="/assets/hero.jpeg"

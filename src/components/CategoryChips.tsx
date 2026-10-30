@@ -37,7 +37,8 @@ export default function CategoryChips({
                 ? {
                     background: 'linear-gradient(120deg,#8b3ffb,#ff4f9e)',
                     color: '#fff',
-                    boxShadow: '0 0 0 2px rgba(201,104,255,.18),0 6px 14px rgba(201,104,255,.25)',
+                    border: '1.5px solid #1b0a3d',
+                    boxShadow: '0 3px 0 0 #4a1397, 0 3px 0 2px #1b0a3d',
                   }
                 : { background: 'rgba(255,255,255,.06)', color: '#e4d4ff' }
             }
