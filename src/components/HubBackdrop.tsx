@@ -7,7 +7,10 @@ import { cardStyle, categoryIcon, type EventCategory } from '@/lib/eventCardStyl
 // own accent colors -- the same bokeh device the landing hero uses
 // (WebAppHero3D.tsx's <Stars/> + drop-shadowed planets), not the flat
 // two-stop gradient the first pass of this backdrop used.
-const ORBS: Record<EventCategory, { color: string; style: React.CSSProperties }[]> = {
+// Only poker (and the original 5 siblings) have bespoke orb layouts --
+// the rest fall back to `other`'s via the lookup below instead of
+// needing one of these hand-placed per new category.
+const ORBS: Partial<Record<EventCategory, { color: string; style: React.CSSProperties }[]>> = {
   poker: [
     { color: '#8b3ffb', style: { top: '-10%', left: '-8%', width: 300, height: 300 } },
     { color: '#ff4f9e', style: { top: '22%', right: '-10%', width: 240, height: 240 } },
@@ -69,7 +72,7 @@ function Stars({ color }: { color: string }) {
 export default function HubBackdrop({ category }: { category: EventCategory }) {
   const s = cardStyle[category]
   const icon = categoryIcon[category]
-  const orbs = ORBS[category]
+  const orbs = ORBS[category] ?? ORBS.other!
 
   return (
     <div className={`fixed inset-0 -z-10 overflow-hidden pointer-events-none nm-bg-${category}`} aria-hidden="true">

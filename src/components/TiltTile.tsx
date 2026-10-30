@@ -57,10 +57,13 @@ export default function TiltTile({
 
       <div className="relative flex items-start justify-between w-full">
         <div
-          className="w-10 h-10 rounded-[13px] flex items-center justify-center shrink-0"
-          style={{ background: `linear-gradient(135deg, ${a}, ${b})`, boxShadow: `0 6px 18px -4px ${a}99, 0 0 0 1px rgba(255,255,255,.14) inset` }}
+          className="w-11 h-11 rounded-[14px] flex items-center justify-center shrink-0"
+          style={{
+            background: `linear-gradient(145deg, ${a}, ${b})`,
+            boxShadow: `inset -4px -5px 9px rgba(10,8,28,.4), inset 3px 4px 7px rgba(255,255,255,.4), 0 8px 18px -4px ${a}99, 0 0 0 1px rgba(255,255,255,.12)`,
+          }}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="#fff" style={{ filter: 'drop-shadow(0 1px 1px rgba(0,0,0,.25))' }}>
             <use href={`#${icon}`} />
           </svg>
         </div>

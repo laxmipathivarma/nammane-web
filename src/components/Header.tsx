@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { NAV_LABELS, type NavKey } from '@/lib/navMenu'
 import { WEBAPP_VERSION_LABEL } from '@/lib/version'
 import { useAuth } from '@/lib/AuthProvider'
+import AvatarBadge from '@/components/AvatarBadge'
 
 const LOGIN_URL = 'https://app.nammane.in/auth/login'
 const WEBAPP_URL = 'https://app.nammane.in'
@@ -57,7 +58,7 @@ export default function Header({ isMarketing = false }: { isMarketing?: boolean 
   const [mobileOpen, setMobileOpen] = useState(false)
   const [appMenuOpen, setAppMenuOpen] = useState(false)
   const appMenuRef = useRef<HTMLDivElement>(null)
-  const { user, loading, signOut } = useAuth()
+  const { user, loading, signOut, avatarKey } = useAuth()
   const HREFS = hrefsFor(isMarketing, !!user)
   const profileHref = accountHref(isMarketing, '/profile')
   const bookingsHref = accountHref(isMarketing, '/bookings')
@@ -184,9 +185,7 @@ export default function Header({ isMarketing = false }: { isMarketing?: boolean 
                     href={profileHref}
                     className="hidden sm:flex items-center gap-2 text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors"
                   >
-                    <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white shrink-0" style={{ background: 'linear-gradient(160deg,#ff8fd1,#8b3ffb)' }}>
-                      {accountLabel.charAt(0).toUpperCase()}
-                    </span>
+                    <AvatarBadge avatarKey={avatarKey} fallbackInitial={accountLabel.charAt(0).toUpperCase()} size={24} />
                     {accountLabel}
                   </a>
                 ) : (
@@ -194,9 +193,7 @@ export default function Header({ isMarketing = false }: { isMarketing?: boolean 
                     href={profileHref}
                     className="hidden sm:flex items-center gap-2 text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors"
                   >
-                    <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white shrink-0" style={{ background: 'linear-gradient(160deg,#ff8fd1,#8b3ffb)' }}>
-                      {accountLabel.charAt(0).toUpperCase()}
-                    </span>
+                    <AvatarBadge avatarKey={avatarKey} fallbackInitial={accountLabel.charAt(0).toUpperCase()} size={24} />
                     {accountLabel}
                   </Link>
                 )}

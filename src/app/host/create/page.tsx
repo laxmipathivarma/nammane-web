@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { CATEGORIES } from '@/components/CategoryChips'
+import { EVENT_CATEGORIES, categoryLabel, categoryEmoji, categoryBadgeGradient } from '@/lib/eventCardStyle'
 import BackButton from '@/components/BackButton'
 import { useAuth } from '@/lib/AuthProvider'
 
@@ -133,23 +133,38 @@ export default function CreateEventPage() {
 
         <label className="nm-label">Choose a category</label>
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5 mb-6">
-          {CATEGORIES.map((c) => (
-            <button
-              key={c.key}
-              type="button"
-              onClick={() => setCategory(c.key)}
-              className={`rounded-2xl flex flex-col items-center gap-1.5 py-3 px-1.5 text-[10.5px] font-bold border transition-colors ${
-                category === c.key
-                  ? 'border-ruby bg-gradient-to-br from-[#2a1a40] to-[#120f26] text-white shadow-[0_0_0_1px_rgba(255,79,158,.4),0_8px_16px_rgba(255,79,158,.18)]'
-                  : 'border-white/10 bg-ink2 text-muted'
-              }`}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill={category === c.key ? '#fff' : 'none'} stroke={category === c.key ? 'none' : '#cfc9e6'}>
-                <use href={`#${c.icon}`} />
-              </svg>
-              {c.label}
-            </button>
-          ))}
+          {EVENT_CATEGORIES.map((key) => {
+            const isActive = category === key
+            const [c1, c2] = categoryBadgeGradient[key]
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setCategory(key)}
+                className={`rounded-2xl flex flex-col items-center gap-1.5 py-3 px-1.5 text-[10.5px] font-bold border transition-all duration-150 hover:-translate-y-0.5 ${
+                  isActive
+                    ? 'border-ruby bg-gradient-to-br from-[#2a1a40] to-[#120f26] text-white shadow-[0_0_0_1px_rgba(255,79,158,.4),0_8px_16px_rgba(255,79,158,.18)]'
+                    : 'border-white/10 bg-ink2 text-muted'
+                }`}
+              >
+                <span
+                  className="flex items-center justify-center rounded-full"
+                  style={{
+                    width: 30,
+                    height: 30,
+                    fontSize: 15,
+                    lineHeight: 1,
+                    background: `linear-gradient(155deg, ${c1}, ${c2})`,
+                    boxShadow:
+                      'inset -3px -4px 6px rgba(10,8,28,.45), inset 2px 3px 4px rgba(255,255,255,.4), 0 4px 8px rgba(0,0,0,.3)',
+                  }}
+                >
+                  {categoryEmoji[key]}
+                </span>
+                {categoryLabel[key]}
+              </button>
+            )
+          })}
         </div>
 
         <label className="nm-label">Cover photo</label>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { usePointer, useClock, useReducedMotion } from '@/components/marketing-v2/hooks'
+import { RepelWords } from '@/components/RepelWords'
 
 const SIGNUP_URL = '/auth/signup'
 const LOGIN_URL = '/auth/login'
@@ -179,9 +180,9 @@ export default function WebAppHero3D({ signedIn = false }: { signedIn?: boolean 
           className="nm2-heading font-black uppercase text-white"
           style={{ fontSize: 'clamp(44px,9vw,72px)', lineHeight: 0.95, letterSpacing: '-0.02em', textShadow: '0 6px 30px rgba(6,6,15,.8)' }}
         >
-          Gather better.
+          <RepelWords text="Gather better." />
           <br />
-          <span className="nm2-grad-text">Live closer.</span>
+          <RepelWords text="Live closer." letterClassName="nm2-grad-text" />
         </h1>
         <div className="flex items-stretch gap-3.5">
           <span className="nm2-grad-bar w-[3px] rounded-sm shrink-0" />

@@ -8,6 +8,8 @@ type AuthContextValue = {
   user: User | null
   session: Session | null
   loading: boolean
+  avatarKey: string | null
+  refreshProfile: () => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -15,6 +17,8 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   session: null,
   loading: true,
+  avatarKey: null,
+  refreshProfile: async () => {},
   signOut: async () => {},
 })
 
@@ -35,6 +39,38 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [avatarKey, setAvatarKey] = useState<string | null>(null)
+
+  // The picked avatar (src/lib/avatars.ts) for whoever's signed in, shared
+  // app-wide -- the header's account pill used to always show a plain
+  // letter badge because it never looked past the auth user object, which
+  // has no notion of avatar_key at all (that only lives in `profiles`).
+  // Exposed as refreshProfile() so the edit page can call it right after a
+  // successful save and have the header pick up a new avatar immediately,
+  // instead of only updating on the next full page load.
+  const refreshProfile = useCallback(async () => {
+    try {
+      const res = await fetch('/api/profile')
+      if (!res.ok) return
+      const j = await res.json()
+      setAvatarKey(j.profile?.avatar_key ?? null)
+    } catch {
+      // best-effort -- the avatar badge just keeps showing its fallback initial
+    }
+  }, [])
+
+  // Deliberately a separate effect from the auth listener below, keyed off
+  // user?.id rather than folded into that onAuthStateChange callback --
+  // see its own comment on why that one chain has to stay the single
+  // source of truth for session state with nothing else racing into it.
+  useEffect(() => {
+    if (user) {
+      refreshProfile()
+    } else {
+      setAvatarKey(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, refreshProfile])
 
   useEffect(() => {
     const supabase = createClient()
@@ -73,7 +109,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, avatarKey, refreshProfile, signOut }}>
       {children}
     </AuthContext.Provider>
   )
