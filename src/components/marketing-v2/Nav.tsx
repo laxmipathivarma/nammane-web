@@ -65,7 +65,7 @@ export default function Nav() {
         <div className="hidden lg:flex items-center gap-3">
           <a
             href={LOGIN_URL}
-            className="nm2-glass h-11 px-5 rounded-full flex items-center gap-2 text-[13px] font-bold text-white hover:border-[var(--nm-cyan)] hover:shadow-[0_0_18px_rgba(76,201,240,.35)] transition-all"
+            className="nm2-glass nm2-btn-ghost h-11 px-5 rounded-full flex items-center gap-2 text-[13px] font-bold text-white hover:border-[var(--nm-cyan)] hover:shadow-[0_0_18px_rgba(76,201,240,.35)] transition-all"
           >
             <i className="ph ph-user-circle text-[var(--nm-cyan)] text-[16px]" />
             Sign in
@@ -108,7 +108,7 @@ export default function Nav() {
             )
           )}
           <div className="border-t border-white/10 pt-3.5 flex gap-3">
-            <a href={LOGIN_URL} className="flex-1 nm2-glass rounded-full text-white py-2.5 text-[13px] text-center font-bold">
+            <a href={LOGIN_URL} className="flex-1 nm2-glass nm2-btn-ghost rounded-full text-white py-2.5 text-[13px] text-center font-bold">
               Sign in
             </a>
             <a href={SIGNUP_URL} className="flex-1 nm2-grad-pill rounded-full py-2.5 text-[13px] text-center font-bold text-white">

@@ -181,7 +181,7 @@ export default function WebAppHero3D() {
           </a>
           <a
             href={LOGIN_URL}
-            className="nm2-glass inline-flex items-center rounded-full px-6 h-[52px] text-[13px] font-extrabold uppercase tracking-[.12em] text-white hover:border-[var(--nm-cyan)] transition-colors"
+            className="nm2-glass nm2-btn-ghost inline-flex items-center rounded-full px-6 h-[52px] text-[13px] font-extrabold uppercase tracking-[.12em] text-white hover:border-[var(--nm-cyan)] transition-colors"
           >
             I have an account
           </a>
