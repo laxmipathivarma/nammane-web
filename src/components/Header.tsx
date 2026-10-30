@@ -155,7 +155,7 @@ export default function Header({ isMarketing = false }: { isMarketing?: boolean 
                 <button
                   type="button"
                   onClick={() => signOut()}
-                  className="nm-btn bg-ink2 text-white border border-white/10 px-4 py-2 text-[13px]"
+                  className="hidden sm:inline-flex nm-btn bg-ink2 text-white border border-white/10 px-4 py-2 text-[13px]"
                 >
                   Sign out
                 </button>
@@ -165,7 +165,7 @@ export default function Header({ isMarketing = false }: { isMarketing?: boolean 
                 <Link href="/auth/login" className="hidden sm:inline-flex text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors">
                   Sign in
                 </Link>
-                <Link href="/auth/signup" className="nm-btn nm-btn-gold px-4 py-2 text-[13px]">
+                <Link href="/auth/signup" className="hidden sm:inline-flex nm-btn nm-btn-gold px-4 py-2 text-[13px]">
                   Sign up
                 </Link>
               </>
