@@ -6,7 +6,8 @@ import AuthShell from '@/components/AuthShell'
 import BackButton from '@/components/BackButton'
 import OtpInput from '@/components/OtpInput'
 import { createClient } from '@/lib/supabase'
-import { EMAIL_OTP_LENGTH } from '@/lib/otp'
+import { EMAIL_OTP_LENGTH, WHATSAPP_OTP_LENGTH } from '@/lib/otp'
+import { toE164India, sanitizeIndianMobileInput } from '@/lib/phone'
 
 const blobs = [
   {
@@ -54,6 +55,18 @@ export default function LoginPage() {
   const [needsEmailVerify, setNeedsEmailVerify] = useState(false)
   const [emailOtp, setEmailOtp] = useState('')
   const [resendStatus, setResendStatus] = useState('')
+
+  // WhatsApp sign-in: a phone number, a code Twilio Verify sends over
+  // WhatsApp (via Supabase's own Phone provider, which is already
+  // configured with Twilio Verify + the WhatsApp channel), and the 6-digit
+  // code the person types back in. A phone number Supabase hasn't seen
+  // before is created as a brand-new account automatically -- same as the
+  // email OTP flow on the signup page -- so this one screen covers both
+  // sign-in and sign-up by WhatsApp.
+  const [mobileDigits, setMobileDigits] = useState('')
+  const [mobileOtpSent, setMobileOtpSent] = useState(false)
+  const [mobileOtp, setMobileOtp] = useState('')
+  const [mobileResendStatus, setMobileResendStatus] = useState('')
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -103,6 +116,73 @@ export default function LoginPage() {
 
     const supabase = createClient()
     const { error: verifyError } = await supabase.auth.verifyOtp({ email, token: emailOtp, type: 'signup' })
+
+    if (verifyError) {
+      setError(verifyError.message)
+      setLoading(false)
+      return
+    }
+
+    window.location.href = '/discover'
+  }
+
+  const handleSendWhatsAppOtp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (mobileDigits.length !== 10) {
+      setError('Enter your 10-digit mobile number.')
+      return
+    }
+    setLoading(true)
+    setError('')
+    setMobileResendStatus('')
+
+    const supabase = createClient()
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      phone: toE164India(mobileDigits),
+      options: { channel: 'whatsapp' },
+    })
+
+    setLoading(false)
+    if (otpError) {
+      setError(otpError.message)
+      return
+    }
+    setMobileOtpSent(true)
+    setMobileResendStatus('Code sent on WhatsApp.')
+  }
+
+  const handleResendWhatsAppOtp = async () => {
+    setLoading(true)
+    setError('')
+    setMobileResendStatus('')
+    const supabase = createClient()
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      phone: toE164India(mobileDigits),
+      options: { channel: 'whatsapp' },
+    })
+    setLoading(false)
+    if (otpError) {
+      setError(otpError.message)
+      return
+    }
+    setMobileResendStatus('Code sent on WhatsApp.')
+  }
+
+  const handleVerifyWhatsAppOtp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (mobileOtp.length !== WHATSAPP_OTP_LENGTH) {
+      setError(`Enter the full ${WHATSAPP_OTP_LENGTH}-digit code.`)
+      return
+    }
+    setLoading(true)
+    setError('')
+
+    const supabase = createClient()
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      phone: toE164India(mobileDigits),
+      token: mobileOtp,
+      type: 'sms',
+    })
 
     if (verifyError) {
       setError(verifyError.message)
@@ -196,7 +276,10 @@ export default function LoginPage() {
             <div className="flex bg-ink2 border border-white/10 rounded-full p-[3px] gap-[3px] mb-6">
               <button
                 type="button"
-                onClick={() => setMethod('email')}
+                onClick={() => {
+                  setMethod('email')
+                  setError('')
+                }}
                 className={method === 'email' ? 'nm-btn nm-btn-gold text-[11.5px]' : 'nm-btn text-[11.5px] font-bold text-muted'}
                 style={{ padding: '6px 18px' }}
               >
@@ -204,11 +287,14 @@ export default function LoginPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setMethod('mobile')}
+                onClick={() => {
+                  setMethod('mobile')
+                  setError('')
+                }}
                 className={method === 'mobile' ? 'nm-btn nm-btn-gold text-[11.5px]' : 'nm-btn text-[11.5px] font-bold text-muted'}
                 style={{ padding: '6px 18px' }}
               >
-                Mobile number
+                WhatsApp
               </button>
             </div>
 
@@ -249,23 +335,59 @@ export default function LoginPage() {
               {loading ? 'Signing in…' : 'Sign in →'}
             </button>
           </form>
+        ) : !mobileOtpSent ? (
+          <form onSubmit={handleSendWhatsAppOtp} className="w-full space-y-4 text-left">
+            <div>
+              <label className="nm-label">WHATSAPP NUMBER</label>
+              <div className="flex items-stretch gap-2">
+                <div className="nm-field flex items-center justify-center !w-auto px-3.5 font-bold text-muted">+91</div>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  value={mobileDigits}
+                  onChange={(e) => setMobileDigits(sanitizeIndianMobileInput(e.target.value))}
+                  placeholder="10-digit mobile number"
+                  required
+                  className="nm-field flex-1"
+                />
+              </div>
+              <p className="text-[12px] text-muted font-medium mt-2">
+                We&apos;ll send a {WHATSAPP_OTP_LENGTH}-digit code to this number on WhatsApp. New here? This creates your account automatically.
+              </p>
+            </div>
+            <button type="submit" disabled={loading} className="nm-btn nm-btn-gold w-full py-4 text-[14.5px] disabled:opacity-50">
+              {loading ? 'Sending…' : 'Send WhatsApp code →'}
+            </button>
+          </form>
         ) : (
-          // Mobile sign-in is temporarily unavailable (the OTP provider
-          // isn't wired up yet) -- say so up front rather than let someone
-          // fill in a number and hit a confusing failure.
-          <div className="w-full bg-ink2 border border-white/10 rounded-2xl px-5 py-6 text-center">
-            <p className="text-[14px] font-bold text-white mb-1.5">Mobile sign-in is down right now</p>
-            <p className="text-[13px] text-muted font-medium leading-relaxed">
-              We&apos;re working on it. For now, please sign in with email or Google instead.
-            </p>
+          <form onSubmit={handleVerifyWhatsAppOtp} className="w-full space-y-4 text-left">
+            <div>
+              <label className="nm-label">ENTER CODE</label>
+              <OtpInput length={WHATSAPP_OTP_LENGTH} value={mobileOtp} onChange={setMobileOtp} />
+              <p className="text-[12px] text-muted font-medium mt-2">
+                Code sent to +91 {mobileDigits} on WhatsApp.{' '}
+                <button type="button" onClick={handleResendWhatsAppOtp} className="text-[#ff8fd1] font-bold">
+                  Resend
+                </button>
+              </p>
+              {mobileResendStatus && <p className="text-[12px] text-[#8fe3b0] font-semibold mt-1">{mobileResendStatus}</p>}
+            </div>
+            <button type="submit" disabled={loading} className="nm-btn nm-btn-gold w-full py-4 text-[14.5px] disabled:opacity-50">
+              {loading ? 'Verifying…' : 'Verify & sign in →'}
+            </button>
             <button
               type="button"
-              onClick={() => setMethod('email')}
-              className="nm-btn nm-btn-gold mt-5 py-3 px-6 text-[13px]"
+              onClick={() => {
+                setMobileOtpSent(false)
+                setMobileOtp('')
+                setError('')
+                setMobileResendStatus('')
+              }}
+              className="nm-btn nm-btn-ghost w-full py-3 text-[13px]"
             >
-              Use email instead →
+              Use a different number
             </button>
-          </div>
+          </form>
         )}
           </>
         )}
@@ -276,8 +398,9 @@ export default function LoginPage() {
           <div className="flex-1 h-px bg-white/10" />
         </div>
 
-        {/* Only Google OAuth for now -- Facebook/Meta and WhatsApp login
-            were dropped to avoid Meta Business verification overhead. */}
+        {/* Only Google OAuth here -- WhatsApp sign-in is its own tab above
+            (OTP-based, not an OAuth provider). Facebook/Meta login was
+            dropped to avoid Meta Business verification overhead. */}
         <div className="flex gap-3 w-full">
           <button type="button" onClick={() => handleOAuth('google')} className="nm-btn nm-btn-ghost flex-1 py-3.5 text-[13px]">
             Google
