@@ -1,18 +1,32 @@
 import { createServerSupabaseClient } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 
-// This route sets the session cookie on its response, so Vercel must never
-// treat that response as a cacheable/shared one -- a cached response is
-// served to OTHER visitors too, and (to stop exactly that kind of leak)
-// Vercel's edge silently strips Set-Cookie from anything it considers
-// public/cacheable. Without this, GET handlers with no other dynamic
-// signal default to that shared/cacheable mode: exchangeCodeForSession()
-// below was succeeding every time (confirmed via Supabase's own auth
-// logs and, temporarily, via a diagnostic that echoed the freshly-issued
-// token back on the redirect URL) but the Set-Cookie header carrying it
-// never survived to the browser, so the very next page load still saw
-// the old session and the header stayed on "Sign in."
+// This route sets the session cookie on its response, so it must never be
+// treated as a cacheable/shared one -- a cached response is served to
+// OTHER visitors too, and (to stop exactly that kind of leak) a CDN/edge
+// layer will silently strip Set-Cookie from anything it considers
+// public/cacheable. `dynamic = 'force-dynamic'` is the normal way to say
+// that, but on this project's production environment specifically it
+// wasn't enough on its own -- the response still came back
+// `cache-control: public, max-age=0, must-revalidate` even after it was
+// added (confirmed with curl against app.nammane.in directly), while the
+// *identical* code produced the correct `no-store` on staging. Something
+// at the production-environment level is overriding the inferred
+// caching mode, so the header is now also set explicitly on every
+// response this route returns -- that can't be silently overridden the
+// way the inferred mode was. Before this, exchangeCodeForSession() below
+// was succeeding on every single OAuth login (confirmed via Supabase's
+// own auth logs, and via a temporary diagnostic that echoed the
+// freshly-issued token back on the redirect URL) but the Set-Cookie
+// carrying that fresh session never survived to the browser, so the very
+// next page load still saw the old session and the header stayed on
+// "Sign in."
 export const dynamic = 'force-dynamic'
+
+function noStore(response: NextResponse) {
+  response.headers.set('Cache-Control', 'no-store, max-age=0')
+  return response
+}
 
 // Google sign-in redirects the browser here with a `?code=...`
 // after the person approves on the provider's own page. Exchanging it for
@@ -28,10 +42,10 @@ export async function GET(request: NextRequest) {
     const supabase = await createServerSupabaseClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      return noStore(NextResponse.redirect(`${origin}${next}`))
     }
     console.error('OAuth callback exchange failed', error)
   }
 
-  return NextResponse.redirect(`${origin}/auth/login?error=oauth`)
+  return noStore(NextResponse.redirect(`${origin}/auth/login?error=oauth`))
 }
