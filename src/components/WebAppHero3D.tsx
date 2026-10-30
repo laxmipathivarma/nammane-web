@@ -132,7 +132,7 @@ export default function WebAppHero3D() {
 
   return (
     <section
-      className="relative overflow-hidden flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-10 px-5 lg:px-[clamp(18px,5vw,80px)] py-6 lg:py-0 lg:min-h-[100dvh]"
+      className="relative overflow-hidden flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-4 px-5 lg:px-[clamp(18px,5vw,56px)] py-6 lg:py-0 lg:min-h-[100dvh]"
       style={{ background: '#06060F' }}
     >
       <Stars />
@@ -189,11 +189,13 @@ export default function WebAppHero3D() {
       </div>
 
       {/* 3D scene -- notably smaller on mobile (w-[58vw], capped at 260px)
-          than desktop (min(86vw,420px)) so it doesn't dominate the first
-          screen and push the headline below the fold; aspect-ratio is
-          untouched so the art itself never looks stretched or cropped. */}
+          so it doesn't dominate the first screen and push the headline
+          below the fold. On desktop it's sized to fill the page (up to
+          620px) and sits close to the copy column (the outer section's
+          gap was tightened from gap-10 to gap-4 to match); aspect-ratio
+          is untouched so the art itself never looks stretched or cropped. */}
       <div
-        className="relative z-[3] order-1 lg:order-2 mx-auto lg:mx-0 shrink-0 w-[min(58vw,260px)] lg:w-[min(86vw,420px)]"
+        className="relative z-[3] order-1 lg:order-2 mx-auto lg:mx-0 shrink-0 w-[min(58vw,260px)] lg:w-[min(46vw,620px)]"
         style={{
           aspectRatio: '736/1380',
           perspective: 1200,
