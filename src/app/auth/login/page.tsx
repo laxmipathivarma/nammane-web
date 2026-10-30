@@ -8,6 +8,7 @@ import OtpInput from '@/components/OtpInput'
 import { createClient } from '@/lib/supabase'
 import { EMAIL_OTP_LENGTH, WHATSAPP_OTP_LENGTH } from '@/lib/otp'
 import { toE164India, sanitizeIndianMobileInput } from '@/lib/phone'
+import { suggestEmailCorrection } from '@/lib/emailTypo'
 
 const blobs = [
   {
@@ -76,6 +77,24 @@ export default function LoginPage() {
   const [mobileOtp, setMobileOtp] = useState('')
   const [mobileResendStatus, setMobileResendStatus] = useState('')
 
+  // Every sign-in method below used to jump straight to `window.location.href
+  // = '/'` the instant Supabase confirmed the sign-in -- on the home screen
+  // the only visible difference for a signed-in person is the hero's CTAs
+  // disappearing and a small "Quick actions" row appearing further down the
+  // page, easy to miss entirely on a phone. With nothing on screen actually
+  // saying "you're signed in," a successful sign-in looked identical to a
+  // silently failed one, so people kept re-submitting a login that had
+  // already worked. This flag swaps the form for an unmistakable "you're in"
+  // message for a beat before the redirect actually happens.
+  const [justSignedIn, setJustSignedIn] = useState(false)
+  const goHomeAfterSignIn = () => {
+    setJustSignedIn(true)
+    setLoading(false)
+    setTimeout(() => {
+      window.location.href = '/'
+    }, 700)
+  }
+
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -96,7 +115,7 @@ export default function LoginPage() {
       return
     }
 
-    window.location.href = '/'
+    goHomeAfterSignIn()
   }
 
   const handleSendEmailVerify = async () => {
@@ -131,7 +150,7 @@ export default function LoginPage() {
       return
     }
 
-    window.location.href = '/'
+    goHomeAfterSignIn()
   }
 
   const handleSendWhatsAppOtp = async (e: React.FormEvent) => {
@@ -198,7 +217,7 @@ export default function LoginPage() {
       return
     }
 
-    window.location.href = '/'
+    goHomeAfterSignIn()
   }
 
   const handleOAuth = async (provider: 'google') => {
@@ -242,7 +261,12 @@ export default function LoginPage() {
           </div>
         )}
 
-        {method === 'email' && needsEmailVerify ? (
+        {justSignedIn ? (
+          <div className="w-full bg-[#8fe3b0]/10 border border-[#8fe3b0]/40 rounded-2xl px-5 py-8 text-center">
+            <p className="text-[14px] font-bold text-[#8fe3b0] mb-1.5">You&apos;re signed in →</p>
+            <p className="text-[13px] text-muted font-medium">Taking you home…</p>
+          </div>
+        ) : method === 'email' && needsEmailVerify ? (
           <div className="w-full">
             <div className="w-full bg-ruby/10 border border-ruby/40 text-[#ff8fd1] px-4 py-3 rounded-xl mb-4 text-[13px] font-semibold text-left">
               This email hasn&apos;t been verified yet. Send a code to finish confirming it.
@@ -328,6 +352,25 @@ export default function LoginPage() {
                 spellCheck={false}
                 className="nm-field"
               />
+              {/* Catches typo'd domains (gmaill.com, gmial.com, ...) before
+                  they create a confusing second account the way one did for
+                  a real person here -- Supabase mailed a confirmation code
+                  to the misspelled address exactly as typed, so "I never
+                  got a code" meant nothing was ever actually wrong with
+                  delivery, just with what was typed. */}
+              {suggestEmailCorrection(email) && (
+                <p className="text-[12px] text-muted font-medium mt-1.5">
+                  Did you mean{' '}
+                  <button
+                    type="button"
+                    onClick={() => setEmail(suggestEmailCorrection(email)!)}
+                    className="text-[#ff8fd1] font-bold"
+                  >
+                    {suggestEmailCorrection(email)}
+                  </button>
+                  ?
+                </p>
+              )}
             </div>
             <div>
               <div className="flex items-center justify-between mb-1.5">
