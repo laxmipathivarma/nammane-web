@@ -135,6 +135,29 @@ export default function WebAppHero3D() {
       className="relative overflow-hidden flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-4 px-5 lg:px-[clamp(18px,5vw,56px)] py-6 lg:py-0 lg:min-h-[100dvh]"
       style={{ background: '#06060F' }}
     >
+      {/* Full-bleed cave backdrop -- the same paper-cut space-cave art used
+          tight behind the astronaut now also washes across the whole
+          section (not just its own small box), so the hero reads as one
+          continuous scene instead of a graphic floating on flat black.
+          Dimmed and vignetted so the copy column stays readable over it. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{
+          backgroundImage: 'url(/assets/webapp/a2-cave2.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: '66% 42%',
+          opacity: 0.55,
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(90deg, #06060F 0%, rgba(6,6,15,.85) 22%, rgba(6,6,15,.25) 55%, rgba(6,6,15,.55) 100%), radial-gradient(60% 70% at 50% 100%, rgba(6,6,15,.7), transparent 60%)',
+        }}
+      />
       <Stars />
 
       {/* Copy column */}
