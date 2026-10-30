@@ -13,9 +13,27 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createServerSupabaseClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      // TEMPORARY DIAGNOSTIC -- remove once the "login succeeds but cookie
+      // never lands in the browser" bug is confirmed fixed. Appends
+      // (non-sensitive) proof that the server really did get a fresh
+      // session, so a stale cookie after redirect means the Set-Cookie
+      // itself isn't surviving, not that the exchange silently failed. A
+      // query param survives the redirect (a header on this hop wouldn't
+      // be visible on the final response after the browser follows it).
+      const dbg = Buffer.from(
+        JSON.stringify({
+          hasSession: !!data.session,
+          userId: data.session?.user?.id ?? null,
+          accessTokenIat: data.session?.access_token
+            ? JSON.parse(atob(data.session.access_token.split('.')[1])).iat
+            : null,
+        })
+      ).toString('base64')
+      const target = new URL(`${origin}${next}`)
+      target.searchParams.set('nmdbg', dbg)
+      return NextResponse.redirect(target)
     }
     console.error('OAuth callback exchange failed', error)
   }
