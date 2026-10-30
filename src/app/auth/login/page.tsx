@@ -8,6 +8,7 @@ import OtpInput from '@/components/OtpInput'
 import { createClient } from '@/lib/supabase'
 import { EMAIL_OTP_LENGTH, WHATSAPP_OTP_LENGTH } from '@/lib/otp'
 import { toE164India, sanitizeIndianMobileInput } from '@/lib/phone'
+import { suggestEmailCorrection } from '@/lib/emailTypo'
 
 const blobs = [
   {
@@ -351,6 +352,25 @@ export default function LoginPage() {
                 spellCheck={false}
                 className="nm-field"
               />
+              {/* Catches typo'd domains (gmaill.com, gmial.com, ...) before
+                  they create a confusing second account the way one did for
+                  a real person here -- Supabase mailed a confirmation code
+                  to the misspelled address exactly as typed, so "I never
+                  got a code" meant nothing was ever actually wrong with
+                  delivery, just with what was typed. */}
+              {suggestEmailCorrection(email) && (
+                <p className="text-[12px] text-muted font-medium mt-1.5">
+                  Did you mean{' '}
+                  <button
+                    type="button"
+                    onClick={() => setEmail(suggestEmailCorrection(email)!)}
+                    className="text-[#ff8fd1] font-bold"
+                  >
+                    {suggestEmailCorrection(email)}
+                  </button>
+                  ?
+                </p>
+              )}
             </div>
             <div>
               <div className="flex items-center justify-between mb-1.5">

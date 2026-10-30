@@ -7,6 +7,7 @@ import BackButton from '@/components/BackButton'
 import OtpInput from '@/components/OtpInput'
 import { createClient } from '@/lib/supabase'
 import { EMAIL_OTP_LENGTH } from '@/lib/otp'
+import { suggestEmailCorrection } from '@/lib/emailTypo'
 
 export default function SignupPage() {
   // Email/password and mobile+OTP are two separate ways to create the same
@@ -236,6 +237,24 @@ export default function SignupPage() {
               spellCheck={false}
               className="nm-field"
             />
+            {/* Catches typo'd domains (gmaill.com, gmial.com, ...) at the
+                moment they'd otherwise create a confusing second,
+                unreachable account -- see the matching comment on the
+                login page's email field for the real incident this came
+                from. */}
+            {suggestEmailCorrection(email) && (
+              <p className="text-[12px] text-muted font-medium mt-1.5">
+                Did you mean{' '}
+                <button
+                  type="button"
+                  onClick={() => setEmail(suggestEmailCorrection(email)!)}
+                  className="text-[#ff8fd1] font-bold"
+                >
+                  {suggestEmailCorrection(email)}
+                </button>
+                ?
+              </p>
+            )}
           </div>
           <div>
             <label className="nm-label">PASSWORD</label>
