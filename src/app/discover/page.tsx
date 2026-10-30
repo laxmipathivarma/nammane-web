@@ -58,8 +58,15 @@ function distanceKm(aLat: number, aLng: number, bLat: number, bLng: number) {
   return 2 * R * Math.asin(Math.sqrt(h))
 }
 
-function eventToCard(e: EventRow, distKm: number | null): EventCardData {
+// Every card, host's own events included, used to get the same generic
+// "Request to join" CTA -- so a host looking at their own public event
+// here (e.g. under "Created By Me") was told to request to join their
+// own party. The event detail page itself has known this (isHost,
+// since v1.7.2) for a while; this is the card carrying the same
+// distinction instead of hard-coding one label for every public event.
+function eventToCard(e: EventRow, distKm: number | null, viewerId: string | null): EventCardData {
   const seats = e.capacity ?? undefined
+  const isHost = viewerId != null && e.host_id === viewerId
   return {
     slug: e.id,
     title: e.title,
@@ -72,7 +79,7 @@ function eventToCard(e: EventRow, distKm: number | null): EventCardData {
     host: undefined,
     seatsLabel: seats ? `0/${seats} seats` : undefined,
     seatsFilledPct: seats ? 0 : undefined,
-    ctaLabel: e.is_public ? 'Request to join' : 'View event',
+    ctaLabel: isHost ? 'Manage event' : e.is_public ? 'Request to join' : 'View event',
   }
 }
 
@@ -276,7 +283,8 @@ export default function Discover() {
                 e,
                 coords && e.lat != null && e.lng != null
                   ? distanceKm(coords.lat, coords.lng, e.lat, e.lng)
-                  : null
+                  : null,
+                user?.id ?? null
               )}
             />
           ))}
