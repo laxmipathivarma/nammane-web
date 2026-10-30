@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { usePointer, useReducedMotion } from './hooks'
+import { RepelWords } from '@/components/RepelWords'
 
 const LOGIN_URL = 'https://app.nammane.in/auth/login'
 
@@ -206,7 +207,7 @@ export default function Hero() {
           </div>
           <div className="nm2-kicker text-[var(--nm-blush)]">Poker · Dinner · Drinks · Dance · Karaoke</div>
           <h1 className="nm2-heading font-black leading-[0.98] text-white" style={{ fontSize: 'clamp(34px,4.4vw,60px)' }}>
-            Find your kind of <span className="nm2-grad-text">night out</span>
+            <RepelWords text="Find your kind of" /> <RepelWords text="night out" letterClassName="nm2-grad-text" />
           </h1>
           <div className="flex items-stretch gap-3.5">
             <span className="nm2-grad-bar w-[3px] rounded-sm shrink-0" />
