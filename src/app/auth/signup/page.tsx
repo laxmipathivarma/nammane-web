@@ -18,6 +18,16 @@ export default function SignupPage() {
   const [mobileName, setMobileName] = useState('')
   const [otp, setOtp] = useState('')
   const [otpSent, setOtpSent] = useState(false)
+  // Email signup gets its own OTP-step flag -- Supabase's "Confirm email"
+  // setting is on for this project, so signUp() never actually creates a
+  // session until the 6-digit code from the confirm-signup email is
+  // verified. This used to be ignored entirely (the old code redirected to
+  // /discover the moment the signup API call succeeded, whether or not a
+  // real session existed), which both skipped verification visibly and
+  // never told the person a code had been sent.
+  const [emailOtp, setEmailOtp] = useState('')
+  const [emailOtpSent, setEmailOtpSent] = useState(false)
+  const [resendStatus, setResendStatus] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -38,12 +48,49 @@ export default function SignupPage() {
         throw new Error(data.error || 'Signup failed')
       }
 
-      window.location.href = '/discover'
+      const data = await res.json()
+      if (data.session) {
+        // Confirm email is off (or this address was already confirmed) --
+        // signUp() already returned a live session, so there's nothing to
+        // verify.
+        window.location.href = '/discover'
+        return
+      }
+
+      // No session yet: Supabase is withholding it until the code from the
+      // confirmation email is verified.
+      setEmailOtpSent(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleVerifyEmailOtp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    const supabase = createClient()
+    const { error: verifyError } = await supabase.auth.verifyOtp({ email, token: emailOtp, type: 'signup' })
+
+    if (verifyError) {
+      setError(verifyError.message)
+      setLoading(false)
+      return
+    }
+
+    window.location.href = '/discover'
+  }
+
+  const handleResendEmailOtp = async () => {
+    setResendStatus('')
+    setError('')
+    const supabase = createClient()
+    const { error: resendError } = await supabase.auth.resend({ type: 'signup', email })
+    setResendStatus(resendError ? '' : 'Code resent.')
+    if (resendError) setError(resendError.message)
   }
 
   const handleSendOtp = async (e: React.FormEvent) => {
@@ -139,7 +186,10 @@ export default function SignupPage() {
         </button>
         <button
           type="button"
-          onClick={() => setMethod('mobile')}
+          onClick={() => {
+            setMethod('mobile')
+            setEmailOtpSent(false)
+          }}
           className={method === 'mobile' ? 'nm-btn nm-btn-gold text-[11.5px]' : 'nm-btn text-[11.5px] font-bold text-muted'}
           style={{ padding: '6px 18px' }}
         >
@@ -147,7 +197,38 @@ export default function SignupPage() {
         </button>
       </div>
 
-      {method === 'email' ? (
+      {method === 'email' && emailOtpSent ? (
+        <form onSubmit={handleVerifyEmailOtp} className="space-y-4">
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="nm-label !mb-0">ENTER CODE</label>
+              <button type="button" onClick={() => setEmailOtpSent(false)} className="text-[12px] font-bold text-[#ff8fd1]">
+                Change email
+              </button>
+            </div>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={emailOtp}
+              onChange={(e) => setEmailOtp(e.target.value)}
+              placeholder="6-digit code"
+              required
+              className="nm-field"
+            />
+            <p className="text-[12px] text-muted font-medium mt-2">
+              Code sent to {email}.{' '}
+              <button type="button" onClick={handleResendEmailOtp} className="text-[#ff8fd1] font-bold">
+                Resend
+              </button>
+              {resendStatus && <span className="text-[#a79ecb]"> &middot; {resendStatus}</span>}
+            </p>
+          </div>
+
+          <button type="submit" disabled={loading} className="nm-btn nm-btn-gold w-full py-4 text-[14.5px] disabled:opacity-50">
+            {loading ? 'Verifying…' : 'Verify & create account →'}
+          </button>
+        </form>
+      ) : method === 'email' ? (
         <form onSubmit={handleEmailSubmit} className="space-y-4">
           <div>
             <label className="nm-label">FULL NAME</label>

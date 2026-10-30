@@ -41,7 +41,11 @@ export async function POST(request: NextRequest) {
       if (profileError) console.error('signup profile upsert failed', profileError)
     }
 
-    return NextResponse.json({ user: data.user }, { status: 201 })
+    // `session` is only non-null when Supabase didn't require email
+    // confirmation (confirmations off, or this address was already
+    // confirmed elsewhere) -- the signup page uses this to decide whether
+    // to show the "enter your code" step or go straight into the app.
+    return NextResponse.json({ user: data.user, session: data.session }, { status: 201 })
   } catch (err) {
     console.error(err)
     return NextResponse.json(
