@@ -2,13 +2,21 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import BackButton from '@/components/BackButton'
+import AvatarBadge from '@/components/AvatarBadge'
 import { useAuth } from '@/lib/AuthProvider'
+
+type ProfileSummary = {
+  avatar_key: string | null
+  profile_status: 'active' | 'pending_age_review'
+}
 
 export default function ProfilePage() {
   const [mode, setMode] = useState<'guest' | 'host'>('host')
   const { user, loading } = useAuth()
   const router = useRouter()
+  const [profile, setProfile] = useState<ProfileSummary | null>(null)
 
   // This page previously showed a hardcoded "Laxmipathi Varma" regardless
   // of whether anyone was actually signed in. Send a signed-out visitor to
@@ -16,6 +24,14 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!loading && !user) router.replace('/auth/login')
   }, [loading, user, router])
+
+  useEffect(() => {
+    if (!user) return
+    fetch('/api/profile')
+      .then((r) => r.json())
+      .then((j) => setProfile(j.profile ?? null))
+      .catch(() => {})
+  }, [user])
 
   const displayName =
     (user?.user_metadata?.full_name as string | undefined) ||
@@ -48,13 +64,17 @@ export default function ProfilePage() {
       </div>
 
       <div className="max-w-md mx-auto px-5 -mt-14 flex flex-col items-center relative z-10">
-        <div className="w-21 h-21 rounded-full border-[3px] border-ink flex items-center justify-center text-2xl font-extrabold text-white shadow-xl" style={{ width: 84, height: 84, background: 'linear-gradient(160deg,#ff8fd1,#8b3ffb)' }}>
-          {initials}
+        <div className="rounded-full border-[3px] border-ink" style={{ width: 90, height: 90 }}>
+          <AvatarBadge avatarKey={profile?.avatar_key} fallbackInitial={initials} size={84} />
         </div>
         <div className="flex items-center gap-1.5 mt-2.5">
           <div className="text-[17px] font-extrabold">{displayName}</div>
         </div>
         <div className="text-[11.5px] text-muted font-semibold mt-0.5">{user.email ?? user.phone}</div>
+
+        <Link href="/profile/edit" className="nm-btn nm-btn-gold px-5 py-2 text-[12px] mt-3">
+          Edit profile
+        </Link>
 
         <div className="flex bg-ink2 border border-white/10 rounded-full p-[3px] gap-[3px] mt-3.5">
           <button
@@ -71,6 +91,15 @@ export default function ProfilePage() {
           </button>
         </div>
       </div>
+
+      {profile?.profile_status === 'pending_age_review' && (
+        <div className="max-w-md mx-auto px-5 mt-5">
+          <div className="rounded-2xl bg-[#3a1030] border border-[#ff4f9e]/40 px-4 py-3 text-[12px] font-semibold text-[#ff9ecb]">
+            Your profile is pending review because of the date of birth on file. Hosting and joining events stays off
+            until this is resolved.
+          </div>
+        </div>
+      )}
 
       <div className="max-w-md mx-auto px-5 mt-6 grid grid-cols-3 gap-2.5">
         <div className="nm-card rounded-2xl p-3 text-center">
@@ -148,7 +177,7 @@ export default function ProfilePage() {
       </div>
 
       <div className="max-w-md mx-auto px-5 mt-6 pb-16">
-        <button className="w-full flex items-center justify-between text-muted">
+        <Link href="/profile/edit" className="w-full flex items-center justify-between text-muted">
           <div className="flex items-center gap-2.5 text-[13px] font-bold">
             <svg width="17" height="17" viewBox="0 0 24 24" stroke="#cfc9e6" fill="none">
               <use href="#i-cog" />
@@ -158,7 +187,7 @@ export default function ProfilePage() {
           <svg width="14" height="14" viewBox="0 0 24 24" stroke="#cfc9e6" fill="none">
             <use href="#i-chev-r" />
           </svg>
-        </button>
+        </Link>
       </div>
     </div>
   )

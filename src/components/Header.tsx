@@ -35,12 +35,26 @@ function hrefsFor(isMarketing: boolean, signedIn: boolean): Record<NavKey, strin
   }
 }
 
+// Account-only destinations (Profile, Bookings, sign in/up) are real
+// pages on app.nammane.in only -- they don't exist under /marketing.
+// On the marketing site these must be absolute app.nammane.in links
+// or middleware.ts rewrites them to a non-existent /marketing/profile
+// etc and they 404. Inside the app they're already on the right host,
+// so a plain relative path is enough.
+function accountHref(isMarketing: boolean, path: string): string {
+  return isMarketing ? `${WEBAPP_URL}${path}` : path
+}
+
 export default function Header({ isMarketing = false }: { isMarketing?: boolean }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [appMenuOpen, setAppMenuOpen] = useState(false)
   const appMenuRef = useRef<HTMLDivElement>(null)
   const { user, loading, signOut } = useAuth()
   const HREFS = hrefsFor(isMarketing, !!user)
+  const profileHref = accountHref(isMarketing, '/profile')
+  const bookingsHref = accountHref(isMarketing, '/bookings')
+  const loginHref = accountHref(isMarketing, '/auth/login')
+  const signupHref = accountHref(isMarketing, '/auth/signup')
 
   // Short label for the signed-in pill -- email local-part, or the phone
   // number, whichever the person actually signed in with.
@@ -143,15 +157,27 @@ export default function Header({ isMarketing = false }: { isMarketing?: boolean 
           {!loading && (
             user ? (
               <>
-                <Link
-                  href="/profile"
-                  className="hidden sm:flex items-center gap-2 text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors"
-                >
-                  <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white shrink-0" style={{ background: 'linear-gradient(160deg,#ff8fd1,#8b3ffb)' }}>
-                    {accountLabel.charAt(0).toUpperCase()}
-                  </span>
-                  {accountLabel}
-                </Link>
+                {profileHref.startsWith('http') ? (
+                  <a
+                    href={profileHref}
+                    className="hidden sm:flex items-center gap-2 text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors"
+                  >
+                    <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white shrink-0" style={{ background: 'linear-gradient(160deg,#ff8fd1,#8b3ffb)' }}>
+                      {accountLabel.charAt(0).toUpperCase()}
+                    </span>
+                    {accountLabel}
+                  </a>
+                ) : (
+                  <Link
+                    href={profileHref}
+                    className="hidden sm:flex items-center gap-2 text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors"
+                  >
+                    <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white shrink-0" style={{ background: 'linear-gradient(160deg,#ff8fd1,#8b3ffb)' }}>
+                      {accountLabel.charAt(0).toUpperCase()}
+                    </span>
+                    {accountLabel}
+                  </Link>
+                )}
                 <button
                   type="button"
                   onClick={() => signOut()}
@@ -160,12 +186,21 @@ export default function Header({ isMarketing = false }: { isMarketing?: boolean 
                   Sign out
                 </button>
               </>
+            ) : loginHref.startsWith('http') ? (
+              <>
+                <a href={loginHref} className="hidden sm:inline-flex text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors">
+                  Sign in
+                </a>
+                <a href={signupHref} className="hidden sm:inline-flex nm-btn nm-btn-gold px-4 py-2 text-[13px]">
+                  Sign up
+                </a>
+              </>
             ) : (
               <>
-                <Link href="/auth/login" className="hidden sm:inline-flex text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors">
+                <Link href={loginHref} className="hidden sm:inline-flex text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors">
                   Sign in
                 </Link>
-                <Link href="/auth/signup" className="hidden sm:inline-flex nm-btn nm-btn-gold px-4 py-2 text-[13px]">
+                <Link href={signupHref} className="hidden sm:inline-flex nm-btn nm-btn-gold px-4 py-2 text-[13px]">
                   Sign up
                 </Link>
               </>
@@ -204,8 +239,16 @@ export default function Header({ isMarketing = false }: { isMarketing?: boolean 
           {/* account-only pages -- kept out of the primary list above so
               it stays identical to the marketing site's menu */}
           <div className="border-t border-white/10 pt-3 flex flex-col gap-3">
-            <Link href="/bookings" onClick={() => setMobileOpen(false)}>Bookings</Link>
-            <Link href="/profile" onClick={() => setMobileOpen(false)}>Profile</Link>
+            {bookingsHref.startsWith('http') ? (
+              <a href={bookingsHref} onClick={() => setMobileOpen(false)}>Bookings</a>
+            ) : (
+              <Link href={bookingsHref} onClick={() => setMobileOpen(false)}>Bookings</Link>
+            )}
+            {profileHref.startsWith('http') ? (
+              <a href={profileHref} onClick={() => setMobileOpen(false)}>Profile</a>
+            ) : (
+              <Link href={profileHref} onClick={() => setMobileOpen(false)}>Profile</Link>
+            )}
           </div>
 
           <div className="text-[10.5px] font-semibold text-muted2">{WEBAPP_VERSION_LABEL}</div>
@@ -224,12 +267,21 @@ export default function Header({ isMarketing = false }: { isMarketing?: boolean 
                   Sign out ({accountLabel})
                 </button>
               </div>
+            ) : loginHref.startsWith('http') ? (
+              <div className="border-t border-white/10 pt-3 flex gap-3">
+                <a href={loginHref} onClick={() => setMobileOpen(false)} className="flex-1 nm-btn bg-ink2 text-white py-2.5 text-[13px] text-center">
+                  Sign in
+                </a>
+                <a href={signupHref} onClick={() => setMobileOpen(false)} className="flex-1 nm-btn nm-btn-gold py-2.5 text-[13px] text-center">
+                  Sign up
+                </a>
+              </div>
             ) : (
               <div className="border-t border-white/10 pt-3 flex gap-3">
-                <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="flex-1 nm-btn bg-ink2 text-white py-2.5 text-[13px]">
+                <Link href={loginHref} onClick={() => setMobileOpen(false)} className="flex-1 nm-btn bg-ink2 text-white py-2.5 text-[13px]">
                   Sign in
                 </Link>
-                <Link href="/auth/signup" onClick={() => setMobileOpen(false)} className="flex-1 nm-btn nm-btn-gold py-2.5 text-[13px]">
+                <Link href={signupHref} onClick={() => setMobileOpen(false)} className="flex-1 nm-btn nm-btn-gold py-2.5 text-[13px]">
                   Sign up
                 </Link>
               </div>
