@@ -4,6 +4,7 @@ import { validateGovtId, type GovtIdType } from '@/lib/govtId'
 import { MAX_INTERESTS } from '@/lib/interests'
 import { avatarByKey } from '@/lib/avatars'
 import { isMinorDob } from '@/lib/age'
+import { profileCompletionBreakdown } from '@/lib/profileCompletion'
 import { NextRequest, NextResponse } from 'next/server'
 
 type Stats = {
@@ -125,8 +126,9 @@ export async function GET() {
   }
 
   const { stats, recentReview } = await loadStats(user.id)
+  const completion = profileCompletionBreakdown(data)
 
-  return NextResponse.json({ profile: data, stats, recentReview })
+  return NextResponse.json({ profile: data, stats, recentReview, completion })
 }
 
 // Everything on the edit form, validated server-side too (not just in the

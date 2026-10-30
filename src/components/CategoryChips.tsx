@@ -1,58 +1,66 @@
 'use client'
 
 import { useState } from 'react'
+import {
+  EVENT_CATEGORIES,
+  categoryLabel,
+  categoryEmoji,
+  categoryBadgeGradient,
+  type EventCategory,
+} from '@/lib/eventCardStyle'
 
-export const CATEGORIES = [
-  { key: 'poker', label: 'Poker', icon: 'i-spade', fill: true },
-  { key: 'rummy', label: 'Rummy', icon: 'i-diamond', fill: true },
-  { key: 'drinks', label: 'Drinks', icon: 'i-martini', fill: false },
-  { key: 'dinner', label: 'Dinner', icon: 'i-dine', fill: false },
-  { key: 'party', label: 'Party', icon: 'i-party', fill: false },
-  { key: 'other', label: 'Other', icon: 'i-grid', fill: false },
-] as const
+// Back-compat: a couple of pages still do CATEGORIES.find(c => c.key === x)?.label
+// to show the active filter's name. Derived from the shared category metadata
+// so there's one source of truth instead of a second hardcoded list.
+export const CATEGORIES = EVENT_CATEGORIES.map((key) => ({ key, label: categoryLabel[key] }))
 
 export default function CategoryChips({
   onChange,
+  initial = 'poker',
 }: {
-  onChange?: (key: string) => void
+  onChange?: (key: EventCategory) => void
+  initial?: EventCategory
 }) {
-  const [active, setActive] = useState<string>('poker')
+  const [active, setActive] = useState<EventCategory>(initial)
 
-  const select = (key: string) => {
+  const select = (key: EventCategory) => {
     setActive(key)
     onChange?.(key)
   }
 
   return (
     <div className="flex gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-      {CATEGORIES.map((c) => {
-        const isActive = active === c.key
+      {EVENT_CATEGORIES.map((key) => {
+        const isActive = active === key
+        const [c1, c2] = categoryBadgeGradient[key]
         return (
           <button
-            key={c.key}
-            onClick={() => select(c.key)}
-            className="nm-chip px-4 py-2.5"
-            style={
-              isActive
-                ? {
-                    background: 'linear-gradient(120deg,#8b3ffb,#ff4f9e)',
-                    color: '#fff',
-                    border: '1.5px solid #1b0a3d',
-                    boxShadow: '0 3px 0 0 #4a1397, 0 3px 0 2px #1b0a3d',
-                  }
-                : { background: 'rgba(255,255,255,.06)', color: '#e4d4ff' }
-            }
+            key={key}
+            onClick={() => select(key)}
+            className="shrink-0 flex flex-col items-center gap-1 pt-2 pb-1.5 px-2.5 rounded-2xl transition-transform duration-150 hover:-translate-y-0.5"
+            style={{
+              background: isActive ? 'linear-gradient(160deg,#241a3d,#120f26)' : 'rgba(255,255,255,.05)',
+              border: isActive ? '1px solid rgba(255,79,158,.5)' : '1px solid rgba(255,255,255,.08)',
+              boxShadow: isActive ? '0 6px 16px rgba(255,79,158,.22)' : 'none',
+            }}
           >
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill={isActive ? '#fff' : c.fill ? '#e4d4ff' : 'none'}
-              stroke={isActive ? 'none' : c.fill ? 'none' : '#e4d4ff'}
+            <span
+              className="flex items-center justify-center rounded-full"
+              style={{
+                width: 34,
+                height: 34,
+                fontSize: 17,
+                lineHeight: 1,
+                background: `linear-gradient(155deg, ${c1}, ${c2})`,
+                boxShadow:
+                  'inset -3px -4px 7px rgba(10,8,28,.45), inset 2px 3px 5px rgba(255,255,255,.4), 0 5px 10px rgba(0,0,0,.3)',
+              }}
             >
-              <use href={`#${c.icon}`} />
-            </svg>
-            {c.label}
+              {categoryEmoji[key]}
+            </span>
+            <span className={`text-[10px] font-bold whitespace-nowrap ${isActive ? 'text-white' : 'text-muted'}`}>
+              {categoryLabel[key]}
+            </span>
           </button>
         )
       })}

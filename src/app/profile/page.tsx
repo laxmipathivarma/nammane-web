@@ -28,6 +28,11 @@ type RecentReview = {
   reviewerInitial: string
 } | null
 
+type Completion = {
+  percent: number
+  fields: { key: string; label: string; weight: number; done: boolean }[]
+} | null
+
 export default function ProfilePage() {
   const [mode, setMode] = useState<'guest' | 'host'>('host')
   const { user, loading } = useAuth()
@@ -35,6 +40,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileSummary | null>(null)
   const [stats, setStats] = useState<Stats | null>(null)
   const [recentReview, setRecentReview] = useState<RecentReview>(null)
+  const [completion, setCompletion] = useState<Completion>(null)
 
   // This page previously showed a hardcoded "Laxmipathi Varma" regardless
   // of whether anyone was actually signed in. Send a signed-out visitor to
@@ -51,6 +57,7 @@ export default function ProfilePage() {
         setProfile(j.profile ?? null)
         setStats(j.stats ?? null)
         setRecentReview(j.recentReview ?? null)
+        setCompletion(j.completion ?? null)
       })
       .catch(() => {})
   }, [user])
@@ -113,6 +120,30 @@ export default function ProfilePage() {
           </button>
         </div>
       </div>
+
+      {completion && completion.percent < 100 && (
+        <div className="max-w-md mx-auto px-5 mt-5">
+          <div className="nm-card rounded-2xl p-3.5">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[12px] font-extrabold text-[#e4d4ff]">Complete your profile</div>
+              <div className="text-[12.5px] font-extrabold text-gold-text">{completion.percent}%</div>
+            </div>
+            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all"
+                style={{ width: `${completion.percent}%`, background: 'linear-gradient(90deg,#8b3ffb,#ff4f9e)' }}
+              />
+            </div>
+            <div className="text-[10.5px] text-muted font-semibold mt-2">
+              Missing:{' '}
+              {completion.fields
+                .filter((f) => !f.done)
+                .map((f) => f.label)
+                .join(', ')}
+            </div>
+          </div>
+        </div>
+      )}
 
       {profile?.profile_status === 'pending_age_review' && (
         <div className="max-w-md mx-auto px-5 mt-5">

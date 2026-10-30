@@ -1,3 +1,5 @@
+import type { EventCategory } from './eventCardStyle'
+
 export type User = {
   id: string
   email?: string
@@ -11,7 +13,7 @@ export type User = {
 export type Event = {
   id: string
   host_id: string
-  category: 'poker' | 'rummy' | 'drinks' | 'dinner' | 'party' | 'other'
+  category: EventCategory
   title: string
   description?: string
   starts_at: string

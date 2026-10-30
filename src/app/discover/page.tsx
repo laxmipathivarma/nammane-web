@@ -5,6 +5,7 @@ import CategoryChips, { CATEGORIES } from '@/components/CategoryChips'
 import EventCard, { EventCardData } from '@/components/EventCard'
 import { createClient } from '@/lib/supabase'
 import { useAuth } from '@/lib/AuthProvider'
+import { categoryLabel } from '@/lib/eventCardStyle'
 
 type EventRow = {
   id: string
@@ -34,15 +35,6 @@ const SCOPES: { key: Scope; label: string }[] = [
   { key: 'invited', label: 'My Invitations' },
 ]
 
-const tagLabel: Record<EventCardData['category'], string> = {
-  poker: 'POKER',
-  rummy: 'RUMMY',
-  drinks: 'DRINKS',
-  dinner: 'DINNER',
-  party: 'PARTY',
-  other: 'OTHER',
-}
-
 // Haversine distance in km between two lat/lng points -- plain JS so we
 // don't need PostGIS functions exposed through the REST API; events and
 // the viewer's own location are both small payloads, so filtering
@@ -71,7 +63,7 @@ function eventToCard(e: EventRow, distKm: number | null, viewerId: string | null
     slug: e.id,
     title: e.title,
     category: e.category,
-    tagLabel: tagLabel[e.category] ?? 'OTHER',
+    tagLabel: (categoryLabel[e.category] ?? 'Other').toUpperCase(),
     subtitle:
       [e.description, distKm != null ? `${distKm.toFixed(1)} km away` : null]
         .filter(Boolean)
