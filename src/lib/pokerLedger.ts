@@ -9,7 +9,17 @@
 // everything that made an event a *poker* event, not everything about the
 // standalone app's own account/sync system.
 
-export type BuyIn = { id: string; amt: number; method: 'cash' | 'upi' | 'credit'; at: number }
+export const newId = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4)
+
+// Quick-pick chip amounts for the "Add buy-in" screen, plus a manual
+// "+ Other amount" field for anything outside this set.
+export const BUYIN_PRESETS = [5000, 10000, 15000, 20000, 30000]
+
+// Expense categories for the quick-pick dropdown on the Rake & Expenses
+// screen, plus a free-text "+ Add" for anything outside this set.
+export const EXPENSE_CATEGORIES = ['Food', 'Drinks', 'Massage', 'Smoke']
+
+export type BuyIn = { id: string; amt: number; method: 'paid' | 'credit'; at: number }
 export type Expense = {
   id: string
   label: string
@@ -34,18 +44,59 @@ export type Transfer = { from: string; to: string; amt: number; done: boolean }
 // player accounts -- Nammane already has its own join/approve flow for
 // that, so an invite here is "I sent this person a message" rather than a
 // tracked yes/no.
-export type Invitee = { id: string; name: string; phone?: string; invitedAt: number | null }
+// `approved` marks that the host has cleared this person to actually sit
+// down and play (separate from `invitedAt`, which just means a WhatsApp
+// message went out) -- `tableId` records which table they were seated at
+// once approved, so Guest Approvals can show "Already at Table 2" instead
+// of offering to seat them twice.
+export type Invitee = {
+  id: string
+  name: string
+  phone?: string
+  invitedAt: number | null
+  approved?: boolean
+  tableId?: string | null
+}
 export type PokerLedger = {
   currency: string
   players: PokerPlayer[]
   rake: number
   expenses: Expense[]
   settle: { at: number; list: Transfer[] } | null
-  invitees: Invitee[]
 }
 
 export function emptyLedger(): PokerLedger {
-  return { currency: '₹', players: [], rake: 0, expenses: [], settle: null, invitees: [] }
+  return { currency: '₹', players: [], rake: 0, expenses: [], settle: null }
+}
+
+// One event can run several tables over a night (or over its lifetime --
+// "Games" keeps the full history). Each table is its own self-contained
+// ledger, so every buy-in/cash-out/expense/settle-up calculation below
+// still just operates on a single table's `ledger`.
+export type PokerTable = {
+  id: string
+  name: string
+  maxPlayers: number
+  status: 'running' | 'settled'
+  createdAt: number
+  ledger: PokerLedger
+}
+
+export function emptyTable(name: string, maxPlayers = 10): PokerTable {
+  return { id: newId(), name, maxPlayers, status: 'running', createdAt: Date.now(), ledger: emptyLedger() }
+}
+
+// Everything poker-related for one event: the shared invite list (not
+// per-table -- an invitee gets seated at whichever table once approved)
+// plus every table ever run.
+export type PokerEventData = {
+  invitees: Invitee[]
+  invitationMessage?: string // host's own edit of the invite text; undefined = use the auto-generated one
+  tables: PokerTable[]
+}
+
+export function emptyPokerEventData(): PokerEventData {
+  return { invitees: [], tables: [] }
 }
 
 const r2 = (n: number) => Math.round(n * 100) / 100
@@ -124,3 +175,32 @@ export function nameFor(g: PokerLedger, id: string) {
 
 export const money = (n: number, cur = '₹') =>
   (n < 0 ? '−' : '') + cur + Math.abs(r2(n)).toLocaleString('en-IN', { maximumFractionDigits: 2 })
+
+export type RankedPlayer = { id: string; name: string; net: number | null }
+
+// Table ranking for the Settle Up summary and the Games history --
+// everyone who has a cash-out entered, best result first. Players still
+// playing (no cash-out yet) are left out of the ranking entirely rather
+// than shown as a mid-game loser.
+export function tableRanking(table: PokerTable): RankedPlayer[] {
+  const c = calc(table.ledger)
+  return c.rows
+    .filter((r) => r.final != null)
+    .map((r) => ({ id: r.p.id, name: r.p.name, net: r.final as number }))
+    .sort((a, b) => (b.net as number) - (a.net as number))
+}
+
+// Who paid for expenses, and how much, broken out per player plus a
+// separate "House" total -- for the Rake & Expenses breakdown.
+export function expenseBreakdown(table: PokerTable) {
+  const g = table.ledger
+  const byId = new Map<string, number>()
+  for (const e of g.expenses) byId.set(e.by, (byId.get(e.by) || 0) + e.amt)
+  const players = g.players
+    .map((p) => ({ id: p.id, name: p.name, amt: byId.get(p.id) || 0 }))
+    .filter((row) => row.amt > 0)
+    .sort((a, b) => b.amt - a.amt)
+  const house = byId.get('bank') || 0
+  const total = g.expenses.reduce((a, e) => a + e.amt, 0)
+  return { players, house, total }
+}

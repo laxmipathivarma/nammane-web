@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/auth'
-import { emptyLedger, type PokerLedger } from '@/lib/pokerLedger'
+import { emptyLedger, emptyPokerEventData, emptyTable, type PokerEventData } from '@/lib/pokerLedger'
 import { NextRequest, NextResponse } from 'next/server'
 
 // The poker ledger for a single event lives in `events.event_details`
@@ -18,6 +18,28 @@ async function loadEvent(supabase: Awaited<ReturnType<typeof createServerSupabas
   return data
 }
 
+// Older events saved a single flat ledger (`{currency, players, rake,
+// expenses, settle, invitees}`) before "multiple tables" existed. Wrap one
+// of those into a single-table PokerEventData instead of discarding it, so
+// a host who was mid-game when this shipped doesn't lose their table.
+function migrate(raw: unknown): PokerEventData {
+  if (!raw || typeof raw !== 'object') return emptyPokerEventData()
+  const obj = raw as Record<string, unknown>
+  if (Array.isArray(obj.tables)) {
+    // Already the current shape -- still spread over the empty shape so a
+    // save from before `invitationMessage` existed comes back valid.
+    return { ...emptyPokerEventData(), ...obj } as PokerEventData
+  }
+  if (Array.isArray(obj.players)) {
+    const table = emptyTable('Table 1')
+    table.ledger = { ...emptyLedger(), ...obj, players: obj.players as PokerEventData['tables'][number]['ledger']['players'] }
+    const allOut = table.ledger.players.length > 0 && table.ledger.players.every((p) => p.out != null)
+    table.status = allOut ? 'settled' : 'running'
+    return { invitees: Array.isArray(obj.invitees) ? (obj.invitees as PokerEventData['invitees']) : [], tables: [table] }
+  }
+  return emptyPokerEventData()
+}
+
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   const supabase = await createServerSupabaseClient()
   const {
@@ -30,10 +52,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   if (event.host_id !== user.id) return NextResponse.json({ error: 'Only the host can open the ledger' }, { status: 403 })
   if (event.category !== 'poker') return NextResponse.json({ error: 'Not a poker event' }, { status: 400 })
 
-  // Spread over emptyLedger() so a ledger saved before the invite list
-  // existed (or before any other future field) still comes back with a
-  // valid shape instead of `invitees` being undefined on the client.
-  const ledger: PokerLedger = { ...emptyLedger(), ...((event.event_details && event.event_details.poker) || {}) }
+  const data: PokerEventData = migrate(event.event_details && event.event_details.poker)
   const eventInfo = {
     title: event.title as string,
     address: event.address as string | null,
@@ -41,7 +60,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     lat: event.lat as number | null,
     lng: event.lng as number | null,
   }
-  return NextResponse.json({ ledger, event: eventInfo })
+  return NextResponse.json({ data, event: eventInfo })
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
@@ -56,12 +75,12 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if (event.host_id !== user.id) return NextResponse.json({ error: 'Only the host can edit the ledger' }, { status: 403 })
 
   const body = await req.json()
-  const ledger: PokerLedger = body.ledger
-  if (!ledger || !Array.isArray(ledger.players) || (ledger.invitees && !Array.isArray(ledger.invitees))) {
-    return NextResponse.json({ error: 'Malformed ledger payload' }, { status: 400 })
+  const data: PokerEventData = body.data
+  if (!data || !Array.isArray(data.tables) || !Array.isArray(data.invitees)) {
+    return NextResponse.json({ error: 'Malformed poker data payload' }, { status: 400 })
   }
 
-  const nextDetails = { ...(event.event_details || {}), poker: { ...ledger, invitees: ledger.invitees || [] } }
+  const nextDetails = { ...(event.event_details || {}), poker: data }
   const { error } = await supabase.from('events').update({ event_details: nextDetails }).eq('id', params.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
 

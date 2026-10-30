@@ -146,15 +146,16 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
       </div>
 
       {/* sticky CTA -- poker events also get a link to the host-only
-          ledger (buy-ins, cash-outs, settle-up); /api/events/[id]/poker
-          itself rejects anyone who isn't the host, so this link is safe
-          to show to everyone rather than needing a server-side session
-          check on a page that's otherwise statically generated. */}
+          toolkit (invitations, tables, buy-ins, settle-up, games history);
+          /api/events/[id]/poker itself rejects anyone who isn't the host,
+          so this link is safe to show to everyone rather than needing a
+          server-side session check on a page that's otherwise statically
+          generated. */}
       <div className="sticky bottom-0 bg-gradient-to-t from-ink via-ink/95 to-transparent pt-6 pb-5 px-5">
         <div className="max-w-3xl mx-auto flex flex-col gap-2.5">
           {event.category === 'poker' && (
             <a href={`/event/${params.slug}/poker`} className="nm-btn w-full py-3.5 text-[13.5px] bg-ink2 text-white border border-white/10 text-center">
-              Open poker ledger (host only)
+              Poker host tools (host only)
             </a>
           )}
           <button className="nm-btn nm-btn-gold w-full py-4 text-[14.5px]">Request to join →</button>
