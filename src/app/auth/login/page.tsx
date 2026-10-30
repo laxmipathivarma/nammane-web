@@ -6,7 +6,6 @@ import AuthShell from '@/components/AuthShell'
 import BackButton from '@/components/BackButton'
 import OtpInput from '@/components/OtpInput'
 import { createClient } from '@/lib/supabase'
-import { toE164India, sanitizeIndianMobileInput } from '@/lib/phone'
 import { EMAIL_OTP_LENGTH } from '@/lib/otp'
 
 const blobs = [
@@ -44,9 +43,6 @@ export default function LoginPage() {
   const [method, setMethod] = useState<'email' | 'mobile'>('email')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [phone, setPhone] = useState('')
-  const [otp, setOtp] = useState('')
-  const [otpSent, setOtpSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   // Someone who signed up before the signup page had a verification step
@@ -107,39 +103,6 @@ export default function LoginPage() {
 
     const supabase = createClient()
     const { error: verifyError } = await supabase.auth.verifyOtp({ email, token: emailOtp, type: 'signup' })
-
-    if (verifyError) {
-      setError(verifyError.message)
-      setLoading(false)
-      return
-    }
-
-    window.location.href = '/discover'
-  }
-
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-
-    const supabase = createClient()
-    const { error: otpError } = await supabase.auth.signInWithOtp({ phone: toE164India(phone) })
-
-    setLoading(false)
-    if (otpError) {
-      setError(otpError.message)
-      return
-    }
-    setOtpSent(true)
-  }
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-
-    const supabase = createClient()
-    const { error: verifyError } = await supabase.auth.verifyOtp({ phone: toE164India(phone), token: otp, type: 'sms' })
 
     if (verifyError) {
       setError(verifyError.message)
@@ -233,10 +196,7 @@ export default function LoginPage() {
             <div className="flex bg-ink2 border border-white/10 rounded-full p-[3px] gap-[3px] mb-6">
               <button
                 type="button"
-                onClick={() => {
-                  setMethod('email')
-                  setOtpSent(false)
-                }}
+                onClick={() => setMethod('email')}
                 className={method === 'email' ? 'nm-btn nm-btn-gold text-[11.5px]' : 'nm-btn text-[11.5px] font-bold text-muted'}
                 style={{ padding: '6px 18px' }}
               >
@@ -289,56 +249,23 @@ export default function LoginPage() {
               {loading ? 'Signing in…' : 'Sign in →'}
             </button>
           </form>
-        ) : !otpSent ? (
-          <form onSubmit={handleSendOtp} className="w-full space-y-4 text-left">
-            <div>
-              <label className="nm-label">MOBILE NUMBER</label>
-              {/* India-only for now -- +91 is fixed, not typed, so there's
-                  no way to pick the wrong country code or omit it. */}
-              <div className="nm-field flex items-center gap-2 !px-0">
-                <span className="pl-4 pr-2 text-[#a79ecb] font-bold border-r border-white/10">+91</span>
-                <input
-                  type="tel"
-                  inputMode="numeric"
-                  value={phone}
-                  onChange={(e) => setPhone(sanitizeIndianMobileInput(e.target.value))}
-                  placeholder="98765 43210"
-                  maxLength={10}
-                  required
-                  className="flex-1 bg-transparent outline-none pr-4 py-0"
-                />
-              </div>
-            </div>
-
-            <button type="submit" disabled={loading} className="nm-btn nm-btn-gold w-full py-4 text-[14.5px] disabled:opacity-50">
-              {loading ? 'Sending code…' : 'Send OTP →'}
-            </button>
-          </form>
         ) : (
-          <form onSubmit={handleVerifyOtp} className="w-full space-y-4 text-left">
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="nm-label !mb-0">ENTER OTP</label>
-                <button type="button" onClick={() => setOtpSent(false)} className="text-[12px] font-bold text-[#ff8fd1]">
-                  Change number
-                </button>
-              </div>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="6-digit code"
-                required
-                className="nm-field"
-              />
-              <p className="text-[12px] text-muted font-medium mt-2">Code sent to {toE164India(phone)}</p>
-            </div>
-
-            <button type="submit" disabled={loading} className="nm-btn nm-btn-gold w-full py-4 text-[14.5px] disabled:opacity-50">
-              {loading ? 'Verifying…' : 'Verify & sign in →'}
+          // Mobile sign-in is temporarily unavailable (the OTP provider
+          // isn't wired up yet) -- say so up front rather than let someone
+          // fill in a number and hit a confusing failure.
+          <div className="w-full bg-ink2 border border-white/10 rounded-2xl px-5 py-6 text-center">
+            <p className="text-[14px] font-bold text-white mb-1.5">Mobile sign-in is down right now</p>
+            <p className="text-[13px] text-muted font-medium leading-relaxed">
+              We&apos;re working on it. For now, please sign in with email or Google instead.
+            </p>
+            <button
+              type="button"
+              onClick={() => setMethod('email')}
+              className="nm-btn nm-btn-gold mt-5 py-3 px-6 text-[13px]"
+            >
+              Use email instead →
             </button>
-          </form>
+          </div>
         )}
           </>
         )}
