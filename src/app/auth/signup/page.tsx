@@ -27,11 +27,17 @@ export default function SignupPage() {
   const [resendStatus, setResendStatus] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  // Set when the signup API tells us this email already has an account
+  // (see isExistingAccountSignup) -- Supabase returns success with no
+  // email sent in this case, so without this the person was told "check
+  // your inbox for a code" for a code that was never coming.
+  const [existingAccountEmail, setExistingAccountEmail] = useState('')
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setExistingAccountEmail('')
 
     try {
       const res = await fetch('/api/auth/signup', {
@@ -46,6 +52,12 @@ export default function SignupPage() {
       }
 
       const data = await res.json()
+
+      if (data.existingAccount) {
+        setExistingAccountEmail(email)
+        return
+      }
+
       if (data.session) {
         // Confirm email is off (or this address was already confirmed) --
         // signUp() already returned a live session, so there's nothing to
@@ -164,7 +176,18 @@ export default function SignupPage() {
         </button>
       </div>
 
-      {method === 'email' && emailOtpSent ? (
+      {method === 'email' && existingAccountEmail ? (
+        <div className="bg-ink2 border border-white/10 rounded-2xl px-5 py-6 text-center">
+          <p className="text-[14px] font-bold text-white mb-1.5">You already have an account</p>
+          <p className="text-[13px] text-muted font-medium leading-relaxed">
+            {existingAccountEmail} is already registered with NamMane -- sign in instead of creating a
+            new account.
+          </p>
+          <Link href="/auth/login" className="nm-btn nm-btn-gold mt-5 py-3 px-6 text-[13px] inline-block">
+            Sign in →
+          </Link>
+        </div>
+      ) : method === 'email' && emailOtpSent ? (
         <form onSubmit={handleVerifyEmailOtp} className="space-y-4">
           <div>
             <div className="flex items-center justify-between mb-1.5">

@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/auth'
 import { createAdminClient } from '@/lib/supabaseAdmin'
+import { isExistingAccountSignup } from '@/lib/signupResult'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -23,6 +24,15 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
+    // See isExistingAccountSignup's own comment -- Supabase returns success
+    // here even when this email already has an account, specifically so a
+    // form can't be used to probe which emails are registered. Tell the
+    // signup page so it can say "sign in instead" rather than claiming a
+    // verification code was sent, which for this case it never was.
+    if (isExistingAccountSignup(data.user)) {
+      return NextResponse.json({ existingAccount: true }, { status: 200 })
     }
 
     if (data.user) {
