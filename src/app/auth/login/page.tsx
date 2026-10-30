@@ -96,7 +96,7 @@ export default function LoginPage() {
       return
     }
 
-    window.location.href = '/discover'
+    window.location.href = '/'
   }
 
   const handleSendEmailVerify = async () => {
@@ -131,7 +131,7 @@ export default function LoginPage() {
       return
     }
 
-    window.location.href = '/discover'
+    window.location.href = '/'
   }
 
   const handleSendWhatsAppOtp = async (e: React.FormEvent) => {
@@ -198,7 +198,7 @@ export default function LoginPage() {
       return
     }
 
-    window.location.href = '/discover'
+    window.location.href = '/'
   }
 
   const handleOAuth = async (provider: 'google') => {
@@ -206,7 +206,7 @@ export default function LoginPage() {
     const supabase = createClient()
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=/discover` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/` },
     })
     if (oauthError) setError(oauthError.message)
   }
@@ -217,7 +217,12 @@ export default function LoginPage() {
         <div className="self-start mb-5">
           <BackButton fallbackHref="/" />
         </div>
-        <div className="nm-logo-mark w-16 h-16 text-[28px]" style={{ width: 64, height: 64 }}>N</div>
+        {/* Auth pages don't use the shared Header (no nav bar here on
+            purpose), so without this the logo was just decorative text --
+            nothing on this screen could take you back to the home page
+            except the small "Back" link above, which goes to whatever
+            page you came from, not home. */}
+        <Link href="/" className="nm-logo-mark w-16 h-16 text-[28px]" style={{ width: 64, height: 64 }}>N</Link>
 
         <h1 className="nm-marquee text-[27px] text-white mt-6 mb-1.5">
           Welcome{' '}
