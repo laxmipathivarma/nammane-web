@@ -47,17 +47,63 @@ export default function LoginPage() {
   const [otpSent, setOtpSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  // Someone who signed up before the signup page had a verification step
+  // (or who abandoned it partway through) has an account Supabase will
+  // never sign in -- "Email not confirmed" -- and until now there was no
+  // way to finish that confirmation from the login screen at all. This
+  // catches that specific error and offers the same 6-digit code flow the
+  // signup page uses, instead of leaving the person stuck.
+  const [needsEmailVerify, setNeedsEmailVerify] = useState(false)
+  const [emailOtp, setEmailOtp] = useState('')
+  const [resendStatus, setResendStatus] = useState('')
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setNeedsEmailVerify(false)
 
     const supabase = createClient()
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
 
     if (signInError) {
+      if (signInError.message.toLowerCase().includes('email not confirmed')) {
+        setNeedsEmailVerify(true)
+        setLoading(false)
+        return
+      }
       setError(signInError.message)
+      setLoading(false)
+      return
+    }
+
+    window.location.href = '/discover'
+  }
+
+  const handleSendEmailVerify = async () => {
+    setResendStatus('')
+    setError('')
+    setLoading(true)
+    const supabase = createClient()
+    const { error: resendError } = await supabase.auth.resend({ type: 'signup', email })
+    setLoading(false)
+    if (resendError) {
+      setError(resendError.message)
+      return
+    }
+    setResendStatus('Code sent.')
+  }
+
+  const handleVerifyEmailOtp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    const supabase = createClient()
+    const { error: verifyError } = await supabase.auth.verifyOtp({ email, token: emailOtp, type: 'signup' })
+
+    if (verifyError) {
+      setError(verifyError.message)
       setLoading(false)
       return
     }
@@ -132,28 +178,81 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* email / mobile number -- same account, pick how you want in */}
-        <div className="flex bg-ink2 border border-white/10 rounded-full p-[3px] gap-[3px] mb-6">
-          <button
-            type="button"
-            onClick={() => {
-              setMethod('email')
-              setOtpSent(false)
-            }}
-            className={method === 'email' ? 'nm-btn nm-btn-gold text-[11.5px]' : 'nm-btn text-[11.5px] font-bold text-muted'}
-            style={{ padding: '6px 18px' }}
-          >
-            Email
-          </button>
-          <button
-            type="button"
-            onClick={() => setMethod('mobile')}
-            className={method === 'mobile' ? 'nm-btn nm-btn-gold text-[11.5px]' : 'nm-btn text-[11.5px] font-bold text-muted'}
-            style={{ padding: '6px 18px' }}
-          >
-            Mobile number
-          </button>
-        </div>
+        {method === 'email' && needsEmailVerify ? (
+          <div className="w-full">
+            <div className="w-full bg-ruby/10 border border-ruby/40 text-[#ff8fd1] px-4 py-3 rounded-xl mb-4 text-[13px] font-semibold text-left">
+              This email hasn&apos;t been verified yet. Send a code to finish confirming it.
+            </div>
+            <div className="flex gap-2 mb-4">
+              <button
+                type="button"
+                onClick={handleSendEmailVerify}
+                disabled={loading}
+                className="nm-btn nm-btn-gold flex-1 py-3.5 text-[13px] disabled:opacity-50"
+              >
+                {loading ? 'Sending…' : 'Send verification code'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setNeedsEmailVerify(false)
+                  setError('')
+                }}
+                className="nm-btn nm-btn-ghost py-3.5 text-[13px]"
+              >
+                Back
+              </button>
+            </div>
+            {resendStatus && (
+              <form onSubmit={handleVerifyEmailOtp} className="w-full space-y-4 text-left">
+                <div>
+                  <label className="nm-label">ENTER CODE</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={emailOtp}
+                    onChange={(e) => setEmailOtp(e.target.value)}
+                    placeholder="6-digit code"
+                    required
+                    className="nm-field"
+                  />
+                  <p className="text-[12px] text-muted font-medium mt-2">
+                    Code sent to {email}.{' '}
+                    <button type="button" onClick={handleSendEmailVerify} className="text-[#ff8fd1] font-bold">
+                      Resend
+                    </button>
+                  </p>
+                </div>
+                <button type="submit" disabled={loading} className="nm-btn nm-btn-gold w-full py-4 text-[14.5px] disabled:opacity-50">
+                  {loading ? 'Verifying…' : 'Verify & sign in →'}
+                </button>
+              </form>
+            )}
+          </div>
+        ) : (
+          <>
+            {/* email / mobile number -- same account, pick how you want in */}
+            <div className="flex bg-ink2 border border-white/10 rounded-full p-[3px] gap-[3px] mb-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setMethod('email')
+                  setOtpSent(false)
+                }}
+                className={method === 'email' ? 'nm-btn nm-btn-gold text-[11.5px]' : 'nm-btn text-[11.5px] font-bold text-muted'}
+                style={{ padding: '6px 18px' }}
+              >
+                Email
+              </button>
+              <button
+                type="button"
+                onClick={() => setMethod('mobile')}
+                className={method === 'mobile' ? 'nm-btn nm-btn-gold text-[11.5px]' : 'nm-btn text-[11.5px] font-bold text-muted'}
+                style={{ padding: '6px 18px' }}
+              >
+                Mobile number
+              </button>
+            </div>
 
         {method === 'email' ? (
           <form onSubmit={handleEmailSubmit} className="w-full space-y-4 text-left">
@@ -239,6 +338,8 @@ export default function LoginPage() {
               {loading ? 'Verifying…' : 'Verify & sign in →'}
             </button>
           </form>
+        )}
+          </>
         )}
 
         <div className="flex items-center gap-2.5 my-6 w-full">
