@@ -20,7 +20,7 @@ const WEBAPP_URL = 'https://app.nammane.in'
 // On the marketing site: Host/Join/Discover go through the login
 // gate when signed out, straight into the real app page when signed
 // in. Inside the app itself, they're already relative in-app routes.
-function hrefsFor(isMarketing: boolean, signedIn: boolean): Record<NavKey, string> {
+export function hrefsFor(isMarketing: boolean, signedIn: boolean): Record<NavKey, string> {
   if (!isMarketing) {
     return { home: '/', host: '/host', join: '/discover', discover: '/discover', webapp: '/', mobile: 'https://nammane.in/mobile-app' }
   }
