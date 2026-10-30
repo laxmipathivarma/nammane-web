@@ -295,7 +295,9 @@ export default function InvitationHub({
             </div>
             {!contactPickerSupported && (
               <p className="text-[11px] text-muted2 font-medium mt-1.5">
-                Contact-book picking isn&apos;t available on this device -- type the name and number instead.
+                Picking straight from your phone&apos;s contacts only works in Chrome on Android -- it&apos;s a browser
+                feature, not something this app can turn on for a desktop or iPhone browser. Type the name and number
+                instead, or open this page in Chrome on an Android phone to use the picker.
               </p>
             )}
           </div>

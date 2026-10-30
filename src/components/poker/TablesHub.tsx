@@ -31,6 +31,17 @@ function TableList({ data, save, onOpen }: Pick<PokerTabProps, 'data' | 'save'> 
       {data.tables.length === 0 && <div className="text-[12.5px] text-muted2 font-semibold">No tables yet -- add your first one below.</div>}
       {data.tables.map((t) => {
         const playing = t.ledger.players.filter((p) => p.out == null).length
+        // A table you just created has nobody in it yet -- "Running"
+        // reads as if the game already started. Show that as "Not
+        // started" instead; "Running" only once someone's actually
+        // sitting at it.
+        const label = t.status === 'settled' ? 'Settled' : t.ledger.players.length === 0 ? 'Not started' : 'Running'
+        const labelClass =
+          t.status === 'settled'
+            ? 'bg-[#8fe3b0]/[0.18] text-[#8fe3b0]'
+            : t.ledger.players.length === 0
+              ? 'bg-white/10 text-muted2'
+              : 'bg-gold/[0.09] text-gold-text'
         return (
           <button
             key={t.id}
@@ -43,13 +54,7 @@ function TableList({ data, save, onOpen }: Pick<PokerTabProps, 'data' | 'save'> 
                 {t.ledger.players.length}/{t.maxPlayers} seated · {playing} still playing
               </div>
             </div>
-            <span
-              className={`text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full shrink-0 ${
-                t.status === 'settled' ? 'bg-[#8fe3b0]/[0.18] text-[#8fe3b0]' : 'bg-gold/[0.09] text-gold-text'
-              }`}
-            >
-              {t.status === 'settled' ? 'Settled' : 'Running'}
-            </span>
+            <span className={`text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full shrink-0 ${labelClass}`}>{label}</span>
           </button>
         )
       })}
@@ -104,6 +109,7 @@ function TableDetail({
   onBack,
 }: Pick<PokerTabProps, 'data' | 'save'> & { table: PokerTable; onBack: () => void }) {
   const [newName, setNewName] = useState('')
+  const [guestId, setGuestId] = useState('')
   const [otherAmt, setOtherAmt] = useState<Record<string, string>>({})
   const [buyMethod, setBuyMethod] = useState<Record<string, 'paid' | 'credit'>>({})
 
@@ -111,10 +117,33 @@ function TableDetail({
 
   const full = table.ledger.players.length >= table.maxPlayers
 
+  // Guests the host already invited (and, usually, approved) who aren't
+  // sitting at any table yet -- picking one here seats them straight
+  // from the guest list instead of retyping their name, and keeps
+  // Guest Approvals in sync (marks them approved + seated here).
+  const availableGuests = data.invitees.filter((i) => !i.tableId)
+
   const addPlayer = () => {
     if (!newName.trim() || full) return
     updateTable({ ...table, ledger: { ...table.ledger, players: [...table.ledger.players, { id: newId(), name: newName.trim(), buyins: [], out: null }] } })
     setNewName('')
+  }
+
+  const addFromGuestList = () => {
+    if (!guestId || full) return
+    const guest = data.invitees.find((i) => i.id === guestId)
+    if (!guest) return
+    const tables = data.tables.map((t) =>
+      t.id === table.id
+        ? { ...t, ledger: { ...t.ledger, players: [...t.ledger.players, { id: newId(), name: guest.name, phone: guest.phone, buyins: [], out: null }] } }
+        : t
+    )
+    save({
+      ...data,
+      tables,
+      invitees: data.invitees.map((i) => (i.id === guestId ? { ...i, approved: true, tableId: table.id } : i)),
+    })
+    setGuestId('')
   }
 
   const removePlayer = (pid: string) =>
@@ -163,12 +192,37 @@ function TableDetail({
         </div>
       </div>
 
-      <div>
-        <label className="nm-label">Add a player ({table.ledger.players.length}/{table.maxPlayers})</label>
-        <div className="flex gap-2">
+      <div className="flex flex-col gap-2.5">
+        <label className="nm-label !mb-0">Add a player ({table.ledger.players.length}/{table.maxPlayers})</label>
+
+        {availableGuests.length > 0 && (
+          <div className="flex gap-2">
+            <select
+              className="nm-field flex-1"
+              value={guestId}
+              disabled={full}
+              onChange={(e) => setGuestId(e.target.value)}
+            >
+              <option value="">Pick from invited guests…</option>
+              {availableGuests.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name}
+                  {g.phone ? ` · ${g.phone}` : ''}
+                  {g.invitedAt ? '' : ' (not invited yet)'}
+                </option>
+              ))}
+            </select>
+            <button type="button" onClick={addFromGuestList} disabled={!guestId || full} className="nm-btn nm-btn-gold px-5 disabled:opacity-40">
+              Add
+            </button>
+          </div>
+        )}
+
+        <div className="flex items-center gap-2">
+          {availableGuests.length > 0 && <span className="text-[10px] text-muted2 font-bold uppercase shrink-0">or</span>}
           <input
             className="nm-field flex-1"
-            placeholder={full ? 'Table is full' : 'Player name'}
+            placeholder={full ? 'Table is full' : 'Type a player name manually'}
             value={newName}
             disabled={full}
             onChange={(e) => setNewName(e.target.value)}
