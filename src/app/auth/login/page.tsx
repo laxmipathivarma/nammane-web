@@ -38,6 +38,14 @@ const blobs = [
   },
 ]
 
+// WhatsApp OTP delivery needs a Twilio WhatsApp Sender, which requires
+// going through Meta Business verification (and a paid WhatsApp Business
+// number) -- the user hit Twilio's paywall for that and asked to hold off
+// for now. The sign-in/verify logic below is fully built and tested --
+// flip this to true once the Twilio WhatsApp Sender is set up and it
+// works immediately, no other changes needed.
+const WHATSAPP_LOGIN_ENABLED = false
+
 export default function LoginPage() {
   // Email/password and mobile+OTP are two separate ways in -- same account,
   // same destination after sign-in, just a different first step.
@@ -335,6 +343,28 @@ export default function LoginPage() {
               {loading ? 'Signing in…' : 'Sign in →'}
             </button>
           </form>
+        ) : !WHATSAPP_LOGIN_ENABLED ? (
+          <div className="w-full bg-ink2 border border-white/10 rounded-2xl px-5 py-6 text-center">
+            <p className="text-[14px] font-bold text-white mb-1.5">WhatsApp sign-in isn&apos;t available right now</p>
+            <p className="text-[13px] text-muted font-medium leading-relaxed">
+              We&apos;re setting it up. For now, please sign in with email or Google instead.
+            </p>
+            <div className="flex gap-3 mt-5">
+              <button
+                type="button"
+                onClick={() => {
+                  setMethod('email')
+                  setError('')
+                }}
+                className="nm-btn nm-btn-gold flex-1 py-3 text-[13px]"
+              >
+                Use email
+              </button>
+              <button type="button" onClick={() => handleOAuth('google')} className="nm-btn nm-btn-ghost flex-1 py-3 text-[13px]">
+                Use Google
+              </button>
+            </div>
+          </div>
         ) : !mobileOtpSent ? (
           <form onSubmit={handleSendWhatsAppOtp} className="w-full space-y-4 text-left">
             <div>
