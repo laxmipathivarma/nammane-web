@@ -14,7 +14,7 @@ import { useAuth } from '@/lib/AuthProvider'
 // straight to the real page.
 const HREFS: Record<NavKey, string> = {
   home: '/',
-  host: '/host/create',
+  host: '/host',
   join: '/discover',
   discover: '/discover',
   webapp: '/',

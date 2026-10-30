@@ -14,7 +14,12 @@ export default function CreateEventPage() {
 
   const [category, setCategory] = useState('poker')
   const [requireApproval, setRequireApproval] = useState(true)
-  const [isPublic, setIsPublic] = useState(true)
+  // Poker games are invite-only home games by nature (WhatsApp invites +
+  // guest approvals, not strangers browsing Discover) -- default private
+  // so publishing a poker event never blocks on a location-permission
+  // prompt the host has no reason to grant. Still a one-tap toggle below
+  // for anyone who does want their event discoverable.
+  const [isPublic, setIsPublic] = useState(false)
   const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM)
 
   const [title, setTitle] = useState('')
