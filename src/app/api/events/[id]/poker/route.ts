@@ -1,0 +1,55 @@
+import { createServerSupabaseClient } from '@/lib/auth'
+import { emptyLedger, type PokerLedger } from '@/lib/pokerLedger'
+import { NextRequest, NextResponse } from 'next/server'
+
+// The poker ledger for a single event lives in `events.event_details`
+// (JSONB, already on the table from 001_initial_schema.sql) under the
+// `poker` key -- no separate table needed. Only the host can read or
+// write it; RLS on `events` (database/002_public_private_radius.sql)
+// already restricts UPDATE to the host, so this route just needs to
+// confirm the event is actually a poker event before touching it.
+
+async function loadEvent(supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>, id: string) {
+  const { data } = await supabase.from('events').select('id,host_id,category,event_details').eq('id', id).maybeSingle()
+  return data
+}
+
+export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+  const supabase = await createServerSupabaseClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Not signed in' }, { status: 401 })
+
+  const event = await loadEvent(supabase, params.id)
+  if (!event) return NextResponse.json({ error: 'Event not found' }, { status: 404 })
+  if (event.host_id !== user.id) return NextResponse.json({ error: 'Only the host can open the ledger' }, { status: 403 })
+  if (event.category !== 'poker') return NextResponse.json({ error: 'Not a poker event' }, { status: 400 })
+
+  const ledger: PokerLedger = (event.event_details && event.event_details.poker) || emptyLedger()
+  return NextResponse.json({ ledger })
+}
+
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const supabase = await createServerSupabaseClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Not signed in' }, { status: 401 })
+
+  const event = await loadEvent(supabase, params.id)
+  if (!event) return NextResponse.json({ error: 'Event not found' }, { status: 404 })
+  if (event.host_id !== user.id) return NextResponse.json({ error: 'Only the host can edit the ledger' }, { status: 403 })
+
+  const body = await req.json()
+  const ledger: PokerLedger = body.ledger
+  if (!ledger || !Array.isArray(ledger.players)) {
+    return NextResponse.json({ error: 'Malformed ledger payload' }, { status: 400 })
+  }
+
+  const nextDetails = { ...(event.event_details || {}), poker: ledger }
+  const { error } = await supabase.from('events').update({ event_details: nextDetails }).eq('id', params.id)
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+
+  return NextResponse.json({ ok: true })
+}

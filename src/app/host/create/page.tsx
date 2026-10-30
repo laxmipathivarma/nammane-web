@@ -99,7 +99,13 @@ export default function CreateEventPage() {
         return
       }
 
-      router.push('/discover')
+      // Poker events get a ledger (buy-ins, cash-outs, settle-up) -- take
+      // the host straight there instead of back to Discover.
+      if (category === 'poker' && json.event?.id) {
+        router.push(`/event/${json.event.id}/poker`)
+      } else {
+        router.push('/discover')
+      }
     } catch (e) {
       console.error(e)
       setError('Something went wrong publishing your event.')
