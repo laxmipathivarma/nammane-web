@@ -246,9 +246,12 @@ export default function SignupPage() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value.trim().toLowerCase())}
               placeholder="you@email.com"
               required
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
               className="nm-field"
             />
           </div>
