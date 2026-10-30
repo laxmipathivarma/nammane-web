@@ -1,13 +1,41 @@
 import { notFound } from 'next/navigation'
 import { EVENTS, categoryHero, categoryIcon } from '@/lib/sampleEvents'
 import BackButton from '@/components/BackButton'
+import { createAdminClient } from '@/lib/supabaseAdmin'
 
 export function generateStaticParams() {
   return Object.keys(EVENTS).map((slug) => ({ slug }))
 }
 
-export default function EventDetailPage({ params }: { params: { slug: string } }) {
-  const event = EVENTS[params.slug]
+// Real events created through /host/create are stored in Supabase and
+// identified by UUID, not one of the handful of static demo slugs this
+// page was originally built around -- look them up and map them onto the
+// same shape the rest of this page already renders, rather than 404ing
+// on every real event.
+async function fetchLiveEvent(id: string) {
+  const admin = createAdminClient()
+  const { data } = await admin.from('events').select('*').eq('id', id).maybeSingle()
+  if (!data) return null
+
+  return {
+    title: data.title,
+    category: data.category,
+    tagLabel: String(data.category).toUpperCase(),
+    schedule: data.starts_at
+      ? new Date(data.starts_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+      : 'Date & time TBD',
+    area: data.address || data.city || (data.is_public ? 'Shared after approval' : 'Private event'),
+    host: { name: 'the host' },
+    eventsHosted: 1,
+    guests: [],
+    seatsLabel: data.capacity ? `0/${data.capacity} seats` : 'Open seats',
+    houseRules: data.description || 'No details added yet.',
+    priceLabel: data.contribution_amount ? `₹${data.contribution_amount}` : undefined,
+  }
+}
+
+export default async function EventDetailPage({ params }: { params: { slug: string } }) {
+  const event = EVENTS[params.slug] ?? (await fetchLiveEvent(params.slug))
   if (!event) notFound()
 
   const icon = categoryIcon[event.category]

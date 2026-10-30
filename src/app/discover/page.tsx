@@ -1,100 +1,134 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import CategoryChips, { CATEGORIES } from '@/components/CategoryChips'
 import EventCard, { EventCardData } from '@/components/EventCard'
+import { createClient } from '@/lib/supabase'
+import { useAuth } from '@/lib/AuthProvider'
 
-const ALL_EVENTS: EventCardData[] = [
-  {
-    title: 'High Stakes Friday',
-    slug: 'high-stakes-friday',
-    category: 'poker',
-    tagLabel: 'POKER',
-    subtitle: "Texas Hold'em · No-limit · Intermediate",
-    host: 'Hosted by Rahul · verified',
-    hostInitials: 'RK',
-    rating: '4.9',
-    seatsLabel: '4/6 seats',
-    seatsFilledPct: 67,
-    ctaLabel: 'Request to join',
-  },
-  {
-    title: 'Sunday 13-Card Social',
-    slug: 'sunday-13-card-social',
-    category: 'rummy',
-    tagLabel: 'RUMMY',
-    subtitle: 'Points rummy · 2 tables · Casual',
-    host: 'Hosted by Meera · verified',
-    hostInitials: 'MS',
-    rating: '4.8',
-    seatsLabel: '10/12 seats',
-    seatsFilledPct: 83,
-    ctaLabel: 'Join waitlist',
-  },
-  {
-    title: 'Copper & Smoke',
-    slug: 'copper-and-smoke',
-    category: 'drinks',
-    tagLabel: 'DRINKS',
-    subtitle: 'BYOB · Snacks on the house · 21+',
-    host: 'Hosted by Varun · verified',
-    hostInitials: 'VK',
-    rating: '4.7',
-    seatsLabel: '14/20 going',
-    seatsFilledPct: 70,
-    ctaLabel: 'Request to join',
-  },
-  {
-    title: 'An Evening Table',
-    slug: 'an-evening-table',
-    category: 'dinner',
-    tagLabel: 'DINNER',
-    subtitle: 'Mediterranean set menu · Seats 8',
-    host: 'Hosted by Priya · verified',
-    hostInitials: 'PS',
-    rating: '5.0',
-    seatsLabel: '6/8 seats',
-    seatsFilledPct: 75,
-    ctaLabel: 'Request to join',
-  },
-  {
-    title: 'Rooftop Neon Soirée',
-    slug: 'rooftop-neon-soiree',
-    category: 'party',
-    tagLabel: 'PARTY',
-    subtitle: 'Theme: Vegas lights',
-    host: 'Hosted by Aisha · verified',
-    hostInitials: 'AJ',
-    rating: '4.9',
-    seatsLabel: '18/30 going',
-    seatsFilledPct: 60,
-    ctaLabel: 'Request to join',
-  },
-  {
-    title: 'Board Game Marathon',
-    slug: 'board-game-marathon',
-    category: 'other',
-    tagLabel: 'OTHER',
-    subtitle: 'Custom event · Snacks & chill music',
-    host: 'Hosted by Karthik · verified',
-    hostInitials: 'KN',
-    rating: '4.6',
-    seatsLabel: '5/10 seats',
-    seatsFilledPct: 50,
-    ctaLabel: 'Request to join',
-  },
-]
+type EventRow = {
+  id: string
+  host_id: string
+  title: string
+  category: EventCardData['category']
+  description: string | null
+  is_public: boolean
+  radius_km: number | null
+  lat: number | null
+  lng: number | null
+  capacity: number | null
+  contribution_amount: number | null
+  address: string | null
+  starts_at: string | null
+}
+
+const tagLabel: Record<EventCardData['category'], string> = {
+  poker: 'POKER',
+  rummy: 'RUMMY',
+  drinks: 'DRINKS',
+  dinner: 'DINNER',
+  party: 'PARTY',
+  other: 'OTHER',
+}
+
+// Haversine distance in km between two lat/lng points -- plain JS so we
+// don't need PostGIS functions exposed through the REST API; events and
+// the viewer's own location are both small payloads, so filtering
+// client-side after a normal `select` is simple and fast enough.
+function distanceKm(aLat: number, aLng: number, bLat: number, bLng: number) {
+  const R = 6371
+  const dLat = ((bLat - aLat) * Math.PI) / 180
+  const dLng = ((bLng - aLng) * Math.PI) / 180
+  const la1 = (aLat * Math.PI) / 180
+  const la2 = (bLat * Math.PI) / 180
+  const h =
+    Math.sin(dLat / 2) ** 2 + Math.cos(la1) * Math.cos(la2) * Math.sin(dLng / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(h))
+}
+
+function eventToCard(e: EventRow, distKm: number | null): EventCardData {
+  const seats = e.capacity ?? undefined
+  return {
+    slug: e.id,
+    title: e.title,
+    category: e.category,
+    tagLabel: tagLabel[e.category] ?? 'OTHER',
+    subtitle:
+      [e.description, distKm != null ? `${distKm.toFixed(1)} km away` : null]
+        .filter(Boolean)
+        .join(' · ') || (e.is_public ? 'Public event' : 'Private event'),
+    host: undefined,
+    seatsLabel: seats ? `0/${seats} seats` : undefined,
+    seatsFilledPct: seats ? 0 : undefined,
+    ctaLabel: e.is_public ? 'Request to join' : 'View event',
+  }
+}
 
 export default function Discover() {
+  const { user } = useAuth()
   const [filter, setFilter] = useState<string>('poker')
-  const visible = ALL_EVENTS.filter((e) => e.category === filter)
+  const [events, setEvents] = useState<EventRow[]>([])
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [locDenied, setLocDenied] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setLocDenied(true)
+      return
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => setLocDenied(true),
+      { timeout: 8000 }
+    )
+  }, [])
+
+  useEffect(() => {
+    const supabase = createClient()
+    // RLS (database/002_public_private_radius.sql) already restricts this
+    // to published public events, plus the signed-in user's own events --
+    // no need to filter host-visibility client-side.
+    supabase
+      .from('events')
+      .select('id,host_id,title,category,description,is_public,radius_km,lat,lng,capacity,contribution_amount,address,starts_at')
+      .eq('status', 'published')
+      .then(({ data, error }) => {
+        if (error) console.error('discover fetch failed', error)
+        setEvents((data as EventRow[]) || [])
+        setLoading(false)
+      })
+  }, [])
+
+  const visible = useMemo(() => {
+    return events
+      .filter((e) => e.category === filter)
+      .filter((e) => {
+        // Always show your own events (public or private).
+        if (user && e.host_id === user.id) return true
+        if (!e.is_public) return false
+        // A public event with no stored location/radius is shown to
+        // everyone rather than silently hidden (can't distance-filter
+        // what has no coordinates).
+        if (e.lat == null || e.lng == null || !e.radius_km) return true
+        if (!coords) return true // haven't got the viewer's location yet/denied -- don't hide events, just skip distance info
+        return distanceKm(coords.lat, coords.lng, e.lat, e.lng) <= e.radius_km
+      })
+  }, [events, filter, coords, user])
+
   const activeLabel = CATEGORIES.find((c) => c.key === filter)?.label ?? ''
 
   return (
     <div className="nm-root nm-bg min-h-screen text-white">
       <div className="px-5 pt-8 pb-4 max-w-5xl mx-auto">
         <h1 className="nm-marquee text-2xl md:text-3xl text-gold-text font-extrabold">Discover</h1>
-        <p className="text-[12.5px] text-muted font-semibold mt-1">Tonight&apos;s hottest tables, your rules</p>
+        <p className="text-[12.5px] text-muted font-semibold mt-1">
+          {locDenied
+            ? "Tonight's hottest tables, your rules"
+            : coords
+              ? 'Showing public events near your location'
+              : 'Finding events near you…'}
+        </p>
       </div>
 
       <div className="px-5 pb-6 max-w-5xl mx-auto">
@@ -103,11 +137,26 @@ export default function Discover() {
 
       <div className="px-5 pb-20 max-w-5xl mx-auto">
         <div className="text-[13px] text-muted font-bold mb-4">
-          {visible.length} {activeLabel} {visible.length === 1 ? 'event' : 'events'} near you
+          {loading
+            ? 'Loading events…'
+            : `${visible.length} ${activeLabel} ${visible.length === 1 ? 'event' : 'events'} near you`}
         </div>
+        {!loading && visible.length === 0 && (
+          <div className="text-[12.5px] text-muted2 font-semibold">
+            No {activeLabel.toLowerCase()} events published nearby yet — be the first to host one.
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {visible.map((e) => (
-            <EventCard key={e.title} data={e} />
+            <EventCard
+              key={e.id}
+              data={eventToCard(
+                e,
+                coords && e.lat != null && e.lng != null
+                  ? distanceKm(coords.lat, coords.lng, e.lat, e.lng)
+                  : null
+              )}
+            />
           ))}
         </div>
       </div>
