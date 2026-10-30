@@ -12,9 +12,11 @@ export default function ForgotPasswordPage() {
           <BackButton fallbackHref="/auth/login" />
         </div>
 
-        <Link href="/" className="nm-logo-mark w-16 h-16 flex items-center justify-center text-[28px]" style={{ width: 64, height: 64 }}>
+        {/* Matches the shared Header's logo elsewhere on app.nammane.in:
+            goes to the marketing site, not this app's own home. */}
+        <a href="https://nammane.in" className="nm-logo-mark w-16 h-16 flex items-center justify-center text-[28px]" style={{ width: 64, height: 64 }}>
           N
-        </Link>
+        </a>
 
         <h1 className="nm-marquee text-[27px] text-white mt-6 mb-1.5">Password reset</h1>
         <div className="nm-glass inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-extrabold tracking-wide mb-4 text-gold-text">

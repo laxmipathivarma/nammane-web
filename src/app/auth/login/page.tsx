@@ -222,7 +222,9 @@ export default function LoginPage() {
             nothing on this screen could take you back to the home page
             except the small "Back" link above, which goes to whatever
             page you came from, not home. */}
-        <Link href="/" className="nm-logo-mark w-16 h-16 text-[28px]" style={{ width: 64, height: 64 }}>N</Link>
+        {/* Matches the shared Header's logo elsewhere on app.nammane.in:
+            goes to the marketing site, not this app's own home. */}
+        <a href="https://nammane.in" className="nm-logo-mark w-16 h-16 text-[28px]" style={{ width: 64, height: 64 }}>N</a>
 
         <h1 className="nm-marquee text-[27px] text-white mt-6 mb-1.5">
           Welcome{' '}

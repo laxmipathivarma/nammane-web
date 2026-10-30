@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/AuthProvider'
 
 const LOGIN_URL = 'https://app.nammane.in/auth/login'
 const WEBAPP_URL = 'https://app.nammane.in'
+const MARKETING_URL = 'https://nammane.in'
 
 // This is the ONE header for both nammane.in (marketing) and
 // app.nammane.in (the web app) -- same component, same shell, same
@@ -20,9 +21,16 @@ const WEBAPP_URL = 'https://app.nammane.in'
 // On the marketing site: Host/Join/Discover go through the login
 // gate when signed out, straight into the real app page when signed
 // in. Inside the app itself, they're already relative in-app routes.
+//
+// Home (and the logo, which points at the same href) is the one
+// deliberate exception to "stay on this host": inside the app, "/" is
+// the app's own quick-actions home, which you're usually already on --
+// clicking Home there did nothing visible and read as broken. Home
+// always goes to the marketing site instead, even while signed in; the
+// quick-actions home is still one click away via "Web App" in the nav.
 export function hrefsFor(isMarketing: boolean, signedIn: boolean): Record<NavKey, string> {
   if (!isMarketing) {
-    return { home: '/', host: '/host', join: '/discover', discover: '/discover', webapp: '/', mobile: 'https://nammane.in/mobile-app' }
+    return { home: MARKETING_URL, host: '/host', join: '/discover', discover: '/discover', webapp: '/', mobile: 'https://nammane.in/mobile-app' }
   }
   const appHref = (path: string) => (signedIn ? `${WEBAPP_URL}${path}` : LOGIN_URL)
   return {
@@ -73,20 +81,34 @@ export default function Header({ isMarketing = false }: { isMarketing?: boolean 
   return (
     <header className="sticky top-0 z-50 bg-ink/90 backdrop-blur-md border-b border-white/10">
       <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
-        {/* logo -- a plain relative link to "/", never a hardcoded
-            cross-host URL. middleware.ts already makes "/" resolve to
-            the right page per host (marketing home on nammane.in, the
-            app's own home on app.nammane.in), so clicking it never hops
-            to a different host, and therefore never looks like a
-            logout mid-navigation. */}
-        <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="nm2-logo-mark w-8 h-8 rounded-[28%] flex items-center justify-center shrink-0">
-            <span className="nm2-heading text-white text-base font-black">N</span>
-          </div>
-          <span className="nm2-heading text-[#e4d4ff] text-lg font-extrabold" style={{ textTransform: 'none' }}>
-            NamMane
-          </span>
-        </Link>
+        {/* logo -- always the same destination as the Home nav item
+            (HREFS.home above): the marketing site. A plain relative "/"
+            link would never cross hosts, but that's exactly what reads
+            as "the logo doesn't do anything" when you're already on the
+            app's own home page -- so this intentionally uses <a> and
+            crosses from app.nammane.in to nammane.in. That's a real
+            navigation (not a client-side route), which is fine: it's
+            never a logout, just a different page on a host-only
+            session cookie that was never shared across hosts anyway. */}
+        {HREFS.home.startsWith('http') ? (
+          <a href={HREFS.home} className="flex items-center gap-2.5 shrink-0">
+            <div className="nm2-logo-mark w-8 h-8 rounded-[28%] flex items-center justify-center shrink-0">
+              <span className="nm2-heading text-white text-base font-black">N</span>
+            </div>
+            <span className="nm2-heading text-[#e4d4ff] text-lg font-extrabold" style={{ textTransform: 'none' }}>
+              NamMane
+            </span>
+          </a>
+        ) : (
+          <Link href={HREFS.home} className="flex items-center gap-2.5 shrink-0">
+            <div className="nm2-logo-mark w-8 h-8 rounded-[28%] flex items-center justify-center shrink-0">
+              <span className="nm2-heading text-white text-base font-black">N</span>
+            </div>
+            <span className="nm2-heading text-[#e4d4ff] text-lg font-extrabold" style={{ textTransform: 'none' }}>
+              NamMane
+            </span>
+          </Link>
+        )}
 
         {/* nav links -- the exact same item set, labels and order
             everywhere (Home, Host, Join, Discover, Web App, Mobile App),

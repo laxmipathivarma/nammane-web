@@ -111,8 +111,10 @@ export default function SignupPage() {
       </div>
       {/* Auth pages don't use the shared Header, so this is the only
           home link on this screen -- make the whole logo+wordmark
-          clickable, same as the header logo everywhere else. */}
-      <Link href="/" className="flex items-center gap-3 mb-7">
+          clickable, same as the header logo everywhere else, and send
+          it to the marketing site like every other logo on
+          app.nammane.in (not this app's own home). */}
+      <a href="https://nammane.in" className="flex items-center gap-3 mb-7">
         <div className="relative inline-flex">
           <div className="nm-logo-mark w-13 h-13 text-[23px]" style={{ width: 52, height: 52 }}>N</div>
         </div>
@@ -120,7 +122,7 @@ export default function SignupPage() {
           <div className="nm-head font-extrabold text-[19px]">NamMane</div>
           <div className="text-[11px] font-bold text-[#a79ecb]">Poker · Dinner · Drinks · Karaoke</div>
         </div>
-      </Link>
+      </a>
 
       <h1 className="nm-marquee text-[28px] leading-tight text-white">
         Create your{' '}

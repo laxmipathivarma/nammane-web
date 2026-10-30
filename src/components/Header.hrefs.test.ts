@@ -1,29 +1,34 @@
 import { describe, it, expect } from 'vitest'
 import { hrefsFor } from './Header'
 
-// Regression coverage for "clicking Home / the logo jumps to a different
-// host" style bugs. Home and the logo always use hrefsFor(...).home, and
-// the invariant that matters is: it is always a bare relative path, never
-// an absolute app.nammane.in / nammane.in URL -- middleware.ts resolves
-// "/" to the right page per host, so a relative link never causes a
-// cross-host navigation (which is what makes the shared session cookie
-// look like a random logout).
+// Regression coverage for Home/logo navigation. Home and the logo always
+// use hrefsFor(...).home:
+//  - on the marketing site, Home stays on nammane.in (relative "/")
+//  - inside the webapp, Home deliberately crosses to the marketing site
+//    (https://nammane.in) rather than pointing at "/", which is the
+//    app's own home page you're usually already on -- that used to make
+//    Home/the logo look like they did nothing.
 describe('Header hrefsFor', () => {
   it.each([
     [true, true],
     [true, false],
-    [false, true],
-    [false, false],
-  ])('home is always the relative path "/" (isMarketing=%s, signedIn=%s)', (isMarketing, signedIn) => {
+  ])('on the marketing site, home stays the relative path "/" (signedIn=%s)', (isMarketing, signedIn) => {
     const hrefs = hrefsFor(isMarketing, signedIn)
     expect(hrefs.home).toBe('/')
-    expect(hrefs.home.startsWith('http')).toBe(false)
   })
 
-  it('on the webapp (isMarketing=false), every nav link is a relative in-app route', () => {
+  it.each([
+    [false, true],
+    [false, false],
+  ])('inside the webapp, home crosses to the marketing site (signedIn=%s)', (isMarketing, signedIn) => {
+    const hrefs = hrefsFor(isMarketing, signedIn)
+    expect(hrefs.home).toBe('https://nammane.in')
+  })
+
+  it('on the webapp (isMarketing=false), every nav link except Home/Mobile App is a relative in-app route', () => {
     const hrefs = hrefsFor(false, true)
-    for (const href of Object.values(hrefs)) {
-      if (href === 'https://nammane.in/mobile-app') continue // marketing-only destination, expected absolute
+    for (const [key, href] of Object.entries(hrefs)) {
+      if (key === 'home' || href === 'https://nammane.in/mobile-app') continue // intentionally cross-host
       expect(href.startsWith('http')).toBe(false)
     }
   })
