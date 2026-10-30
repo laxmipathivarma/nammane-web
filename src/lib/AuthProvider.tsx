@@ -39,18 +39,26 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     const supabase = createClient()
 
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
-      setUser(data.session?.user ?? null)
-      setLoading(false)
-      if (data.session?.user) ensureProfile()
-    })
-
+    // This used to ALSO call supabase.auth.getSession() here, separately
+    // from the onAuthStateChange subscription below -- two independent
+    // async chains racing to call setUser/setSession. That's how a real
+    // bug happened: a stale session left over from hours earlier (expired
+    // access token, and its refresh token already invalid/rotated) made
+    // getSession() kick off a background refresh that fails every time.
+    // If that failed-refresh cleanup resolved *after* a brand new,
+    // genuinely successful sign-in had already set a valid session, it
+    // would wipe the fresh session straight back out -- login would
+    // succeed (a real 200 from Supabase) and the cookie would still get
+    // cleared, leaving the header stuck on "Sign in / Sign up" with no
+    // error anywhere. onAuthStateChange alone delivers every event --
+    // including the current state as an initial event the moment you
+    // subscribe -- strictly in order, so there's only ever one chain
+    // updating state and the most recent event always wins.
     const { data: listener } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession)
       setUser(newSession?.user ?? null)
       setLoading(false)
-      if (event === 'SIGNED_IN') ensureProfile()
+      if (event === 'SIGNED_IN' || (event === 'INITIAL_SESSION' && newSession?.user)) ensureProfile()
     })
 
     return () => listener.subscription.unsubscribe()
