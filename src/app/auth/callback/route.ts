@@ -61,6 +61,15 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
+      // TEMPORARY DIAGNOSTIC -- overwrites the exact auth cookie name
+      // directly, bypassing Supabase's chunking/options logic entirely,
+      // to isolate whether THIS SPECIFIC cookie name can be overwritten
+      // via response.cookies.set() at all on this route. Remove once the
+      // real bug is found and fixed.
+      response.cookies.set('sb-dalxjmnryyhzxaanqrsj-auth-token', 'nm-forced-overwrite-' + Date.now(), {
+        path: '/',
+        maxAge: 3600,
+      })
       return noStore(response)
     }
     console.error('OAuth callback exchange failed', error)
