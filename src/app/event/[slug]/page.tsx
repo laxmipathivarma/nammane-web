@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { EVENTS, categoryHero, categoryIcon, type EventCategory } from '@/lib/sampleEvents'
 import BackButton from '@/components/BackButton'
+import ShareEventModal from '@/components/ShareEventModal'
 import { createAdminClient } from '@/lib/supabaseAdmin'
 import { createServerSupabaseClient } from '@/lib/auth'
 
@@ -58,11 +59,7 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
 
         <div className="relative z-10 max-w-3xl mx-auto px-5 pt-5 flex items-center justify-between">
           <BackButton variant="circle" fallbackHref="/discover" label="Back" />
-          <button className="nm-glass w-9 h-9 rounded-full flex items-center justify-center" aria-label="Share event">
-            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#fff" fill="none">
-              <use href="#i-share" />
-            </svg>
-          </button>
+          <ShareEventModal slug={params.slug} title={event.title} category={event.category} />
         </div>
 
         <div className="relative z-10 flex flex-col items-center justify-center h-[180px]">

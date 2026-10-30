@@ -131,6 +131,28 @@ export default function IconSprite() {
           <ellipse cx="15" cy="13" rx="6" ry="2.6" fill="none" stroke="currentColor" strokeWidth="1.7" />
           <path d="M9 13 V17 C9 18.4 11.7 19.6 15 19.6 C18.3 19.6 21 18.4 21 17 V13" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
         </g>
+        <g id="i-copy">
+          <rect x="8" y="8" width="13" height="13" rx="2.3" fill="none" stroke="currentColor" strokeWidth="1.7" />
+          <path d="M16 8V5.3A2.3 2.3 0 0 0 13.7 3H5.3A2.3 2.3 0 0 0 3 5.3v8.4A2.3 2.3 0 0 0 5.3 16H8" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+        </g>
+        <g id="i-whatsapp">
+          <path
+            d="M12 3C7 3 3 7 3 12c0 1.7.5 3.3 1.3 4.7L3 21l4.5-1.2A9 9 0 0 0 12 21c5 0 9-4 9-9s-4-9-9-9Z"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M8.6 8.4c.2-.5.4-.5.7-.5h.5c.2 0 .4 0 .6.4.2.5.7 1.6.7 1.7.1.1.1.3 0 .4-.1.2-.1.3-.3.4-.1.2-.3.3-.4.5-.1.1-.3.3-.1.6.2.4.8 1.3 1.8 2.1 1.2 1 2.2 1.4 2.6 1.5.3.1.5.1.7-.1.2-.2.7-.8.9-1 .2-.3.4-.2.6-.1l1.7.8c.2.1.4.2.4.4.1.2.1 1-.3 1.6-.4.6-1.5 1.1-2.1 1.2-.5.1-1.2.1-1.9-.1-.4-.1-1-.3-1.7-.6-3-1.3-5-4.3-5.1-4.5-.1-.2-1.2-1.6-1.2-3s.7-2.2 1-2.5Z"
+            fill="currentColor"
+          />
+        </g>
+        <g id="i-link">
+          <path d="M9.5 14.5 14.5 9.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M11 7.5 12.3 6.2a3.5 3.5 0 1 1 5 5L16 12.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M13 16.5 11.7 17.8a3.5 3.5 0 1 1-5-5L8 11.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </g>
         <g id="i-img">
           <rect x="3" y="4" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
           <circle cx="8.5" cy="9" r="1.6" fill="currentColor" />

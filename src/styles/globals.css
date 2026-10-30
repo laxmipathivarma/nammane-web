@@ -215,6 +215,23 @@ body {
   background: radial-gradient(130% 90% at 18% -10%, #1c1240 0%, #0a081c 45%, #05050f 100%);
 }
 
+/* The share sheet pops up from the bottom on mobile (where it docks to
+   the edge, like a native sheet) and scales in from center elsewhere --
+   one entrance moment, not a hover gimmick. */
+@keyframes nm-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.nm-share-sheet {
+  animation: nm-sheet-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* ---------- Category-themed hub backgrounds ----------
    A host's "tools" hub (poker's menu of Create Invitation / Tables /
    Settle Up / ...) used to sit on the same flat .nm-bg as every other
