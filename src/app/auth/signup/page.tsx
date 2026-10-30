@@ -16,6 +16,19 @@ export default function SignupPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  // The terms checkbox used to be a plain `required` HTML checkbox with no
+  // state of its own. That meant clicking "Create account" with it
+  // unchecked never ran handleEmailSubmit at all -- the browser's native
+  // validation silently blocked the whole submit before any request was
+  // sent, so nothing in the app (no error banner, no network call, nothing
+  // in Supabase's logs) showed any trace of the attempt. From the outside
+  // that's indistinguishable from "I tried to sign up and nothing
+  // happened, and no code ever arrived" -- which is exactly what it looks
+  // like, because nothing was ever sent anywhere. Tracking it in state and
+  // checking it explicitly, with a real message in the same error banner
+  // used everywhere else on this page, means a missed checkbox is never
+  // silent again.
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
   // Email signup gets its own OTP-step flag -- Supabase's "Confirm email"
   // setting is on for this project, so signUp() never actually creates a
   // session until the 6-digit code from the confirm-signup email is
@@ -36,9 +49,15 @@ export default function SignupPage() {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
     setError('')
     setExistingAccountEmail('')
+
+    if (!agreedToTerms) {
+      setError('Please agree to the Terms of Service and Host Approval Guidelines to create your account.')
+      return
+    }
+
+    setLoading(true)
 
     try {
       const res = await fetch('/api/auth/signup', {
@@ -269,7 +288,12 @@ export default function SignupPage() {
           </div>
 
           <label className="flex items-start gap-2.5 pt-1">
-            <input type="checkbox" required className="mt-0.5 accent-[#b968ff]" />
+            <input
+              type="checkbox"
+              checked={agreedToTerms}
+              onChange={(e) => setAgreedToTerms(e.target.checked)}
+              className="mt-0.5 accent-[#b968ff]"
+            />
             <span className="text-[11.5px] text-[#a79ecb] font-medium leading-relaxed">
               I agree to the Terms of Service and Host Approval Guidelines
             </span>
