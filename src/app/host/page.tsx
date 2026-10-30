@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/AuthProvider'
+import HostEventCard from '@/components/HostEventCard'
+import type { EventCategory } from '@/lib/eventCardStyle'
 
 type HostedEvent = {
   id: string
   title: string
-  category: string
+  category: EventCategory
   starts_at: string | null
   is_public: boolean
   status: string
@@ -45,7 +47,7 @@ export default function HostDashboardPage() {
 
   return (
     <div className="nm-bg min-h-screen text-white">
-      <div className="max-w-2xl mx-auto px-5 pt-7 pb-28">
+      <div className="max-w-5xl mx-auto px-5 pt-7 pb-28">
         <div className="flex items-center justify-between mb-6">
           <h1 className="nm-marquee text-xl text-gold-text">Host</h1>
           <Link href="/host/create" className="nm-btn nm-btn-gold px-4 py-2.5 text-[13px]">
@@ -70,30 +72,12 @@ export default function HostDashboardPage() {
           </div>
         )}
 
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pt-1">
           {events?.map((ev) => (
-            <div key={ev.id} className="nm-field bg-ink2 flex flex-col gap-2.5 !items-stretch">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="font-extrabold text-[13.5px] leading-tight">{ev.title}</div>
-                  <div className="text-[11px] text-muted2 font-semibold mt-0.5">{fmt(ev.starts_at)}</div>
-                </div>
-                <span className="text-[10px] font-extrabold tracking-wide uppercase px-2.5 py-1 rounded-full shrink-0" style={{ background: 'rgba(139,63,251,.18)', color: '#c9a8ff' }}>
-                  {ev.category}
-                </span>
-              </div>
-
-              <div className="flex gap-2">
-                <Link href={`/event/${ev.id}`} className="nm-btn flex-1 py-2.5 text-[12px] bg-ink text-white border border-white/10 text-center">
-                  View event
-                </Link>
-                {ev.category === 'poker' && (
-                  <Link href={`/event/${ev.id}/poker`} className="nm-btn nm-btn-gold flex-1 py-2.5 text-[12px] text-center">
-                    Poker host tools →
-                  </Link>
-                )}
-              </div>
-            </div>
+            <HostEventCard
+              key={ev.id}
+              data={{ id: ev.id, title: ev.title, category: ev.category, when: fmt(ev.starts_at), isPublic: ev.is_public }}
+            />
           ))}
         </div>
       </div>

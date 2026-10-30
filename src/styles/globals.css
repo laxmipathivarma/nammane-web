@@ -130,6 +130,59 @@ body {
   box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
 }
 
+/* ---------- 3D event cards ----------
+   An event card is a physical object: it rests on a solid NeoPOP
+   "plinth" (same hard-offset-shadow mechanic as .nm-btn-gold, not a
+   blur) and tilts toward the pointer like glossy cardboard, with a
+   specular highlight that tracks the cursor -- the poker-chip-catching-
+   light effect the rest of the app's palette is built around. Pure CSS
+   perspective transform driven by --rx/--ry/--mx/--my custom properties
+   set from JS on pointer move; untouched on devices with no fine
+   pointer (touch), where the plinth lift alone still reads as depth. */
+.nm-tilt-card {
+  --rx: 0deg;
+  --ry: 0deg;
+  --mx: 50%;
+  --my: 35%;
+  position: relative;
+  transform: perspective(1000px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(0);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.nm-tilt-card:hover,
+.nm-tilt-card:focus-visible {
+  transform: perspective(1000px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(-6px);
+  transition: transform 0.08s linear, box-shadow 0.2s ease;
+}
+.nm-tilt-card:active {
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(2px);
+  transition: transform 0.08s ease;
+}
+.nm-tilt-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, 0.65), transparent 45%);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+.nm-tilt-card:hover .nm-tilt-shine,
+.nm-tilt-card:focus-visible .nm-tilt-shine {
+  opacity: 1;
+}
+@media (hover: none) {
+  /* Touch devices: no pointer to track, so skip the tilt/shine and keep
+     just the plinth -- the card still looks raised, nothing feels inert. */
+  .nm-tilt-card {
+    transition: transform 0.08s ease;
+  }
+  .nm-tilt-card:active {
+    transform: translateY(2px);
+  }
+}
+
 .nm-field {
   width: 100%;
   background: rgba(255, 255, 255, 0.05);

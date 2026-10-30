@@ -1,9 +1,13 @@
+'use client'
+
 import Link from 'next/link'
+import { useRef } from 'react'
+import { cardStyle, categoryIcon, type EventCategory } from '@/lib/eventCardStyle'
 
 export type EventCardData = {
   slug: string
   title: string
-  category: 'poker' | 'rummy' | 'drinks' | 'dinner' | 'party' | 'other'
+  category: EventCategory
   tagLabel: string
   subtitle: string
   priceLabel?: string
@@ -15,111 +19,48 @@ export type EventCardData = {
   ctaLabel: string
 }
 
-type CardStyle = {
-  bg: string
-  color: string
-  iconBg: string
-  badgeBg: string
-  badgeColor: string
-  shadow: string
-  ctaBg: string
-  ctaColor: string
-  avatarRing: string
-  iconStroke?: boolean
-}
-
-const cardStyle: Record<EventCardData['category'], CardStyle> = {
-  poker: {
-    bg: 'linear-gradient(160deg,#ffffff,#e9e3f7)',
-    color: '#1b1030',
-    iconBg: 'rgba(27,16,48,.08)',
-    badgeBg: 'rgba(139,63,251,.12)',
-    badgeColor: '#6d1fd1',
-    shadow: '0 2px 0 rgba(255,255,255,.8) inset, 0 16px 30px rgba(139,63,251,.3)',
-    ctaBg: '#1b1030',
-    ctaColor: '#fff',
-    avatarRing: '#e9e3f7',
-  },
-  rummy: {
-    bg: 'linear-gradient(160deg,#c9a8ff,#8b3ffb)',
-    color: '#fff',
-    iconBg: 'rgba(255,255,255,.2)',
-    badgeBg: 'rgba(255,255,255,.22)',
-    badgeColor: '#fff',
-    shadow: '0 2px 0 rgba(255,255,255,.3) inset, 0 16px 30px rgba(107,30,220,.35)',
-    ctaBg: '#fff',
-    ctaColor: '#6d1fd1',
-    avatarRing: '#8b3ffb',
-  },
-  drinks: {
-    bg: 'linear-gradient(160deg,#8fe3ff,#1a8fd1)',
-    color: '#fff',
-    iconBg: 'rgba(255,255,255,.2)',
-    badgeBg: 'rgba(255,255,255,.22)',
-    badgeColor: '#fff',
-    shadow: '0 2px 0 rgba(255,255,255,.3) inset, 0 16px 30px rgba(26,100,209,.35)',
-    ctaBg: '#fff',
-    ctaColor: '#1a8fd1',
-    avatarRing: '#1a8fd1',
-    iconStroke: true,
-  },
-  dinner: {
-    bg: 'linear-gradient(160deg,#ffd37a,#e8942c)',
-    color: '#3a2608',
-    iconBg: 'rgba(58,38,8,.12)',
-    badgeBg: 'rgba(58,38,8,.12)',
-    badgeColor: '#3a2608',
-    shadow: '0 2px 0 rgba(255,255,255,.4) inset, 0 16px 30px rgba(180,110,20,.35)',
-    ctaBg: '#3a2608',
-    ctaColor: '#fff',
-    avatarRing: '#e8942c',
-    iconStroke: true,
-  },
-  party: {
-    bg: 'linear-gradient(160deg,#ff8fd1,#ff4f9e)',
-    color: '#fff',
-    iconBg: 'rgba(255,255,255,.22)',
-    badgeBg: 'rgba(255,255,255,.22)',
-    badgeColor: '#fff',
-    shadow: '0 2px 0 rgba(255,255,255,.35) inset, 0 16px 30px rgba(255,79,158,.35)',
-    ctaBg: '#fff',
-    ctaColor: '#ff4f9e',
-    avatarRing: '#ff4f9e',
-  },
-  other: {
-    bg: 'linear-gradient(160deg,#b9b4d6,#4a4a6e)',
-    color: '#fff',
-    iconBg: 'rgba(255,255,255,.18)',
-    badgeBg: 'rgba(255,255,255,.2)',
-    badgeColor: '#fff',
-    shadow: '0 2px 0 rgba(255,255,255,.3) inset, 0 16px 30px rgba(20,20,40,.35)',
-    ctaBg: '#fff',
-    ctaColor: '#4a4a6e',
-    avatarRing: '#4a4a6e',
-    iconStroke: true,
-  },
-}
-
-const categoryIcon: Record<EventCardData['category'], string> = {
-  poker: 'i-spade',
-  rummy: 'i-diamond',
-  drinks: 'i-martini',
-  dinner: 'i-dine',
-  party: 'i-party',
-  other: 'i-grid',
-}
-
 export default function EventCard({ data }: { data: EventCardData }) {
+  const ref = useRef<HTMLAnchorElement>(null)
   const icon = categoryIcon[data.category]
   const s = cardStyle[data.category]
   const badge = typeof data.seatsFilledPct === 'number' ? data.seatsLabel : 'Approval required'
 
+  // Pointer-reactive tilt: rotate toward the cursor and move the
+  // highlight with it, written straight onto the element's own custom
+  // properties so nothing re-renders on every mousemove.
+  const handleMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const el = ref.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    const px = (e.clientX - r.left) / r.width
+    const py = (e.clientY - r.top) / r.height
+    el.style.setProperty('--ry', `${(px - 0.5) * 12}deg`)
+    el.style.setProperty('--rx', `${(0.5 - py) * 10}deg`)
+    el.style.setProperty('--mx', `${px * 100}%`)
+    el.style.setProperty('--my', `${py * 100}%`)
+  }
+  const handleLeave = () => {
+    const el = ref.current
+    if (!el) return
+    el.style.setProperty('--ry', '0deg')
+    el.style.setProperty('--rx', '0deg')
+  }
+
   return (
     <Link
+      ref={ref}
       href={`/event/${data.slug}`}
-      className="rounded-[24px] overflow-hidden flex flex-col relative p-4.5 transition-transform hover:-translate-y-0.5"
-      style={{ background: s.bg, color: s.color, boxShadow: s.shadow, padding: 18 }}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      className="nm-tilt-card rounded-[24px] overflow-hidden flex flex-col"
+      style={{
+        background: s.bg,
+        color: s.color,
+        padding: 18,
+        boxShadow: `${s.shadow}, 0 9px 0 0 ${s.plinth}, 0 9px 0 2px ${s.plinthDark}`,
+      }}
     >
+      <div className="nm-tilt-shine" />
       <div
         className="absolute inset-0 rounded-[24px] pointer-events-none"
         style={{ background: 'linear-gradient(135deg, rgba(255,255,255,.35), transparent 45%)' }}
