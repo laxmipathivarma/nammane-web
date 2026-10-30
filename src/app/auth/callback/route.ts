@@ -42,7 +42,19 @@ export async function GET(request: NextRequest) {
     const supabase = await createServerSupabaseClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return noStore(NextResponse.redirect(`${origin}${next}`))
+      const response = noStore(NextResponse.redirect(`${origin}${next}`))
+      // TEMPORARY DIAGNOSTIC -- isolates whether Set-Cookie delivery itself
+      // is broken on this route/environment, or whether it's specific to
+      // how createServerSupabaseClient's cookieStore.set() (via
+      // next/headers) wires cookies onto the response. This one bypasses
+      // that entirely and sets a cookie directly on the NextResponse
+      // object Route Handlers are documented to auto-attach Set-Cookie
+      // from. Remove once the real bug is found and fixed.
+      response.cookies.set('nm-cookie-test', String(Date.now()), {
+        path: '/',
+        maxAge: 300,
+      })
+      return response
     }
     console.error('OAuth callback exchange failed', error)
   }
