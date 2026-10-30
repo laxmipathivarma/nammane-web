@@ -215,6 +215,46 @@ body {
   background: radial-gradient(130% 90% at 18% -10%, #1c1240 0%, #0a081c 45%, #05050f 100%);
 }
 
+/* ---------- Category-themed hub backgrounds ----------
+   A host's "tools" hub (poker's menu of Create Invitation / Tables /
+   Settle Up / ...) used to sit on the same flat .nm-bg as every other
+   screen, so a poker event and a dinner event felt identical once you
+   were inside them. Each category gets its own backdrop instead: a
+   radial "table light" glow built from that category's own plinth
+   color (see eventCardStyle.ts), over the same ink base everything
+   else uses, so the hub reads as "a poker table at night" / "a bar at
+   night" / etc. without breaking the app's own palette. Only Poker has
+   a built hub today; the rest are ready for when their hubs ship. */
+.nm-bg-poker {
+  background:
+    radial-gradient(55% 45% at 50% 0%, rgba(139, 63, 251, 0.38) 0%, transparent 62%),
+    radial-gradient(85% 55% at 50% 100%, rgba(74, 19, 151, 0.28) 0%, transparent 65%),
+    radial-gradient(130% 90% at 18% -10%, #1c1240 0%, #0a081c 45%, #05050f 100%);
+}
+.nm-bg-rummy {
+  background:
+    radial-gradient(55% 45% at 50% 0%, rgba(94, 23, 176, 0.42) 0%, transparent 62%),
+    radial-gradient(130% 90% at 18% -10%, #1c1240 0%, #0a081c 45%, #05050f 100%);
+}
+.nm-bg-drinks {
+  background:
+    radial-gradient(55% 45% at 50% 0%, rgba(26, 143, 209, 0.38) 0%, transparent 62%),
+    radial-gradient(130% 90% at 18% -10%, #0c2338 0%, #081226 45%, #05050f 100%);
+}
+.nm-bg-dinner {
+  background:
+    radial-gradient(55% 45% at 50% 0%, rgba(232, 148, 44, 0.3) 0%, transparent 62%),
+    radial-gradient(130% 90% at 18% -10%, #241607 0%, #130c05 45%, #05050f 100%);
+}
+.nm-bg-party {
+  background:
+    radial-gradient(55% 45% at 50% 0%, rgba(255, 79, 158, 0.35) 0%, transparent 62%),
+    radial-gradient(130% 90% at 18% -10%, #2a0f22 0%, #140a19 45%, #05050f 100%);
+}
+.nm-bg-other {
+  background: radial-gradient(130% 90% at 18% -10%, #1c1240 0%, #0a081c 45%, #05050f 100%);
+}
+
 ::-webkit-scrollbar {
   display: none;
 }

@@ -121,6 +121,16 @@ export default function IconSprite() {
         <g id="i-chev-r">
           <path d="M9 6 L15 12 L9 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </g>
+        <g id="i-eye">
+          <path d="M2 12C4 7 8 4.5 12 4.5C16 4.5 20 7 22 12C20 17 16 19.5 12 19.5C8 19.5 4 17 2 12Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+          <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        </g>
+        <g id="i-coins">
+          <ellipse cx="9" cy="7" rx="6" ry="2.6" fill="none" stroke="currentColor" strokeWidth="1.7" />
+          <path d="M3 7 V11 C3 12.4 5.7 13.6 9 13.6 C12.3 13.6 15 12.4 15 11 V7" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+          <ellipse cx="15" cy="13" rx="6" ry="2.6" fill="none" stroke="currentColor" strokeWidth="1.7" />
+          <path d="M9 13 V17 C9 18.4 11.7 19.6 15 19.6 C18.3 19.6 21 18.4 21 17 V13" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+        </g>
         <g id="i-img">
           <rect x="3" y="4" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
           <circle cx="8.5" cy="9" r="1.6" fill="currentColor" />

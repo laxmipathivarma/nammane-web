@@ -3,8 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import BackButton from '@/components/BackButton'
+import HubBackdrop from '@/components/HubBackdrop'
+import TiltTile from '@/components/TiltTile'
 import { useAuth } from '@/lib/AuthProvider'
 import { emptyPokerEventData, type PokerEventData } from '@/lib/pokerLedger'
+import { cardStyle } from '@/lib/eventCardStyle'
 import type { InviteEventInfo } from '@/lib/invite'
 import InvitationHub, { type InvitationSubTab } from '@/components/poker/InvitationHub'
 import TablesHub from '@/components/poker/TablesHub'
@@ -13,15 +16,17 @@ import SettleHub from '@/components/poker/SettleHub'
 import GamesHub from '@/components/poker/GamesHub'
 import type { PokerTabKey } from '@/components/poker/types'
 
+const pokerStyle = cardStyle.poker
+
 const MENU: { tab: PokerTabKey; sub?: InvitationSubTab; label: string; hint: string; icon: string }[] = [
-  { tab: 'invite', sub: 'create', label: 'Create Invitation', hint: 'Write the message guests get', icon: '✍️' },
-  { tab: 'invite', sub: 'preview', label: 'Preview the Invitation', hint: 'See exactly what guests see', icon: '👀' },
-  { tab: 'invite', sub: 'guests', label: 'Invite Guests', hint: 'Add numbers, send on WhatsApp', icon: '📇' },
-  { tab: 'invite', sub: 'approvals', label: 'Guest Approvals', hint: 'Approve guests onto a table', icon: '✅' },
-  { tab: 'tables', label: 'Poker Tables', hint: 'Players, buy-ins, cash-outs', icon: '🃏' },
-  { tab: 'expenses', label: 'Rake & Expenses', hint: 'Food, drinks, who paid', icon: '🧾' },
-  { tab: 'settle', label: 'Settle Up', hint: 'Who pays whom, how much', icon: '🤝' },
-  { tab: 'games', label: 'Games', hint: 'Full history, every table', icon: '📊' },
+  { tab: 'invite', sub: 'create', label: 'Create Invitation', hint: 'Write the message guests get', icon: 'i-ticket' },
+  { tab: 'invite', sub: 'preview', label: 'Preview the Invitation', hint: 'See exactly what guests see', icon: 'i-eye' },
+  { tab: 'invite', sub: 'guests', label: 'Invite Guests', hint: 'Add numbers, send on WhatsApp', icon: 'i-chat' },
+  { tab: 'invite', sub: 'approvals', label: 'Guest Approvals', hint: 'Approve guests onto a table', icon: 'i-check' },
+  { tab: 'tables', label: 'Poker Tables', hint: 'Players, buy-ins, cash-outs', icon: 'i-seat' },
+  { tab: 'expenses', label: 'Rake & Expenses', hint: 'Food, drinks, who paid', icon: 'i-coins' },
+  { tab: 'settle', label: 'Settle Up', hint: 'Who pays whom, how much', icon: 'i-shield' },
+  { tab: 'games', label: 'Games', hint: 'Full history, every table', icon: 'i-club' },
 ]
 
 const TAB_LABELS: Record<PokerTabKey, string> = {
@@ -85,10 +90,17 @@ export default function PokerHubPage() {
     }
   }
 
-  if (loading) return <div className="nm-bg min-h-screen text-white flex items-center justify-center text-muted">Loading poker tools…</div>
+  if (loading)
+    return (
+      <div className="min-h-screen text-white flex items-center justify-center text-muted relative">
+        <HubBackdrop category="poker" />
+        Loading poker tools…
+      </div>
+    )
   if (error && !data)
     return (
-      <div className="nm-bg min-h-screen text-white flex flex-col items-center justify-center gap-3 px-6 text-center">
+      <div className="min-h-screen text-white flex flex-col items-center justify-center gap-3 px-6 text-center relative">
+        <HubBackdrop category="poker" />
         <div className="text-[13px] text-muted2 font-semibold">{error}</div>
         <BackButton fallbackHref="/discover" label="Back to Discover" />
       </div>
@@ -107,8 +119,9 @@ export default function PokerHubPage() {
   }
 
   return (
-    <div className="nm-bg min-h-screen text-white">
-      <div className="max-w-2xl mx-auto px-5 pt-7 pb-28">
+    <div className="min-h-screen text-white relative">
+      <HubBackdrop category="poker" />
+      <div className="max-w-2xl mx-auto px-5 pt-7 pb-28 relative">
         <div className="flex items-center gap-3 mb-6">
           {tab === 'menu' ? (
             <BackButton variant="circle" fallbackHref={`/event/${params.slug}`} label="Back" className="!w-8 !h-8 bg-ink2 border-0" />
@@ -124,6 +137,14 @@ export default function PokerHubPage() {
               </svg>
             </button>
           )}
+          <div
+            className="w-8 h-8 rounded-[10px] flex items-center justify-center shrink-0"
+            style={{ background: 'rgba(139,63,251,.18)', color: '#c9a8ff' }}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <use href="#i-spade" />
+            </svg>
+          </div>
           <h1 className="nm-marquee text-xl text-gold-text">{TAB_LABELS[tab]}</h1>
           {saving && <span className="text-[10.5px] text-muted2 font-semibold ml-auto">Saving…</span>}
         </div>
@@ -133,20 +154,19 @@ export default function PokerHubPage() {
         )}
 
         {tab === 'menu' && (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3.5">
             {MENU.map((item) => (
-              <button
+              <TiltTile
                 key={item.label}
+                icon={item.icon}
+                label={item.label}
+                hint={item.hint}
+                style={pokerStyle}
                 onClick={() => {
                   setTab(item.tab)
                   if (item.sub) setInvitationSub(item.sub)
                 }}
-                className="nm-field bg-ink2 text-left flex flex-col gap-1.5 !items-start"
-              >
-                <span className="text-[20px]">{item.icon}</span>
-                <span className="font-extrabold text-[12.5px] leading-tight">{item.label}</span>
-                <span className="text-[10.5px] text-muted2 font-semibold leading-snug">{item.hint}</span>
-              </button>
+              />
             ))}
           </div>
         )}
