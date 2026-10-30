@@ -2,19 +2,30 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { useAuth } from '@/lib/AuthProvider'
 
 const LOGIN_URL = 'https://app.nammane.in/auth/login'
 const SIGNUP_URL = 'https://app.nammane.in/auth/signup'
 const WEBAPP_URL = 'https://app.nammane.in'
 
-const navItems = [
-  { label: 'Home', href: '/', external: false },
-  { label: 'Host', href: LOGIN_URL, external: true },
-  { label: 'Join', href: LOGIN_URL, external: true },
-  { label: 'Discover', href: LOGIN_URL, external: true },
-  { label: 'Web App', href: WEBAPP_URL, external: true },
-  { label: 'Mobile App', href: '/mobile-app', external: false },
-]
+// Host/Join/Discover used to hard-code straight to the login page, every
+// time, for everyone -- so a signed-in host clicking the logo (back to
+// nammane.in) and then "Host" got sent to sign in again even though
+// their session (now shared across nammane.in/app.nammane.in -- see
+// cookieDomain() in src/lib/supabase.ts and src/lib/auth.ts) was still
+// perfectly valid. Signed in, these go straight to the real page;
+// signed out, they still go through the login gate as before.
+function navItems(signedIn: boolean) {
+  const appHref = (path: string) => (signedIn ? `${WEBAPP_URL}${path}` : LOGIN_URL)
+  return [
+    { label: 'Home', href: '/', external: false },
+    { label: 'Host', href: appHref('/host'), external: true },
+    { label: 'Join', href: appHref('/discover'), external: true },
+    { label: 'Discover', href: appHref('/discover'), external: true },
+    { label: 'Web App', href: WEBAPP_URL, external: true },
+    { label: 'Mobile App', href: '/mobile-app', external: false },
+  ]
+}
 
 function HeaderLogo() {
   return (
@@ -37,6 +48,9 @@ function HeaderLogo() {
 
 export default function MarketingHeader() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { user, loading } = useAuth()
+  const accountLabel = user?.email?.split('@')[0] ?? user?.phone ?? 'Account'
+  const items = navItems(!!user)
 
   return (
     <div
@@ -50,7 +64,7 @@ export default function MarketingHeader() {
           <HeaderLogo />
 
           <nav className="hidden lg:flex items-center gap-6 text-[13.5px] font-bold text-[#cfc9e6]">
-            {navItems.map((item) =>
+            {items.map((item) =>
               item.external ? (
                 <a key={item.href + item.label} href={item.href} className="hover:text-white transition-colors whitespace-nowrap">
                   {item.label}
@@ -64,12 +78,31 @@ export default function MarketingHeader() {
           </nav>
 
           <div className="hidden lg:flex items-center gap-2.5">
-            <a href={LOGIN_URL} className="nm-btn nm-btn-ghost px-4 py-2.5 text-[13px]">
-              Sign in
-            </a>
-            <a href={SIGNUP_URL} className="nm-btn nm-btn-gold px-5 py-2.5 text-[13px]">
-              Get started
-            </a>
+            {!loading && user ? (
+              <>
+                <a href={`${WEBAPP_URL}/profile`} className="nm-btn nm-btn-ghost px-4 py-2.5 text-[13px] flex items-center gap-2">
+                  <span
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold text-white shrink-0"
+                    style={{ background: 'linear-gradient(160deg,#ff8fd1,#8b3ffb)' }}
+                  >
+                    {accountLabel.charAt(0).toUpperCase()}
+                  </span>
+                  {accountLabel}
+                </a>
+                <a href={WEBAPP_URL} className="nm-btn nm-btn-gold px-5 py-2.5 text-[13px]">
+                  Open app
+                </a>
+              </>
+            ) : (
+              <>
+                <a href={LOGIN_URL} className="nm-btn nm-btn-ghost px-4 py-2.5 text-[13px]">
+                  Sign in
+                </a>
+                <a href={SIGNUP_URL} className="nm-btn nm-btn-gold px-5 py-2.5 text-[13px]">
+                  Get started
+                </a>
+              </>
+            )}
           </div>
 
           <button
@@ -85,7 +118,7 @@ export default function MarketingHeader() {
 
         {mobileOpen && (
           <div className="lg:hidden border-t border-white/10 px-5 py-4 flex flex-col gap-3.5 text-[14.5px] font-semibold text-white bg-ink">
-            {navItems.map((item) =>
+            {items.map((item) =>
               item.external ? (
                 <a key={item.href + item.label} href={item.href} onClick={() => setMobileOpen(false)}>
                   {item.label}
@@ -97,12 +130,20 @@ export default function MarketingHeader() {
               )
             )}
             <div className="border-t border-white/10 pt-3.5 flex gap-3">
-              <a href={LOGIN_URL} className="flex-1 nm-btn bg-ink2 text-white py-2.5 text-[13px] text-center">
-                Sign in
-              </a>
-              <a href={SIGNUP_URL} className="flex-1 nm-btn nm-btn-gold py-2.5 text-[13px] text-center">
-                Sign up
-              </a>
+              {!loading && user ? (
+                <a href={WEBAPP_URL} className="flex-1 nm-btn nm-btn-gold py-2.5 text-[13px] text-center">
+                  Open app ({accountLabel})
+                </a>
+              ) : (
+                <>
+                  <a href={LOGIN_URL} className="flex-1 nm-btn bg-ink2 text-white py-2.5 text-[13px] text-center">
+                    Sign in
+                  </a>
+                  <a href={SIGNUP_URL} className="flex-1 nm-btn nm-btn-gold py-2.5 text-[13px] text-center">
+                    Sign up
+                  </a>
+                </>
+              )}
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 
 type CookieToSet = {
   name: string
@@ -7,13 +7,26 @@ type CookieToSet = {
   options?: CookieOptions
 }
 
+// Same reasoning as src/lib/supabase.ts's cookieDomain(): nammane.in and
+// app.nammane.in are the same deployment but different cookie hosts, so
+// a session cookie set on one is invisible on the other unless it's
+// explicitly scoped to the shared parent domain. Mirrored here so a
+// session created server-side (OAuth callback, OTP verify) is just as
+// visible on both hosts as one created client-side.
+async function cookieDomain(): Promise<string | undefined> {
+  const h = (await headers()).get('host')?.split(':')[0] ?? ''
+  return h === 'nammane.in' || h.endsWith('.nammane.in') ? '.nammane.in' : undefined
+}
+
 export const createServerSupabaseClient = async () => {
   const cookieStore = await cookies()
+  const domain = await cookieDomain()
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      cookieOptions: { domain },
       cookies: {
         getAll() {
           return cookieStore.getAll()
