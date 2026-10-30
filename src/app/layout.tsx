@@ -26,6 +26,16 @@ export const metadata: Metadata = {
     apple: [{ url: '/brand/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   manifest: '/brand/site.webmanifest',
+  // iOS Safari's "Add to Home Screen" ignores the JSON manifest's
+  // display:standalone -- it only goes fullscreen (no URL bar / Safari
+  // chrome) when these Apple-specific meta tags are present. Without them
+  // the home-screen icon still opens inside a normal Safari tab, which is
+  // why app.nammane.in was showing the address bar when launched.
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'NamMane',
+  },
   openGraph: {
     title: 'NamMane — Gather better. Live closer.',
     description: 'Poker faces, full plates, louder karaoke. Real hosts, real nights, zero awkward intros.',
@@ -41,6 +51,10 @@ export const metadata: Metadata = {
 
 export const viewport = {
   themeColor: '#8B3FFB',
+  // Lets the standalone PWA draw under the notch/status bar edge-to-edge
+  // instead of leaving a plain-black bar up top, matching the
+  // black-translucent status bar style set above.
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({
