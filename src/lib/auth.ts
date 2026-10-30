@@ -7,17 +7,6 @@ type CookieToSet = {
   options?: CookieOptions
 }
 
-// TEMPORARY DIAGNOSTIC -- setAll's catch below silently swallows whatever
-// cookieStore.set() throws, on the assumption it only ever fires when
-// called from a Server Component render. This records what actually
-// happened on the most recent call (name + value length attempted, and
-// the error if one was thrown) so a Route Handler can report it instead
-// of guessing. Remove once the real "session cookie never lands" bug is
-// found and fixed.
-export const lastSetAllDiagnostic: {
-  attempts: { name: string; valueLength: number; threw: string | null }[]
-} = { attempts: [] }
-
 // Deliberately back to the default host-only session cookie -- see
 // the matching comment in src/lib/supabase.ts for why. The actual
 // fix for "clicking the logo logs me out" is the shared Header's
@@ -47,24 +36,16 @@ export const createServerSupabaseClient = async () => {
         // bouncing the person back to the login screen even though their
         // account had already been created.
         setAll(cookiesToSet: CookieToSet[]) {
-          lastSetAllDiagnostic.attempts = []
-          cookiesToSet.forEach(({ name, value, options }) => {
-            try {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
-              lastSetAllDiagnostic.attempts.push({ name, valueLength: value.length, threw: null })
-            } catch (err) {
-              // Called from a Server Component render (not a Route Handler
-              // or Server Action) -- cookies() is read-only there, so this
-              // only ever throws in a context where there was never going
-              // to be a response to attach Set-Cookie headers to anyway.
-              // TEMPORARY: recording what actually threw, see diagnostic above.
-              lastSetAllDiagnostic.attempts.push({
-                name,
-                valueLength: value.length,
-                threw: err instanceof Error ? err.message : String(err),
-              })
-            }
-          })
+            )
+          } catch {
+            // Called from a Server Component render (not a Route Handler
+            // or Server Action) -- cookies() is read-only there, so this
+            // only ever throws in a context where there was never going
+            // to be a response to attach Set-Cookie headers to anyway.
+          }
         },
       },
     }
