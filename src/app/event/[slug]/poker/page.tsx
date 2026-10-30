@@ -7,7 +7,6 @@ import HubBackdrop from '@/components/HubBackdrop'
 import TiltTile from '@/components/TiltTile'
 import { useAuth } from '@/lib/AuthProvider'
 import { emptyPokerEventData, type PokerEventData } from '@/lib/pokerLedger'
-import { cardStyle } from '@/lib/eventCardStyle'
 import type { InviteEventInfo } from '@/lib/invite'
 import InvitationHub, { type InvitationSubTab } from '@/components/poker/InvitationHub'
 import TablesHub from '@/components/poker/TablesHub'
@@ -16,17 +15,18 @@ import SettleHub from '@/components/poker/SettleHub'
 import GamesHub from '@/components/poker/GamesHub'
 import type { PokerTabKey } from '@/components/poker/types'
 
-const pokerStyle = cardStyle.poker
-
-const MENU: { tab: PokerTabKey; sub?: InvitationSubTab; label: string; hint: string; icon: string }[] = [
-  { tab: 'invite', sub: 'create', label: 'Create Invitation', hint: 'Write the message guests get', icon: 'i-ticket' },
-  { tab: 'invite', sub: 'preview', label: 'Preview the Invitation', hint: 'See exactly what guests see', icon: 'i-eye' },
-  { tab: 'invite', sub: 'guests', label: 'Invite Guests', hint: 'Add numbers, send on WhatsApp', icon: 'i-chat' },
-  { tab: 'invite', sub: 'approvals', label: 'Guest Approvals', hint: 'Approve guests onto a table', icon: 'i-check' },
-  { tab: 'tables', label: 'Poker Tables', hint: 'Players, buy-ins, cash-outs', icon: 'i-seat' },
-  { tab: 'expenses', label: 'Rake & Expenses', hint: 'Food, drinks, who paid', icon: 'i-coins' },
-  { tab: 'settle', label: 'Settle Up', hint: 'Who pays whom, how much', icon: 'i-shield' },
-  { tab: 'games', label: 'Games', hint: 'Full history, every table', icon: 'i-club' },
+// Each tile gets its own gradient accent (from the landing page's own
+// nm2 neon palette) instead of one flat purple repeated eight times --
+// a lobby of distinct, lit tiles rather than a photocopied grid.
+const MENU: { tab: PokerTabKey; sub?: InvitationSubTab; label: string; hint: string; icon: string; accent: readonly [string, string] }[] = [
+  { tab: 'invite', sub: 'create', label: 'Create Invitation', hint: 'Write the message guests get', icon: 'i-ticket', accent: ['#ff4f9e', '#c23ffb'] },
+  { tab: 'invite', sub: 'preview', label: 'Preview the Invitation', hint: 'See exactly what guests see', icon: 'i-eye', accent: ['#4cc9f0', '#1a8fd1'] },
+  { tab: 'invite', sub: 'guests', label: 'Invite Guests', hint: 'Add numbers, send on WhatsApp', icon: 'i-chat', accent: ['#8b3ffb', '#ff4f9e'] },
+  { tab: 'invite', sub: 'approvals', label: 'Guest Approvals', hint: 'Approve guests onto a table', icon: 'i-check', accent: ['#7fe3a1', '#4cc9f0'] },
+  { tab: 'tables', label: 'Poker Tables', hint: 'Players, buy-ins, cash-outs', icon: 'i-seat', accent: ['#c23ffb', '#8b3ffb'] },
+  { tab: 'expenses', label: 'Rake & Expenses', hint: 'Food, drinks, who paid', icon: 'i-coins', accent: ['#ffd166', '#e8942c'] },
+  { tab: 'settle', label: 'Settle Up', hint: 'Who pays whom, how much', icon: 'i-shield', accent: ['#4cc9f0', '#8b3ffb'] },
+  { tab: 'games', label: 'Games', hint: 'Full history, every table', icon: 'i-club', accent: ['#ff4f9e', '#8b3ffb'] },
 ]
 
 const TAB_LABELS: Record<PokerTabKey, string> = {
@@ -122,7 +122,7 @@ export default function PokerHubPage() {
     <div className="min-h-screen text-white relative">
       <HubBackdrop category="poker" />
       <div className="max-w-2xl mx-auto px-5 pt-7 pb-28 relative">
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-2">
           {tab === 'menu' ? (
             <BackButton variant="circle" fallbackHref={`/event/${params.slug}`} label="Back" className="!w-8 !h-8 bg-ink2 border-0" />
           ) : (
@@ -138,16 +138,29 @@ export default function PokerHubPage() {
             </button>
           )}
           <div
-            className="w-8 h-8 rounded-[10px] flex items-center justify-center shrink-0"
-            style={{ background: 'rgba(139,63,251,.18)', color: '#c9a8ff' }}
+            className="w-9 h-9 rounded-[12px] flex items-center justify-center shrink-0"
+            style={{ background: 'linear-gradient(135deg,#8b3ffb,#ff4f9e)', boxShadow: '0 6px 18px -4px rgba(139,63,251,.55)' }}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff">
               <use href="#i-spade" />
             </svg>
           </div>
-          <h1 className="nm-marquee text-xl text-gold-text">{TAB_LABELS[tab]}</h1>
           {saving && <span className="text-[10.5px] text-muted2 font-semibold ml-auto">Saving…</span>}
         </div>
+
+        {tab === 'menu' ? (
+          <div className="mb-6">
+            <div className="flex items-center gap-2.5 text-[10.5px] font-extrabold uppercase tracking-[.22em] mb-1.5" style={{ color: 'var(--nm-blush)' }}>
+              <span className="w-6 h-px" style={{ background: 'linear-gradient(90deg, transparent, #ff4f9e)' }} />
+              NamMane poker
+            </div>
+            <h1 className="nm2-heading text-[26px] leading-[0.95] text-white">
+              Host <span className="nm2-grad-text">tools</span>
+            </h1>
+          </div>
+        ) : (
+          <h1 className="nm-marquee text-xl text-gold-text mb-6">{TAB_LABELS[tab]}</h1>
+        )}
 
         {error && (
           <div className="mb-4 rounded-xl bg-[#3a1030] border border-[#ff4f9e]/40 px-3.5 py-3 text-[12px] font-semibold text-[#ff9ecb]">{error}</div>
@@ -161,7 +174,7 @@ export default function PokerHubPage() {
                 icon={item.icon}
                 label={item.label}
                 hint={item.hint}
-                style={pokerStyle}
+                accent={item.accent}
                 onClick={() => {
                   setTab(item.tab)
                   if (item.sub) setInvitationSub(item.sub)

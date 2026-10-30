@@ -244,32 +244,94 @@ body {
    a built hub today; the rest are ready for when their hubs ship. */
 .nm-bg-poker {
   background:
-    radial-gradient(55% 45% at 50% 0%, rgba(139, 63, 251, 0.38) 0%, transparent 62%),
-    radial-gradient(85% 55% at 50% 100%, rgba(74, 19, 151, 0.28) 0%, transparent 65%),
-    radial-gradient(130% 90% at 18% -10%, #1c1240 0%, #0a081c 45%, #05050f 100%);
+    radial-gradient(62% 48% at 50% -6%, rgba(139, 63, 251, 0.48) 0%, transparent 62%),
+    radial-gradient(55% 40% at 88% 96%, rgba(255, 79, 158, 0.22) 0%, transparent 60%),
+    radial-gradient(50% 35% at 6% 85%, rgba(76, 201, 240, 0.14) 0%, transparent 60%),
+    linear-gradient(180deg, #06060f 0%, #0a081c 45%, #05050f 100%);
 }
 .nm-bg-rummy {
   background:
-    radial-gradient(55% 45% at 50% 0%, rgba(94, 23, 176, 0.42) 0%, transparent 62%),
-    radial-gradient(130% 90% at 18% -10%, #1c1240 0%, #0a081c 45%, #05050f 100%);
+    radial-gradient(62% 48% at 50% -6%, rgba(194, 63, 251, 0.5) 0%, transparent 62%),
+    radial-gradient(55% 40% at 88% 96%, rgba(139, 63, 251, 0.25) 0%, transparent 60%),
+    linear-gradient(180deg, #06060f 0%, #0a081c 45%, #05050f 100%);
 }
 .nm-bg-drinks {
   background:
-    radial-gradient(55% 45% at 50% 0%, rgba(26, 143, 209, 0.38) 0%, transparent 62%),
-    radial-gradient(130% 90% at 18% -10%, #0c2338 0%, #081226 45%, #05050f 100%);
+    radial-gradient(62% 48% at 50% -6%, rgba(76, 201, 240, 0.42) 0%, transparent 62%),
+    radial-gradient(55% 40% at 88% 96%, rgba(26, 143, 209, 0.25) 0%, transparent 60%),
+    linear-gradient(180deg, #06060f 0%, #081226 45%, #05050f 100%);
 }
 .nm-bg-dinner {
   background:
-    radial-gradient(55% 45% at 50% 0%, rgba(232, 148, 44, 0.3) 0%, transparent 62%),
-    radial-gradient(130% 90% at 18% -10%, #241607 0%, #130c05 45%, #05050f 100%);
+    radial-gradient(62% 48% at 50% -6%, rgba(232, 148, 44, 0.36) 0%, transparent 62%),
+    radial-gradient(55% 40% at 88% 96%, rgba(255, 79, 158, 0.18) 0%, transparent 60%),
+    linear-gradient(180deg, #06060f 0%, #130c05 45%, #05050f 100%);
 }
 .nm-bg-party {
   background:
-    radial-gradient(55% 45% at 50% 0%, rgba(255, 79, 158, 0.35) 0%, transparent 62%),
-    radial-gradient(130% 90% at 18% -10%, #2a0f22 0%, #140a19 45%, #05050f 100%);
+    radial-gradient(62% 48% at 50% -6%, rgba(255, 79, 158, 0.42) 0%, transparent 62%),
+    radial-gradient(55% 40% at 88% 96%, rgba(194, 63, 251, 0.22) 0%, transparent 60%),
+    linear-gradient(180deg, #06060f 0%, #140a19 45%, #05050f 100%);
 }
 .nm-bg-other {
-  background: radial-gradient(130% 90% at 18% -10%, #1c1240 0%, #0a081c 45%, #05050f 100%);
+  background:
+    radial-gradient(62% 48% at 50% -6%, rgba(139, 63, 251, 0.3) 0%, transparent 62%),
+    linear-gradient(180deg, #06060f 0%, #0a081c 45%, #05050f 100%);
+}
+
+/* ---------- Hub "lobby" tiles ----------
+   A category hub's own utility screens (poker's host-tools menu) sit on
+   a dark neon-glass surface pulled from the landing page's own nm2-*
+   tokens -- the same glass/gradient/glow the hero already uses -- in
+   place of the pastel "physical card" idiom built for Discover/Host
+   event cards. A tools menu should read as a game lobby, not a stack
+   of paper index cards. */
+.nm-hub-tile {
+  position: relative;
+  background: rgba(20, 14, 46, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.08s ease;
+}
+.nm-hub-tile:hover,
+.nm-hub-tile:focus-visible {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.nm-hub-tile:active {
+  transform: translateY(2px);
+}
+.nm-hub-tile-arrow {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+  opacity: 0.4;
+}
+.nm-hub-tile:hover .nm-hub-tile-arrow,
+.nm-hub-tile:focus-visible .nm-hub-tile-arrow {
+  transform: translateX(4px);
+  opacity: 1;
+}
+
+/* Ambient background blooms -- soft blurred color circles, the same
+   device as the landing hero's bokeh/stars, used behind a hub instead
+   of a flat gradient so the scene has real depth. */
+.nm-amb-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+}
+.nm-amb-spin-slow {
+  animation: nm-amb-spin 90s linear infinite;
+}
+@keyframes nm-amb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nm-amb-spin-slow {
+    animation: none !important;
+  }
 }
 
 ::-webkit-scrollbar {
