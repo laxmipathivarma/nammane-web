@@ -1,5 +1,5 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 
 type CookieToSet = {
   name: string
@@ -7,18 +7,49 @@ type CookieToSet = {
   options?: CookieOptions
 }
 
-// Deliberately back to the default host-only session cookie -- see
-// the matching comment in src/lib/supabase.ts for why. The actual
-// fix for "clicking the logo logs me out" is the shared Header's
-// logo never crossing from app.nammane.in to nammane.in (or back) in
-// the first place, so there's no cross-host cookie to share here.
+// Only the real nammane.in / app.nammane.in hosts get the shared-domain
+// cookie -- a hardcoded `.nammane.in` would make the browser silently
+// reject the Set-Cookie entirely on localhost or a Vercel preview URL
+// (*.vercel.app isn't a subdomain of nammane.in), breaking sign-in there.
+export function sharedCookieDomain(host: string): string | undefined {
+  const hostname = host.split(':')[0]
+  return hostname === 'nammane.in' || hostname.endsWith('.nammane.in') ? '.nammane.in' : undefined
+}
+
+// Session cookie is scoped to the shared parent domain (.nammane.in) so
+// one sign-in is valid on both nammane.in and app.nammane.in -- needed
+// for Home/the logo to cross from the app to the marketing site without
+// it looking like a sign-out there (see Header.tsx).
+//
+// A previous attempt at exactly this was reverted (see git history /
+// src/lib/supabase.ts's old comment) because changing a cookie's domain
+// doesn't migrate an already-set cookie -- it creates a *second* cookie
+// with the same name next to the old host-only one, and a browser
+// sending both looks exactly like random logouts. That failure mode is
+// real, but @supabase/ssr (confirmed in the installed version, 0.12.7)
+// already has the actual fix for it built in: when `cookieOptions.domain`
+// is set, both its setItem (sign-in/refresh) and removeItem (sign-out)
+// paths explicitly clear the stale host-only cookie of the same name in
+// the same response, specifically to prevent this exact bug (see
+// node_modules/@supabase/ssr/dist/main/cookies.js, the "host-only
+// also-clear" comments, referencing upstream issue #256). We just need
+// to turn it on, not hand-roll the migration ourselves.
+//
+// One nuance: this only actively migrates a cookie the moment Supabase
+// itself writes one (sign-in, sign-out, or a token refresh) -- someone
+// already signed in under the old host-only cookie keeps using it,
+// invisibly to nammane.in, until their session next refreshes (normally
+// within the hour). That's a quiet delay, not a logout.
 export const createServerSupabaseClient = async () => {
   const cookieStore = await cookies()
+  const host = (await headers()).get('host') ?? ''
+  const domain = sharedCookieDomain(host)
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      ...(domain ? { cookieOptions: { domain } } : {}),
       cookies: {
         getAll() {
           return cookieStore.getAll()

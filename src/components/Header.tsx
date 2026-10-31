@@ -22,23 +22,30 @@ const WEBAPP_URL = 'https://app.nammane.in'
 // gate when signed out, straight into the real app page when signed
 // in. Inside the app itself, they're already relative in-app routes.
 //
-// Home (and the logo, which points at the same href) ALWAYS stays inside
-// the app on app.nammane.in -- "/" already renders the right thing either
-// way (WebAppHero3D when signed out, the quick-actions home when signed
-// in -- see src/app/page.tsx).
+// Home (and the logo, which points at the same href) crosses to
+// nammane.in on both hosts, signed in or not. This went back and forth
+// twice before landing here: it looked like a logout the first time it
+// shipped, because app.nammane.in and nammane.in each had their own
+// independent, host-only session cookie -- crossing hosts genuinely did
+// show "Sign in / Sign up" over there, session untouched or not. The
+// actual fix wasn't in this file at all: src/lib/auth.ts and
+// src/lib/supabase.ts now scope the session cookie to the shared parent
+// domain (.nammane.in) on the real hosts, using @supabase/ssr's own
+// built-in migration logic (see the long comment in auth.ts) instead of
+// hand-rolling it. With that in place, a signed-in visit to nammane.in
+// actually looks signed in.
 //
-// This was briefly changed to cross to nammane.in instead (on an explicit
-// ask), then reverted the same day once that was actually tried: a
-// different host doesn't share the app's session cookie, so the
-// marketing page's header shows "Sign in / Sign up" there no matter what
-// -- there is no version of "Home crosses hosts" that doesn't look like
-// getting signed out. Keeping Home in-app is the only fix that avoids
-// that appearance, so this is deliberately NOT going back to crossing
-// hosts again -- see the matching test in Header.hrefs.test.ts.
+// Caveat worth knowing if this ever looks broken again: that cookie
+// sharing only applies the moment Supabase writes a fresh cookie (sign
+// in, sign out, or a token refresh) -- a session that was already active
+// before this shipped stays on its old host-only cookie until it next
+// refreshes (normally within the hour), so Home crossing hosts won't
+// look right for that one browser tab until then, or until signing out
+// and back in once.
 export function hrefsFor(isMarketing: boolean, signedIn: boolean): Record<NavKey, string> {
   if (!isMarketing) {
     return {
-      home: '/',
+      home: 'https://nammane.in',
       host: '/host',
       join: '/discover',
       discover: '/discover',

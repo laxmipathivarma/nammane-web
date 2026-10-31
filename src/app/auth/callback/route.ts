@@ -13,6 +13,16 @@ function noStore(response: NextResponse) {
   return response
 }
 
+// Matches src/lib/auth.ts's sharedCookieDomain -- real nammane.in hosts
+// only, never localhost or a Vercel preview URL. This is the single most
+// important place to get this right: a brand-new sign-in lands here, so
+// setting the shared-domain cookie from the very first moment (instead of
+// waiting on a later token refresh) is what makes "just signed in with
+// Google" immediately visible on nammane.in too.
+function sharedCookieDomain(hostname: string): string | undefined {
+  return hostname === 'nammane.in' || hostname.endsWith('.nammane.in') ? '.nammane.in' : undefined
+}
+
 // Google sign-in redirects the browser here with a `?code=...`
 // after the person approves on the provider's own page. Exchanging it for
 // a session has to happen server-side (it sets the auth cookies on the
@@ -41,11 +51,13 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const response = NextResponse.redirect(`${origin}${next}`)
+    const domain = sharedCookieDomain(new URL(request.url).hostname)
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
+        ...(domain ? { cookieOptions: { domain } } : {}),
         cookies: {
           getAll() {
             return request.cookies.getAll()

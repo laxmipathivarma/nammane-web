@@ -1,18 +1,20 @@
 import { createBrowserClient } from '@supabase/ssr'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-// Deliberately back to the default host-only session cookie. A
-// previous attempt scoped this to the shared parent domain
-// (.nammane.in) so one sign-in would be valid on both nammane.in and
-// app.nammane.in -- but changing a cookie's domain attribute doesn't
-// migrate an already-set cookie, it creates a *second* cookie with
-// the same name next to the old one, and a browser sending both on
-// every request is exactly the kind of thing that looks like random
-// logouts. The real fix for "the logo logs me out" is Header.tsx's
-// logo never crossing hosts in the first place (see its own
-// comment) -- so there's no cookie-sharing problem left to solve
-// here, and the safer, standard default is to leave it alone.
-//
+// Session cookie is scoped to the shared parent domain (.nammane.in,
+// matching src/lib/auth.ts's server client) wherever that's actually
+// valid -- real nammane.in hosts only, never localhost or a Vercel
+// preview URL, where the browser would just reject a `.nammane.in`
+// Set-Cookie outright and break sign-in there. @supabase/ssr's own
+// migration logic (see the long comment in auth.ts) handles clearing
+// the old host-only cookie as sessions get created/refreshed here, the
+// same as it does server-side.
+function sharedCookieDomain(): string | undefined {
+  if (typeof window === 'undefined') return undefined
+  const hostname = window.location.hostname
+  return hostname === 'nammane.in' || hostname.endsWith('.nammane.in') ? '.nammane.in' : undefined
+}
+
 // This used to call createBrowserClient() fresh on every invocation.
 // It's called from well over a dozen places (AuthProvider, the login
 // and signup pages, profile/edit, discover, ...), and each call was
@@ -34,7 +36,12 @@ let client: SupabaseClient | undefined
 
 export const createClient = () => {
   if (!client) {
-    client = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    const domain = sharedCookieDomain()
+    client = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      domain ? { cookieOptions: { domain } } : undefined
+    )
   }
   return client
 }
