@@ -9,7 +9,6 @@ import AvatarBadge from '@/components/AvatarBadge'
 
 const LOGIN_URL = 'https://app.nammane.in/auth/login'
 const WEBAPP_URL = 'https://app.nammane.in'
-const MARKETING_URL = 'https://nammane.in'
 
 // This is the ONE header for both nammane.in (marketing) and
 // app.nammane.in (the web app) -- same component, same shell, same
@@ -23,15 +22,30 @@ const MARKETING_URL = 'https://nammane.in'
 // gate when signed out, straight into the real app page when signed
 // in. Inside the app itself, they're already relative in-app routes.
 //
-// Home (and the logo, which points at the same href) is the one
-// deliberate exception to "stay on this host": inside the app, "/" is
-// the app's own quick-actions home, which you're usually already on --
-// clicking Home there did nothing visible and read as broken. Home
-// always goes to the marketing site instead, even while signed in; the
-// quick-actions home is still one click away via "Web App" in the nav.
+// Home (and the logo, which points at the same href) used to cross to
+// the marketing site whenever the viewer wasn't (yet) known to be
+// signed in -- and "yet" was the actual bug: AuthProvider's `user`
+// starts out null on every single page load, for a brief moment even
+// when a real session exists, while it waits on Supabase to confirm
+// the session. If someone clicked Home/the logo during that window,
+// this used to send them straight to nammane.in on a plain hard <a>
+// (different host, cookie not shared) -- which renders "Sign in / Sign
+// up" in the header and reads exactly like getting signed out, even
+// though the app.nammane.in session was never touched. The actual fix:
+// "/" on the app host already renders the right thing either way
+// (WebAppHero3D when signed out, the quick-actions home when signed
+// in -- see src/app/page.tsx), so Home never needs to leave the app
+// host at all. Only the marketing site's own Home points at nammane.in.
 export function hrefsFor(isMarketing: boolean, signedIn: boolean): Record<NavKey, string> {
   if (!isMarketing) {
-    return { home: MARKETING_URL, host: '/host', join: '/discover', discover: '/discover', webapp: '/', mobile: 'https://nammane.in/mobile-app' }
+    return {
+      home: '/',
+      host: '/host',
+      join: '/discover',
+      discover: '/discover',
+      webapp: '/',
+      mobile: 'https://nammane.in/mobile-app',
+    }
   }
   const appHref = (path: string) => (signedIn ? `${WEBAPP_URL}${path}` : LOGIN_URL)
   return {

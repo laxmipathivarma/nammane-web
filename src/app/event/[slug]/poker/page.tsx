@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import BackButton from '@/components/BackButton'
 import HubBackdrop from '@/components/HubBackdrop'
-import TiltTile from '@/components/TiltTile'
+import HostToolsDeck from '@/components/HostToolsDeck'
 import { useAuth } from '@/lib/AuthProvider'
 import { emptyPokerEventData, type PokerEventData } from '@/lib/pokerLedger'
 import type { InviteEventInfo } from '@/lib/invite'
@@ -167,21 +167,19 @@ export default function PokerHubPage() {
         )}
 
         {tab === 'menu' && (
-          <div className="grid grid-cols-2 gap-3.5">
-            {MENU.map((item) => (
-              <TiltTile
-                key={item.label}
-                icon={item.icon}
-                label={item.label}
-                hint={item.hint}
-                accent={item.accent}
-                onClick={() => {
-                  setTab(item.tab)
-                  if (item.sub) setInvitationSub(item.sub)
-                }}
-              />
-            ))}
-          </div>
+          <HostToolsDeck
+            items={MENU.map((item) => ({
+              key: item.label,
+              icon: item.icon,
+              label: item.label,
+              hint: item.hint,
+              accent: item.accent,
+              onOpen: () => {
+                setTab(item.tab)
+                if (item.sub) setInvitationSub(item.sub)
+              },
+            }))}
+          />
         )}
 
         {tab === 'invite' && <InvitationHub {...tabProps} sub={invitationSub} setSub={setInvitationSub} />}

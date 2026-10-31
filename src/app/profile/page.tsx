@@ -11,6 +11,7 @@ type ProfileSummary = {
   avatar_key: string | null
   profile_status: 'active' | 'pending_age_review'
   govt_id_verified: boolean
+  govt_id_number: string | null
   phone_verified: boolean
 }
 
@@ -188,12 +189,17 @@ export default function ProfilePage() {
               <use href="#i-shield" />
             </svg>
             <div className="flex-1 text-[12.5px] font-bold">Government ID</div>
-            {profile?.govt_id_verified ? (
-              <svg width="16" height="16" viewBox="0 0 24 24">
-                <use href="#i-check" />
-              </svg>
+            {profile?.govt_id_number ? (
+              <span className="flex items-center gap-1 text-[10.5px] font-bold text-[#8fe3b0]">
+                <svg width="16" height="16" viewBox="0 0 24 24">
+                  <use href="#i-check" />
+                </svg>
+                On file
+              </span>
             ) : (
-              <span className="text-[10.5px] font-bold text-muted2">Not verified</span>
+              <Link href="/profile/edit" className="text-[10.5px] font-bold text-muted2 hover:text-gold-text transition-colors">
+                Add it
+              </Link>
             )}
           </div>
           <div className="flex items-center gap-3 px-3.5 py-3 border-b border-white/[0.06]">
