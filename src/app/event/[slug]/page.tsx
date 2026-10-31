@@ -4,6 +4,7 @@ import BackButton from '@/components/BackButton'
 import ShareEventModal from '@/components/ShareEventModal'
 import JoinRequestButton from '@/components/JoinRequestButton'
 import GuestRequestsPanel from '@/components/GuestRequestsPanel'
+import HostDetailsModal from '@/components/HostDetailsModal'
 import { createAdminClient } from '@/lib/supabaseAdmin'
 import { createServerSupabaseClient } from '@/lib/auth'
 import { isEventCompleted } from '@/lib/eventStatus'
@@ -27,11 +28,38 @@ async function fetchLiveEvent(id: string, viewerId: string | null) {
   // Real seat count instead of the permanent "0/N" this used to show --
   // approved bookings only, so a pile of still-pending requests doesn't
   // make the event look fuller than it actually is.
-  const { count: approvedCount } = await admin
-    .from('bookings')
-    .select('id', { count: 'exact', head: true })
-    .eq('event_id', id)
-    .eq('status', 'approved')
+  //
+  // Alongside that, pull everything a guest needs to judge the host's
+  // credibility before requesting to join: their public profile, how
+  // many events they've actually hosted (not the old hardcoded "1"),
+  // and their rating/reviews so far (reviews.reviewed_id -- the FK hint
+  // picks reviewer_id's relation to profiles, since reviews has two FKs
+  // into profiles and a plain embed would be ambiguous). All of this is
+  // public info by design (same as "Public profiles are viewable" in
+  // 001_initial_schema.sql), so it's safe to show before a guest is
+  // approved -- it's what they're using to decide whether to ask at all.
+  const [{ count: approvedCount }, { data: hostProfile }, { count: eventsHostedCount }, { data: reviewRows }] =
+    await Promise.all([
+      admin.from('bookings').select('id', { count: 'exact', head: true }).eq('event_id', id).eq('status', 'approved'),
+      admin.from('profiles').select('id,display_name,avatar_url,bio,city').eq('id', data.host_id).maybeSingle(),
+      admin.from('events').select('id', { count: 'exact', head: true }).eq('host_id', data.host_id),
+      admin
+        .from('reviews')
+        .select('rating,comment,created_at,profiles!reviews_reviewer_id_fkey(display_name)')
+        .eq('reviewed_id', data.host_id)
+        .order('created_at', { ascending: false }),
+    ])
+
+  const ratings = (reviewRows ?? []).map((r) => r.rating as number).filter((r) => typeof r === 'number')
+  const ratingAvg = ratings.length > 0 ? ratings.reduce((s, r) => s + r, 0) / ratings.length : null
+  const reviews = (reviewRows ?? []).slice(0, 5).map((r) => ({
+    rating: r.rating as number | null,
+    comment: r.comment as string | null,
+    createdAt: r.created_at as string,
+    reviewerName:
+      (Array.isArray(r.profiles) ? r.profiles[0]?.display_name : (r.profiles as { display_name: string | null } | null)?.display_name) ||
+      'Guest',
+  }))
 
   return {
     id: data.id as string,
@@ -43,8 +71,16 @@ async function fetchLiveEvent(id: string, viewerId: string | null) {
       ? new Date(data.starts_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
       : 'Date & time TBD',
     area: data.address || data.city || (data.is_public ? 'Shared after approval' : 'Private event'),
-    host: { name: 'the host' },
-    eventsHosted: 1,
+    host: {
+      name: hostProfile?.display_name || 'the host',
+      avatarUrl: hostProfile?.avatar_url ?? null,
+      bio: hostProfile?.bio ?? null,
+      city: hostProfile?.city ?? null,
+      ratingAvg,
+      ratingCount: ratings.length,
+      reviews,
+    },
+    eventsHosted: eventsHostedCount ?? 1,
     guests: [],
     seatsLabel: data.capacity ? `${approvedCount ?? 0}/${data.capacity} seats` : 'Open seats',
     houseRules: data.description || 'No details added yet.',
@@ -125,19 +161,23 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
             <div className="text-[11.5px] text-[#a79ecb] font-semibold">Exact address shared after approval</div>
           </div>
         </div>
-        <div className="flex items-center gap-3 py-3">
-          <div className="w-9 h-9 rounded-[11px] bg-white/[0.07] flex items-center justify-center shrink-0">
-            <svg width="17" height="17" viewBox="0 0 24 24" stroke="#ff8fd1" fill="none">
-              <use href="#i-shield" />
-            </svg>
-          </div>
-          <div>
-            <div className="text-[13.5px] font-bold">Hosted by {event.host.name}</div>
-            <div className="text-[11.5px] text-[#a79ecb] font-semibold">
-              Verified host · {event.eventsHosted} events hosted
+        {event.isLive ? (
+          <HostDetailsModal host={event.host} eventsHosted={event.eventsHosted} />
+        ) : (
+          <div className="flex items-center gap-3 py-3">
+            <div className="w-9 h-9 rounded-[11px] bg-white/[0.07] flex items-center justify-center shrink-0">
+              <svg width="17" height="17" viewBox="0 0 24 24" stroke="#ff8fd1" fill="none">
+                <use href="#i-shield" />
+              </svg>
+            </div>
+            <div>
+              <div className="text-[13.5px] font-bold">Hosted by {event.host.name}</div>
+              <div className="text-[11.5px] text-[#a79ecb] font-semibold">
+                Verified host · {event.eventsHosted} events hosted
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="nm-glass rounded-[18px] p-4 mt-4">
           <div className="text-[12px] font-extrabold text-muted mb-2 tracking-wide">WHO&apos;S GOING</div>
