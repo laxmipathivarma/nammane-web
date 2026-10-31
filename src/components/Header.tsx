@@ -22,24 +22,22 @@ const WEBAPP_URL = 'https://app.nammane.in'
 // gate when signed out, straight into the real app page when signed
 // in. Inside the app itself, they're already relative in-app routes.
 //
-// Home (and the logo, which points at the same href) used to cross to
-// the marketing site whenever the viewer wasn't (yet) known to be
-// signed in -- and "yet" was the actual bug: AuthProvider's `user`
-// starts out null on every single page load, for a brief moment even
-// when a real session exists, while it waits on Supabase to confirm
-// the session. If someone clicked Home/the logo during that window,
-// this used to send them straight to nammane.in on a plain hard <a>
-// (different host, cookie not shared) -- which renders "Sign in / Sign
-// up" in the header and reads exactly like getting signed out, even
-// though the app.nammane.in session was never touched. The actual fix:
-// "/" on the app host already renders the right thing either way
-// (WebAppHero3D when signed out, the quick-actions home when signed
-// in -- see src/app/page.tsx), so Home never needs to leave the app
-// host at all. Only the marketing site's own Home points at nammane.in.
+// Home (and the logo, which points at the same href) always points at
+// the marketing site, nammane.in -- on both hosts, signed in or not.
+// This is a deliberate, explicit choice (confirmed with the person this
+// app is built for): clicking Home/the logo takes you to nammane.in's
+// marketing homepage, full stop. Note this is a real cross-host
+// navigation from the app -- app.nammane.in and nammane.in don't share
+// a session cookie, so the marketing header will show "Sign in / Sign
+// up" there even while you're still signed in on the app. That's
+// expected for a different host's own session state, not a logout: the
+// app.nammane.in session is untouched, and Host/Join/Discover on the
+// marketing page still route straight into the app for a signed-in
+// visitor (see appHref below).
 export function hrefsFor(isMarketing: boolean, signedIn: boolean): Record<NavKey, string> {
   if (!isMarketing) {
     return {
-      home: '/',
+      home: 'https://nammane.in',
       host: '/host',
       join: '/discover',
       discover: '/discover',
@@ -93,8 +91,19 @@ export default function Header({ isMarketing = false }: { isMarketing?: boolean 
     return () => document.removeEventListener('mousedown', onClick)
   }, [])
 
+  // paddingTop: env(safe-area-inset-top) below -- the root layout turns on
+  // viewport-fit=cover + a translucent iOS status bar so the page
+  // background draws edge-to-edge under the notch (intentional, for the
+  // "Add to Home Screen" PWA). Without this padding the header's own
+  // content -- logo, nav, the hamburger icon -- draws there too and sits
+  // underneath the clock/signal/battery row. The background (bg-ink/90,
+  // this element) still starts at the very top; only the row of controls
+  // below is pushed clear of the status bar.
   return (
-    <header className="sticky top-0 z-50 bg-ink/90 backdrop-blur-md border-b border-white/10">
+    <header
+      className="sticky top-0 z-50 bg-ink/90 backdrop-blur-md border-b border-white/10"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
       <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
         {/* logo -- always the same destination as the Home nav item
             (HREFS.home above): the marketing site. A plain relative "/"
