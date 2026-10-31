@@ -76,7 +76,14 @@ export default function HostDashboardPage() {
           {events?.map((ev) => (
             <HostEventCard
               key={ev.id}
-              data={{ id: ev.id, title: ev.title, category: ev.category, when: fmt(ev.starts_at), isPublic: ev.is_public }}
+              data={{
+                id: ev.id,
+                title: ev.title,
+                category: ev.category,
+                when: fmt(ev.starts_at),
+                startsAt: ev.starts_at,
+                isPublic: ev.is_public,
+              }}
             />
           ))}
         </div>

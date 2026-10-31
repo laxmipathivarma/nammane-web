@@ -6,6 +6,7 @@ import JoinRequestButton from '@/components/JoinRequestButton'
 import GuestRequestsPanel from '@/components/GuestRequestsPanel'
 import { createAdminClient } from '@/lib/supabaseAdmin'
 import { createServerSupabaseClient } from '@/lib/auth'
+import { isEventCompleted } from '@/lib/eventStatus'
 
 export function generateStaticParams() {
   return Object.keys(EVENTS).map((slug) => ({ slug }))
@@ -37,6 +38,7 @@ async function fetchLiveEvent(id: string, viewerId: string | null) {
     title: data.title,
     category: data.category as EventCategory,
     tagLabel: String(data.category).toUpperCase(),
+    startsAt: data.starts_at as string | null,
     schedule: data.starts_at
       ? new Date(data.starts_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
       : 'Date & time TBD',
@@ -59,8 +61,12 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
   } = await supabase.auth.getUser()
 
   const demoEvent = EVENTS[params.slug]
-  const event = demoEvent ? { ...demoEvent, isHost: false, isLive: false as const } : await fetchLiveEvent(params.slug, user?.id ?? null)
+  const event = demoEvent
+    ? { ...demoEvent, isHost: false, isLive: false as const, startsAt: null as string | null }
+    : await fetchLiveEvent(params.slug, user?.id ?? null)
   if (!event) notFound()
+
+  const completed = isEventCompleted(event.startsAt)
 
   const icon = categoryIcon[event.category]
 
@@ -87,9 +93,15 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
 
       <div className="relative -mt-5 bg-ink rounded-t-[24px] max-w-3xl mx-auto px-5 pb-32 pt-6">
         <h1 className="nm-marquee text-2xl md:text-3xl text-white leading-tight">{event.title}</h1>
-        <div className="text-[11px] font-extrabold mt-2 px-3 py-1.5 rounded-full inline-block w-fit" style={{ background: 'rgba(139,63,251,.18)', color: '#c9a8ff' }}>
-          Approval required before entry
-        </div>
+        {completed ? (
+          <div className="text-[11px] font-extrabold mt-2 px-3 py-1.5 rounded-full inline-block w-fit" style={{ background: 'rgba(255,255,255,.08)', color: '#a79ecb' }}>
+            Event completed
+          </div>
+        ) : (
+          <div className="text-[11px] font-extrabold mt-2 px-3 py-1.5 rounded-full inline-block w-fit" style={{ background: 'rgba(139,63,251,.18)', color: '#c9a8ff' }}>
+            Approval required before entry
+          </div>
+        )}
 
         <div className="flex items-center gap-3 py-3 border-b border-white/[0.08]">
           <div className="w-9 h-9 rounded-[11px] bg-white/[0.07] flex items-center justify-center shrink-0">
@@ -186,9 +198,23 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
             </a>
           )}
           {event.isHost ? (
-            <a href="/host" className="nm-btn w-full py-3.5 text-[13.5px] bg-ink2 text-white border border-white/10 text-center">
-              Back to my events
-            </a>
+            <>
+              {/* A host can change anything about their event right up
+                  until it starts -- once it's over (completed above),
+                  this link disappears rather than sending them to a form
+                  that would just refuse the edit server-side too. */}
+              {!completed && (
+                <a
+                  href={`/host/${params.slug}/edit`}
+                  className="nm-btn nm-btn-gold w-full py-3.5 text-[13.5px] text-center"
+                >
+                  Modify event
+                </a>
+              )}
+              <a href="/host" className="nm-btn w-full py-3.5 text-[13.5px] bg-ink2 text-white border border-white/10 text-center">
+                Back to my events
+              </a>
+            </>
           ) : event.isLive ? (
             <JoinRequestButton eventId={event.id} />
           ) : (

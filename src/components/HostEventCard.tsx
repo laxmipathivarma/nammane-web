@@ -3,12 +3,14 @@
 import Link from 'next/link'
 import { useRef } from 'react'
 import { cardStyle, categoryIcon, type EventCategory } from '@/lib/eventCardStyle'
+import { isEventCompleted } from '@/lib/eventStatus'
 
 export type HostEventCardData = {
   id: string
   title: string
   category: EventCategory
   when: string
+  startsAt: string | null
   isPublic: boolean
 }
 
@@ -22,6 +24,7 @@ export default function HostEventCard({ data }: { data: HostEventCardData }) {
   const ref = useRef<HTMLDivElement>(null)
   const icon = categoryIcon[data.category]
   const s = cardStyle[data.category]
+  const completed = isEventCompleted(data.startsAt)
 
   const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const el = ref.current
@@ -75,7 +78,14 @@ export default function HostEventCard({ data }: { data: HostEventCardData }) {
       </div>
 
       <div className="relative nm-marquee text-[17px] font-extrabold mt-3.5">{data.title}</div>
-      <div className="relative text-[12px] font-bold opacity-65 mt-1">{data.when}</div>
+      <div className="relative flex items-center gap-2 mt-1">
+        <div className="text-[12px] font-bold opacity-65">{data.when}</div>
+        {completed && (
+          <div className="text-[9.5px] font-extrabold px-2 py-[3px] rounded-full shrink-0 bg-black/20">
+            Event completed
+          </div>
+        )}
+      </div>
 
       <div className="relative flex gap-2 mt-4">
         <Link href={`/event/${data.id}`} className="nm-btn flex-1 text-[12px] py-2.5 text-center" style={{ background: s.ctaBg, color: s.ctaColor }}>
@@ -87,6 +97,19 @@ export default function HostEventCard({ data }: { data: HostEventCardData }) {
           </Link>
         )}
       </div>
+
+      {/* Modify is only ever offered before the event happens -- once it's
+          over there's nothing left to change, so this row disappears
+          instead of linking to a form that would just reject the host. */}
+      {!completed && (
+        <Link
+          href={`/host/${data.id}/edit`}
+          className="relative mt-2 text-center text-[11.5px] font-extrabold py-2 rounded-xl border"
+          style={{ borderColor: 'rgba(255,255,255,.18)', color: s.color, opacity: 0.85 }}
+        >
+          Edit details
+        </Link>
+      )}
     </div>
   )
 }
