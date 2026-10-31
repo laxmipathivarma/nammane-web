@@ -6,6 +6,7 @@ import Link from 'next/link'
 import BackButton from '@/components/BackButton'
 import AvatarBadge from '@/components/AvatarBadge'
 import { useAuth } from '@/lib/AuthProvider'
+import DelayedLoader from '@/components/ui/delayed-loader'
 
 type ProfileSummary = {
   avatar_key: string | null
@@ -74,8 +75,9 @@ export default function ProfilePage() {
 
   if (loading || !user) {
     return (
-      <div className="nm-bg min-h-screen text-white flex items-center justify-center">
+      <div className="nm-bg min-h-screen text-white flex flex-col items-center justify-center gap-2">
         <div className="text-muted text-[13px] font-semibold">Loading your profile…</div>
+        <DelayedLoader className="" />
       </div>
     )
   }

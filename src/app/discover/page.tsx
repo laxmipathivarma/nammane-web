@@ -6,6 +6,7 @@ import EventCard, { EventCardData } from '@/components/EventCard'
 import { createClient } from '@/lib/supabase'
 import { useAuth } from '@/lib/AuthProvider'
 import { categoryLabel } from '@/lib/eventCardStyle'
+import DelayedLoader from '@/components/ui/delayed-loader'
 
 type EventRow = {
   id: string
@@ -266,6 +267,10 @@ export default function Discover() {
             ? 'Loading events…'
             : `${visible.length} ${activeLabel} ${visible.length === 1 ? 'event' : 'events'}`}
         </div>
+        {/* Instant loads (the common case) show just the text above and
+            nothing else. Only a fetch that's still running past ~1s gets
+            the branded loader -- see DelayedLoader's own comment. */}
+        {(loading || (scope === 'invited' && invitedLoading)) && <DelayedLoader />}
         {!loading && !(scope === 'invited' && invitedLoading) && visible.length === 0 && (
           <div className="text-[12.5px] text-muted2 font-semibold">
             {scope === 'mine' && `You haven't created any ${activeLabel.toLowerCase()} events yet.`}

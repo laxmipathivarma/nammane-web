@@ -215,6 +215,14 @@ body {
   background: radial-gradient(130% 90% at 18% -10%, #1c1240 0%, #0a081c 45%, #05050f 100%);
 }
 
+/* Simple fade-in for DelayedLoader (src/components/ui/delayed-loader.tsx)
+   -- the branded KineticTextLoader eases in rather than popping once a
+   load has run past the "feels slow" threshold. */
+@keyframes nm-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* The share sheet pops up from the bottom on mobile (where it docks to
    the edge, like a native sheet) and scales in from center elsewhere --
    one entrance moment, not a hover gimmick. */

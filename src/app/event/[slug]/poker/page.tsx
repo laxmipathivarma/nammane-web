@@ -14,6 +14,7 @@ import ExpensesHub from '@/components/poker/ExpensesHub'
 import SettleHub from '@/components/poker/SettleHub'
 import GamesHub from '@/components/poker/GamesHub'
 import type { PokerTabKey } from '@/components/poker/types'
+import DelayedLoader from '@/components/ui/delayed-loader'
 
 // Each tile gets its own gradient accent (from the landing page's own
 // nm2 neon palette) instead of one flat purple repeated eight times --
@@ -164,9 +165,10 @@ export default function PokerHubPage() {
 
   if (loading)
     return (
-      <div className="min-h-screen text-white flex items-center justify-center text-muted relative">
+      <div className="min-h-screen text-white flex flex-col items-center justify-center gap-2 text-muted relative">
         <HubBackdrop category="poker" />
-        Loading poker tools…
+        <span className="relative">Loading poker tools…</span>
+        <DelayedLoader className="relative" />
       </div>
     )
   if (error && !data)

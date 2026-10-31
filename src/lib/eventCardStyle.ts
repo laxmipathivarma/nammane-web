@@ -385,6 +385,30 @@ export const cardStyle: Record<EventCategory, CardStyle> = {
   },
 }
 
+// Illustration used behind each category card (CategoryCard), replacing
+// the flat line-icon badge. Not every category has art yet -- CategoryCard
+// falls back to the old icon treatment when a category is missing here.
+export const categoryImage: Partial<Record<EventCategory, string>> = {
+  poker: '/categories/poker.jpg',
+  rummy: '/categories/rummy.jpg',
+  drinks: '/categories/drinks.jpg',
+  dinner: '/categories/dinner.jpg',
+  party: '/categories/party.jpg',
+  marriage: '/categories/marriage.jpg',
+  engagement: '/categories/engagement.jpg',
+  movie_night: '/categories/movie_night.jpg',
+  trip: '/categories/trip.jpg',
+  birthday: '/categories/birthday.jpg',
+  fest: '/categories/fest.jpg',
+  meetup: '/categories/meetup.jpg',
+  cycling: '/categories/cycling.jpg',
+  biking: '/categories/biking.jpg',
+  trekking: '/categories/trekking.jpg',
+  outing: '/categories/outing.jpg',
+  get_together: '/categories/get_together.jpg',
+  other: '/categories/other.jpg',
+}
+
 export const categoryIcon: Record<EventCategory, string> = {
   poker: 'i-spade',
   rummy: 'i-diamond',

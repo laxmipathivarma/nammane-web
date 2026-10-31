@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import BackButton from '@/components/BackButton'
 import { useAuth } from '@/lib/AuthProvider'
+import DelayedLoader from '@/components/ui/delayed-loader'
 
 type Tab = 'requested' | 'approved' | 'waitlist'
 
@@ -62,8 +63,9 @@ export default function BookingsPage() {
 
   if (loading || !user) {
     return (
-      <div className="nm-bg min-h-screen text-white flex items-center justify-center">
+      <div className="nm-bg min-h-screen text-white flex flex-col items-center justify-center gap-2">
         <div className="text-muted text-[13px] font-semibold">Loading your bookings…</div>
+        <DelayedLoader className="" />
       </div>
     )
   }

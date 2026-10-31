@@ -6,6 +6,8 @@ import { NAV_LABELS, type NavKey } from '@/lib/navMenu'
 import { WEBAPP_VERSION_LABEL } from '@/lib/version'
 import { useAuth } from '@/lib/AuthProvider'
 import AvatarBadge from '@/components/AvatarBadge'
+import { popButtonClasses } from '@/components/ui/pop-button'
+import { cn } from '@/lib/utils'
 
 const LOGIN_URL = 'https://app.nammane.in/auth/login'
 const WEBAPP_URL = 'https://app.nammane.in'
@@ -238,19 +240,19 @@ export default function Header({ isMarketing = false }: { isMarketing?: boolean 
               </>
             ) : loginHref.startsWith('http') ? (
               <>
-                <a href={loginHref} className="hidden sm:inline-flex text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors">
+                <a href={loginHref} className={cn(popButtonClasses('outline'), 'hidden sm:inline-flex px-4 py-2 text-[12.5px]')}>
                   Sign in
                 </a>
-                <a href={signupHref} className="hidden sm:inline-flex nm-btn nm-btn-gold px-4 py-2 text-[13px]">
+                <a href={signupHref} className={cn(popButtonClasses('primary'), 'hidden sm:inline-flex px-4 py-2 text-[12.5px]')}>
                   Sign up
                 </a>
               </>
             ) : (
               <>
-                <Link href={loginHref} className="hidden sm:inline-flex text-[13px] font-bold text-[#e4d4ff] px-3 py-2 hover:text-gold-text transition-colors">
+                <Link href={loginHref} className={cn(popButtonClasses('outline'), 'hidden sm:inline-flex px-4 py-2 text-[12.5px]')}>
                   Sign in
                 </Link>
-                <Link href={signupHref} className="hidden sm:inline-flex nm-btn nm-btn-gold px-4 py-2 text-[13px]">
+                <Link href={signupHref} className={cn(popButtonClasses('primary'), 'hidden sm:inline-flex px-4 py-2 text-[12.5px]')}>
                   Sign up
                 </Link>
               </>
@@ -319,19 +321,19 @@ export default function Header({ isMarketing = false }: { isMarketing?: boolean 
               </div>
             ) : loginHref.startsWith('http') ? (
               <div className="border-t border-white/10 pt-3 flex gap-3">
-                <a href={loginHref} onClick={() => setMobileOpen(false)} className="flex-1 nm-btn bg-ink2 text-white py-2.5 text-[13px] text-center">
+                <a href={loginHref} onClick={() => setMobileOpen(false)} className={cn(popButtonClasses('outline'), 'flex-1 py-2.5 text-[13px] text-center')}>
                   Sign in
                 </a>
-                <a href={signupHref} onClick={() => setMobileOpen(false)} className="flex-1 nm-btn nm-btn-gold py-2.5 text-[13px] text-center">
+                <a href={signupHref} onClick={() => setMobileOpen(false)} className={cn(popButtonClasses('primary'), 'flex-1 py-2.5 text-[13px] text-center')}>
                   Sign up
                 </a>
               </div>
             ) : (
               <div className="border-t border-white/10 pt-3 flex gap-3">
-                <Link href={loginHref} onClick={() => setMobileOpen(false)} className="flex-1 nm-btn bg-ink2 text-white py-2.5 text-[13px]">
+                <Link href={loginHref} onClick={() => setMobileOpen(false)} className={cn(popButtonClasses('outline'), 'flex-1 py-2.5 text-[13px] text-center')}>
                   Sign in
                 </Link>
-                <Link href={signupHref} onClick={() => setMobileOpen(false)} className="flex-1 nm-btn nm-btn-gold py-2.5 text-[13px]">
+                <Link href={signupHref} onClick={() => setMobileOpen(false)} className={cn(popButtonClasses('primary'), 'flex-1 py-2.5 text-[13px] text-center')}>
                   Sign up
                 </Link>
               </div>
