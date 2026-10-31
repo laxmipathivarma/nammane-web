@@ -943,6 +943,7 @@ body {
 .nm2-hero-card {
   flex: 0 0 82%;
   scroll-snap-align: start;
+  perspective: 900px;
 }
 @media (min-width: 640px) {
   .nm2-hero-cards {
@@ -951,4 +952,47 @@ body {
     overflow: visible;
   }
   .nm2-hero-card { flex: unset; }
+}
+
+/* Hero cards sit on their own idle 3D drift -- a slow, perpetual
+   rotate+bob so the row reads as a little floating scene even before
+   anyone touches it, each card out of phase with its neighbours so they
+   never move in lockstep. This lives on the OUTER wrapper
+   (.nm2-card-float3d); the INNER card (.nm2-hero-card-inner) still does
+   its own pointer-driven tilt via inline style on hover -- two different
+   elements animating `transform` so the idle loop and the hover tilt
+   never fight over the same property. */
+.nm2-card-float3d {
+  animation: nm2-card-float3d 7s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+.nm2-hero-card:nth-child(2) .nm2-card-float3d { animation-delay: -2.3s; }
+.nm2-hero-card:nth-child(3) .nm2-card-float3d { animation-delay: -4.6s; }
+@keyframes nm2-card-float3d {
+  0%, 100% { transform: rotateX(2.5deg) rotateY(-3.5deg) translateY(0); }
+  50% { transform: rotateX(-2.5deg) rotateY(3.5deg) translateY(-8px); }
+}
+
+/* Pointer-tracked specular shine, same "catching the light" language as
+   .nm-tilt-shine elsewhere -- driven by --mx/--my custom properties the
+   same mousemove handler that sets the tilt transform also updates. */
+.nm2-hero-card-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 35%), rgba(255, 255, 255, 0.55), transparent 45%);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+.nm2-hero-card-inner:hover .nm2-hero-card-shine {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nm2-card-float3d {
+    animation: none !important;
+    transform: none !important;
+  }
 }

@@ -29,8 +29,17 @@ function Stars() {
 }
 
 // Thumbnail on the left, tag/copy/CTA on the right -- side by side, never stacked.
+//
+// Two layers of 3D here, each its own element so they never fight over
+// the same `transform` property: the outer wrapper (.nm2-card-float3d)
+// does a slow, perpetual rotate+bob so the row reads as a floating scene
+// even before anyone touches it; the inner card still does its own
+// pointer-driven tilt on hover, same as before, now also driving a
+// specular shine (--mx/--my) and a faster-moving thumbnail for a layered
+// depth-parallax feel -- the image "pops" slightly in front of the card.
 function HeroCard({ c, idx }: { c: (typeof heroCards)[number]; idx: number }) {
   const ref = useRef<HTMLAnchorElement>(null)
+  const imgRef = useRef<HTMLImageElement>(null)
   const reduced = useReducedMotion()
 
   useEffect(() => {
@@ -44,10 +53,18 @@ function HeroCard({ c, idx }: { c: (typeof heroCards)[number]; idx: number }) {
       const my = (e.clientY - r.top) / r.height - 0.5
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(() => {
-        el.style.transform = `perspective(700px) rotateX(${-my * 10}deg) rotateY(${mx * 12}deg) translateY(-3px)`
+        el.style.transform = `perspective(700px) rotateX(${-my * 10}deg) rotateY(${mx * 12}deg) translateY(-3px) translateZ(12px)`
+        el.style.setProperty('--mx', `${(mx + 0.5) * 100}%`)
+        el.style.setProperty('--my', `${(my + 0.5) * 100}%`)
+        if (imgRef.current) {
+          imgRef.current.style.transform = `scale(1.1) translate(${mx * 14}px, ${my * 10}px)`
+        }
       })
     }
-    const onLeave = () => { el.style.transform = '' }
+    const onLeave = () => {
+      el.style.transform = ''
+      if (imgRef.current) imgRef.current.style.transform = ''
+    }
     el.addEventListener('mousemove', onMove)
     el.addEventListener('mouseleave', onLeave)
     return () => {
@@ -58,28 +75,39 @@ function HeroCard({ c, idx }: { c: (typeof heroCards)[number]; idx: number }) {
   }, [reduced])
 
   return (
-    <a
-      ref={ref}
-      href={LOGIN_URL}
-      className="nm2-hero-card nm2-glass nm2-card-fade-up relative grid items-center gap-4 rounded-[20px] p-3 transition-transform duration-300"
-      style={{ gridTemplateColumns: '112px 1fr', minHeight: 140, animationDelay: `${0.4 + idx * 0.12}s` }}
-    >
-      <div className="relative overflow-hidden rounded-[14px] nm2-image-grade" style={{ height: 118 }}>
-        <img src={c.img} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: c.pos }} />
+    <div className="nm2-hero-card">
+      <div className={reduced ? undefined : 'nm2-card-float3d'}>
+        <a
+          ref={ref}
+          href={LOGIN_URL}
+          className="nm2-hero-card-inner nm2-glass nm2-card-fade-up relative grid items-center gap-4 rounded-[20px] p-3 transition-transform duration-300"
+          style={{ gridTemplateColumns: '112px 1fr', minHeight: 140, animationDelay: `${0.4 + idx * 0.12}s` }}
+        >
+          <div className="nm2-hero-card-shine" />
+          <div className="relative overflow-hidden rounded-[14px] nm2-image-grade" style={{ height: 118 }}>
+            <img
+              ref={imgRef}
+              src={c.img}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-300"
+              style={{ objectPosition: c.pos }}
+            />
+          </div>
+          <div className="flex flex-col items-start gap-2">
+            <span className="nm2-kicker rounded-full border border-white/20 px-2.5 py-1 text-[10px] text-[var(--nm-text-body)] normal-case tracking-[.12em]">
+              {c.tag}
+            </span>
+            <p className="text-[13px] leading-[1.5] text-[var(--nm-text-body)]">{c.desc}</p>
+            <span className="nm2-heading inline-flex items-center gap-2 rounded-full bg-white pl-3 pr-1.5 py-1 text-[10px] font-extrabold text-[#0a081c]">
+              {c.title}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c23ffb" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </span>
+          </div>
+        </a>
       </div>
-      <div className="flex flex-col items-start gap-2">
-        <span className="nm2-kicker rounded-full border border-white/20 px-2.5 py-1 text-[10px] text-[var(--nm-text-body)] normal-case tracking-[.12em]">
-          {c.tag}
-        </span>
-        <p className="text-[13px] leading-[1.5] text-[var(--nm-text-body)]">{c.desc}</p>
-        <span className="nm2-heading inline-flex items-center gap-2 rounded-full bg-white pl-3 pr-1.5 py-1 text-[10px] font-extrabold text-[#0a081c]">
-          {c.title}
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c23ffb" strokeWidth="2.5" strokeLinecap="round">
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
-        </span>
-      </div>
-    </a>
+    </div>
   )
 }
 
