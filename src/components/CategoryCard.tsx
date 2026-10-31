@@ -1,47 +1,54 @@
 'use client'
 
-import { useRef } from 'react'
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
-import {
-  categoryIcon,
-  categoryLabel,
-  categoryBadgeGradient,
-  categoryImage,
-  type EventCategory,
-} from '@/lib/eventCardStyle'
+import { useEffect, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
+import { categoryIcon, categoryLabel, categoryBadgeGradient, categoryImage, type EventCategory } from '@/lib/eventCardStyle'
 
-// The category picker used to be tiny circular badges -- "looking so
-// bad" per feedback, wanting bigger cards with the same pointer-tilt
-// mechanic as EventCard/TiltTile. It then moved to plain white cards with
-// a black line-icon. Now each category gets a real illustration
-// (categoryImage) instead of a line-icon, tinted with that category's own
-// brand gradient (categoryBadgeGradient) via a color-blend overlay so the
-// photos read as one cohesive, on-brand set rather than stock art pasted
-// in -- and the cards are sized up a good deal so the art (and the
-// difference between categories) is actually easy to see and tap.
+// Rebuilt to actually match the two Skiper UI references the brief named
+// (skiper-ui.com/v1/skiper6 "Hover members" and /v1/skiper35 "Hover
+// expand") -- neither ships as installable here (both 404 at the real
+// shadcn registry without a paid Skiper UI Pro key; confirmed directly
+// against https://skiper-ui.com/registry/skiper6.json, which answers
+// `{"error":"Missing license key..."}`), so this is a hand-built
+// recreation after visually inspecting both live demos rather than a
+// generic "card with a hover glow."
 //
-// On top of that, a hover layer modeled on Skiper UI's "hover members"
-// component (skiper-ui.com/v1/skiper6): a soft cursor-follow glow in the
-// category's own brand color, a slow photo zoom, and the label brightening
-// with a gradient underline growing in underneath it. skiper6 itself is a
-// paid/licensed package (its registry 404s without a Pro key -- confirmed
-// by hand), so this is a from-scratch recreation of the same feel with
-// framer-motion (already a project dependency) rather than the real thing.
-// The label stays visible at rest (not hidden-until-hover like skiper6's
-// original) because this app is used touch-first -- hover never fires on a
-// phone, so hiding the name behind hover would make it permanently
-// invisible there. The spotlight/zoom are pointer-only enhancements that
-// are simply inert on touch (no pointermove, no hover) rather than
-// something that has to be disabled for it.
+// skiper35 is a row of narrow vertical strips that push-expand on hover
+// into a wide panel with a large label -- that's the resting/expanded
+// *shape* used here. skiper6 is a small thumbnail whose name renders
+// enormous on interaction -- that's where the oversized label on expand
+// comes from. Combined: small strip at rest ("cards should be smaller"),
+// image + a dramatically larger label when hovered/active ("letters
+// should be so big"), and the row makes room for the expanded one by
+// shrinking its siblings, same push mechanic as skiper35.
+//
+// Hover only exists on a mouse/trackpad, and this app is used touch-first,
+// so touch devices skip the push-expand entirely (useHoverCapable below)
+// and just get the compact resting card full-time, with the label already
+// sized up from the original build. Tapping still selects either way.
+function useHoverCapable() {
+  const [capable, setCapable] = useState(false)
+  useEffect(() => {
+    setCapable(window.matchMedia('(hover: hover) and (pointer: fine)').matches)
+  }, [])
+  return capable
+}
+
 export default function CategoryCard({
   category,
   active,
   onSelect,
+  expanded = false,
+  dimmed = false,
+  onHoverStart,
   size = 'md',
 }: {
   category: EventCategory
   active: boolean
   onSelect: () => void
+  expanded?: boolean
+  dimmed?: boolean
+  onHoverStart?: () => void
   size?: 'sm' | 'md'
 }) {
   const ref = useRef<HTMLButtonElement>(null)
@@ -49,59 +56,32 @@ export default function CategoryCard({
   const label = categoryLabel[category]
   const image = categoryImage[category]
   const [a, b] = categoryBadgeGradient[category]
-
-  // Spotlight position, 0-1 within the card, smoothed with a spring so it
-  // trails the pointer like skiper6's cursor-follower rather than snapping
-  // to it. Starts centered so the very first hover frame doesn't jump in
-  // from a corner.
-  const mx = useMotionValue(0.5)
-  const my = useMotionValue(0.5)
-  const sx = useSpring(mx, { stiffness: 220, damping: 24, mass: 0.4 })
-  const sy = useSpring(my, { stiffness: 220, damping: 24, mass: 0.4 })
-  const spotlightLeft = useTransform(sx, (v) => `${v * 100}%`)
-  const spotlightTop = useTransform(sy, (v) => `${v * 100}%`)
-
-  const handleMove = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const el = ref.current
-    if (!el) return
-    const r = el.getBoundingClientRect()
-    const px = (e.clientX - r.left) / r.width
-    const py = (e.clientY - r.top) / r.height
-    el.style.setProperty('--ry', `${(px - 0.5) * 14}deg`)
-    el.style.setProperty('--rx', `${(0.5 - py) * 12}deg`)
-    el.style.setProperty('--mx', `${px * 100}%`)
-    el.style.setProperty('--my', `${py * 100}%`)
-    mx.set(px)
-    my.set(py)
-  }
-  const handleLeave = () => {
-    const el = ref.current
-    if (!el) return
-    el.style.setProperty('--ry', '0deg')
-    el.style.setProperty('--rx', '0deg')
-    mx.set(0.5)
-    my.set(0.5)
-  }
+  const hoverCapable = useHoverCapable()
+  const isExpanded = hoverCapable && expanded
 
   const dims =
     size === 'sm'
-      ? { card: 136, icon: 36, iconBox: 46, font: 12.5 }
-      : { card: 160, icon: 40, iconBox: 52, font: 13.5 }
+      ? { rest: 58, open: 208, height: 190, restFont: 10.5, openFont: 26 }
+      : { rest: 66, open: 240, height: 216, restFont: 11.5, openFont: 30 }
+
+  // The vertical resting label has to fit the strip's own height ("Get
+  // together", "Engagement", "Movie night" are all long) -- a fixed font
+  // size clipped the longer names against the card's rounded corners.
+  // Shrink proportionally to label length instead of clipping.
+  const availableVertical = dims.height - 28
+  const restFont = Math.min(dims.restFont, Math.max(7.5, availableVertical / (label.length * 1.22)))
 
   return (
     <motion.button
       ref={ref}
       type="button"
       onClick={onSelect}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-      initial="rest"
-      whileHover="hover"
-      whileTap={{ scale: 0.97 }}
-      className="nm-tilt-card relative shrink-0 rounded-[22px] flex flex-col items-center justify-end overflow-hidden"
+      onMouseEnter={hoverCapable ? onHoverStart : undefined}
+      className="nm-tilt-card relative shrink-0 rounded-[18px] overflow-hidden flex items-end"
+      animate={{ width: isExpanded ? dims.open : dims.rest, opacity: dimmed && hoverCapable ? 0.45 : 1 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 28 }}
       style={{
-        width: dims.card,
-        height: dims.card,
+        height: dims.height,
         background: image ? '#17132b' : '#f5f3fa',
         boxShadow: active
           ? `0 0 0 2.5px ${a}, 0 10px 26px -8px ${a}99, 0 7px 0 0 rgba(0,0,0,.14)`
@@ -115,73 +95,73 @@ export default function CategoryCard({
 
       {image ? (
         <>
-          {/* Illustration, tinted with the category's own brand gradient
-              (color blend) so every card -- whatever the source photo's
-              original palette -- reads as part of the same NamMane set.
-              A slow zoom on hover is the skiper6-style "wake up" cue. */}
           <motion.div
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${image})` }}
-            variants={{ rest: { scale: 1 }, hover: { scale: 1.1 } }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            animate={{ scale: isExpanded ? 1.12 : 1 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           />
           <div
             className="absolute inset-0"
             style={{ background: `linear-gradient(160deg, ${a}, ${b})`, mixBlendMode: 'color', opacity: 0.85 }}
           />
-          {/* Cursor-follow spotlight in the category's own brand color --
-              the Skiper "hover members" cursor-follower, recreated without
-              the paid package. Pointer-only: with no pointermove on touch,
-              mx/my just sit at their centered default and this stays
-              invisible (opacity only turns on via whileHover="hover",
-              which touch taps don't trigger as a *held* state). */}
-          <motion.div
-            className="pointer-events-none absolute h-[85%] w-[85%] rounded-full blur-2xl"
-            style={{
-              left: spotlightLeft,
-              top: spotlightTop,
-              x: '-50%',
-              y: '-50%',
-              background: `radial-gradient(circle, ${a}99 0%, ${b}00 70%)`,
-              mixBlendMode: 'screen',
-            }}
-            variants={{ rest: { opacity: 0 }, hover: { opacity: 0.8 } }}
-            transition={{ duration: 0.25 }}
-          />
           <div
             className="absolute inset-0"
-            style={{ background: 'linear-gradient(0deg, rgba(10,8,22,.92) 0%, rgba(10,8,22,.15) 55%, rgba(10,8,22,0) 75%)' }}
+            style={{ background: 'linear-gradient(0deg, rgba(10,8,22,.94) 0%, rgba(10,8,22,.1) 60%, rgba(10,8,22,0) 78%)' }}
           />
+
+          {/* Resting label: small, rotated vertical -- the skiper35 strip
+              treatment (fixed CSS, not animated -- writingMode isn't a
+              value framer-motion can interpolate). Crossfades out as the
+              card expands. On touch (no hover), it just stays horizontal
+              and readable since there's no expanded state to crossfade to. */}
           <motion.span
-            className="relative z-[2] px-2.5 pb-2.5 text-center font-extrabold leading-tight whitespace-nowrap"
-            style={{ fontSize: dims.font, color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,.4)' }}
-            variants={{ rest: { y: 0 }, hover: { y: -3 } }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="absolute left-0 right-0 bottom-3 z-[2] text-center font-extrabold uppercase"
+            style={{
+              color: '#fff',
+              fontSize: restFont,
+              letterSpacing: '.06em',
+              textShadow: '0 1px 4px rgba(0,0,0,.4)',
+              writingMode: hoverCapable ? 'vertical-rl' : 'horizontal-tb',
+              transform: hoverCapable ? 'rotate(180deg)' : undefined,
+            }}
+            animate={{ opacity: isExpanded ? 0 : 1 }}
+            transition={{ duration: 0.2 }}
           >
             {label}
           </motion.span>
-          <motion.div
-            className="relative z-[2] mb-2.5 h-[2.5px] rounded-full"
-            style={{ background: `linear-gradient(90deg, ${a}, ${b})` }}
-            variants={{ rest: { width: 0, opacity: 0 }, hover: { width: 22, opacity: 1 } }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-          />
+
+          {/* Expanded label: the skiper6 "letters should be so big" cue --
+              only ever mounted on hover-capable pointers. */}
+          {hoverCapable && (
+            <motion.span
+              className="relative z-[2] px-3 pb-3 font-black leading-[0.95] whitespace-nowrap"
+              style={{ color: '#fff', textShadow: '0 2px 10px rgba(0,0,0,.5)', fontSize: dims.openFont }}
+              initial={false}
+              animate={{ opacity: isExpanded ? 1 : 0, y: isExpanded ? 0 : 10 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+            >
+              {label}
+            </motion.span>
+          )}
         </>
       ) : (
-        <>
-          <div className="flex-1" />
+        <div className="flex w-full flex-col items-center justify-end pb-3 pt-2">
           <div
-            className="relative flex items-center justify-center rounded-2xl"
-            style={{ width: dims.iconBox, height: dims.iconBox, background: active ? `${a}14` : 'rgba(20,14,46,.05)' }}
+            className="relative mb-2 flex items-center justify-center rounded-2xl"
+            style={{ width: 34, height: 34, background: active ? `${a}14` : 'rgba(20,14,46,.05)' }}
           >
-            <svg width={dims.icon} height={dims.icon} viewBox="0 0 24 24" fill="#17132b" stroke="#17132b" strokeWidth="1.3">
+            <svg width={20} height={20} viewBox="0 0 24 24" fill="#17132b" stroke="#17132b" strokeWidth="1.3">
               <use href={`#${icon}`} />
             </svg>
           </div>
-          <span className="relative pb-3 pt-2 text-[10.5px] font-extrabold whitespace-nowrap" style={{ color: '#17132b' }}>
+          <span
+            className="px-1 text-center font-extrabold whitespace-nowrap"
+            style={{ fontSize: restFont, color: '#17132b', writingMode: hoverCapable ? 'vertical-rl' : 'horizontal-tb' }}
+          >
             {label}
           </span>
-        </>
+        </div>
       )}
     </motion.button>
   )

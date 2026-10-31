@@ -17,6 +17,11 @@ export default function CategoryChips({
   initial?: EventCategory
 }) {
   const [active, setActive] = useState<EventCategory>(initial)
+  // Which card is currently hovered, shared across the row -- this is what
+  // makes the skiper35-style push-expand work: the hovered card grows and
+  // every other card in the row shrinks/dims to make room, rather than
+  // each card animating in isolation.
+  const [hovered, setHovered] = useState<EventCategory | null>(null)
 
   const select = (key: EventCategory) => {
     setActive(key)
@@ -24,9 +29,22 @@ export default function CategoryChips({
   }
 
   return (
-    <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+    <div
+      className="flex gap-1.5 overflow-x-auto pb-2"
+      style={{ scrollbarWidth: 'none' }}
+      onMouseLeave={() => setHovered(null)}
+    >
       {EVENT_CATEGORIES.map((key) => (
-        <CategoryCard key={key} category={key} active={active === key} onSelect={() => select(key)} size="sm" />
+        <CategoryCard
+          key={key}
+          category={key}
+          active={active === key}
+          expanded={hovered === key}
+          dimmed={hovered !== null && hovered !== key}
+          onSelect={() => select(key)}
+          onHoverStart={() => setHovered(key)}
+          size="sm"
+        />
       ))}
     </div>
   )

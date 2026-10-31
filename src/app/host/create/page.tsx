@@ -14,6 +14,7 @@ export default function CreateEventPage() {
   const { user } = useAuth()
 
   const [category, setCategory] = useState('poker')
+  const [hoveredCategory, setHoveredCategory] = useState<(typeof EVENT_CATEGORIES)[number] | null>(null)
   const [requireApproval, setRequireApproval] = useState(true)
   // Poker games are invite-only home games by nature (WhatsApp invites +
   // guest approvals, not strangers browsing Discover) -- default private
@@ -133,9 +134,18 @@ export default function CreateEventPage() {
         </div>
 
         <label className="nm-label">Choose a category</label>
-        <div className="flex flex-wrap gap-3 mb-6">
+        <div className="flex flex-wrap gap-1.5 mb-6" onMouseLeave={() => setHoveredCategory(null)}>
           {EVENT_CATEGORIES.map((key) => (
-            <CategoryCard key={key} category={key} active={category === key} onSelect={() => setCategory(key)} size="md" />
+            <CategoryCard
+              key={key}
+              category={key}
+              active={category === key}
+              expanded={hoveredCategory === key}
+              dimmed={hoveredCategory !== null && hoveredCategory !== key}
+              onSelect={() => setCategory(key)}
+              onHoverStart={() => setHoveredCategory(key)}
+              size="md"
+            />
           ))}
         </div>
 

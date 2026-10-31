@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { ElasticStack } from '@/components/ui/elastic-stack'
 
 const avatars = [
   { img: '/assets/cards/x7.jpeg', pos: '50% 20%' },
@@ -93,24 +94,22 @@ export default function AppPromo() {
             YOUR NEXT NIGHT OUT, <span className="nm2-grad-text">IN YOUR POCKET</span>
           </h2>
 
+          {/* Elastic avatar stack (Skiper UI's elastic-stack, re-skinned in
+              brand colors): the same overlapping "people who've joined"
+              row as before, now with the spring push-apart-on-hover
+              interaction instead of a static overlap. Trailing "+" tile
+              stays a plain sibling -- it's an action affordance (join the
+              crowd), not a person, so it doesn't belong in the stack's own
+              push/hover physics. */}
           <div className="flex items-center mb-5">
-            {avatars.map((a, i) => (
-              <div
-                key={i}
-                className="nm2-bob w-11 h-11 rounded-full p-[2px]"
-                style={{
-                  marginLeft: i === 0 ? 0 : -12,
-                  background: 'linear-gradient(135deg,#8B3FFB,#FF4F9E,#4CC9F0)',
-                  animationDelay: `${i * 0.4}s`,
-                  zIndex: avatars.length - i,
-                }}
-              >
-                <div
-                  className="w-full h-full rounded-full border-2"
-                  style={{ borderColor: '#0A081C', backgroundImage: `url(${a.img})`, backgroundSize: 'cover', backgroundPosition: a.pos }}
-                />
-              </div>
-            ))}
+            <ElasticStack
+              items={avatars.map((a, i) => ({ id: i, image: a.img }))}
+              itemSize={44}
+              overlap={12}
+              pushForce={10}
+              ringBorder="2px solid #0A081C"
+              className="!py-0 !justify-start"
+            />
             <div
               className="w-11 h-11 rounded-full flex items-center justify-center text-white text-[16px] font-bold -ml-3 border-2"
               style={{ background: 'var(--nm-grad)', borderColor: '#0A081C' }}

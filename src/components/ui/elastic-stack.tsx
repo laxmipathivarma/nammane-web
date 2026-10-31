@@ -14,6 +14,11 @@ export interface ElasticStackProps extends React.HTMLAttributes<HTMLDivElement> 
   itemSize?: number;
   overlap?: number;
   pushForce?: number;
+  // Border color/width around each item, e.g. '2px solid #0A081C' -- lets
+  // callers match the stack's ring to their own dark background instead of
+  // this component's default white/neutral-950 ring, which only suits a
+  // light/dark-mode page, not a page that's always dark like Nammane's.
+  ringBorder?: string;
 }
 
 export function ElasticStack({
@@ -21,6 +26,7 @@ export function ElasticStack({
   itemSize = 70,
   overlap = 30,
   pushForce = 15,
+  ringBorder,
   className,
   ...props
 }: ElasticStackProps) {
@@ -60,7 +66,7 @@ export function ElasticStack({
             onMouseEnter={() => setHoveredIndex(i)}
             className={cn(
               "relative flex items-center justify-center rounded-full isolate bg-neutral-100 dark:bg-neutral-800",
-              "border-2 border-white dark:border-neutral-950",
+              !ringBorder && "border-2 border-white dark:border-neutral-950",
               isHovered ? "shadow-xl" : "shadow-sm"
             )}
             style={{
@@ -74,6 +80,7 @@ export function ElasticStack({
               transitionDelay: isHovered ? "0ms, 150ms" : "0ms",
               transitionTimingFunction: springEasing,
               zIndex,
+              ...(ringBorder ? { border: ringBorder } : {}),
             }}
           >
             {item.image ? (
