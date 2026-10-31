@@ -22,10 +22,16 @@ import { categoryIcon, categoryLabel, categoryBadgeGradient, categoryImage, type
 // should be so big"), and the row makes room for the expanded one by
 // shrinking its siblings, same push mechanic as skiper35.
 //
-// Hover only exists on a mouse/trackpad, and this app is used touch-first,
-// so touch devices skip the push-expand entirely (useHoverCapable below)
-// and just get the compact resting card full-time, with the label already
-// sized up from the original build. Tapping still selects either way.
+// Hover only exists on a mouse/trackpad, so touch devices (useHoverCapable
+// below) can't trigger the hover push-expand. But this app is used
+// touch-first, so the big-label "letters should be so big" moment can't be
+// hover-only or it would never be visible on a phone at all -- that was the
+// actual bug: the expanded-label block below used to be hover-gated
+// entirely (`{hoverCapable && (...)}`), so on a touch device no card ever
+// showed it, full stop. Fixed by expanding on *selection* on touch instead
+// of hover: the active category auto-expands with the big label (no tap
+// needed beyond selecting it), and tapping a different card swaps which one
+// is expanded. Desktop keeps the original hover-driven behavior unchanged.
 function useHoverCapable() {
   const [capable, setCapable] = useState(false)
   useEffect(() => {
@@ -57,7 +63,9 @@ export default function CategoryCard({
   const image = categoryImage[category]
   const [a, b] = categoryBadgeGradient[category]
   const hoverCapable = useHoverCapable()
-  const isExpanded = hoverCapable && expanded
+  // Desktop: expands on hover (expanded prop, from parent's hover state).
+  // Touch: expands when selected, since there's no hover to drive it.
+  const isExpanded = hoverCapable ? expanded : active
 
   const dims =
     size === 'sm'
@@ -132,18 +140,17 @@ export default function CategoryCard({
           </motion.span>
 
           {/* Expanded label: the skiper6 "letters should be so big" cue --
-              only ever mounted on hover-capable pointers. */}
-          {hoverCapable && (
-            <motion.span
-              className="relative z-[2] px-3 pb-3 font-black leading-[0.95] whitespace-nowrap"
-              style={{ color: '#fff', textShadow: '0 2px 10px rgba(0,0,0,.5)', fontSize: dims.openFont }}
-              initial={false}
-              animate={{ opacity: isExpanded ? 1 : 0, y: isExpanded ? 0 : 10 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-            >
-              {label}
-            </motion.span>
-          )}
+              always mounted (not hover-gated) so the selected category can
+              show it on touch too; it's invisible until isExpanded flips. */}
+          <motion.span
+            className="relative z-[2] px-3 pb-3 font-black leading-[0.95] whitespace-nowrap"
+            style={{ color: '#fff', textShadow: '0 2px 10px rgba(0,0,0,.5)', fontSize: dims.openFont }}
+            initial={false}
+            animate={{ opacity: isExpanded ? 1 : 0, y: isExpanded ? 0 : 10 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
+            {label}
+          </motion.span>
         </>
       ) : (
         <div className="flex w-full flex-col items-center justify-end pb-3 pt-2">
