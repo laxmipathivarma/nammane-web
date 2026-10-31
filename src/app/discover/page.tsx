@@ -148,8 +148,15 @@ export default function Discover() {
 
   const visible = useMemo(() => {
     const source = scope === 'invited' ? invited ?? [] : events
+    const now = Date.now()
     return source
       .filter((e) => e.category === filter)
+      // A night that's already happened has nothing to join -- hide it
+      // from every guest-browsing scope. An event with no starts_at set
+      // (date TBD) is left visible since there's no past date to judge it
+      // against. "Created By Me" is left unfiltered on purpose: a host
+      // managing their own events still needs to find past ones.
+      .filter((e) => scope === 'mine' || !e.starts_at || new Date(e.starts_at).getTime() >= now)
       .filter((e) => {
         if (scope === 'invited') return true // already scoped server-side to "invites me"
         if (scope === 'mine') return !!user && e.host_id === user.id

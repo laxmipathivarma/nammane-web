@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import { EVENTS, categoryHero, categoryIcon, type EventCategory } from '@/lib/sampleEvents'
 import BackButton from '@/components/BackButton'
 import ShareEventModal from '@/components/ShareEventModal'
+import JoinRequestButton from '@/components/JoinRequestButton'
+import GuestRequestsPanel from '@/components/GuestRequestsPanel'
 import { createAdminClient } from '@/lib/supabaseAdmin'
 import { createServerSupabaseClient } from '@/lib/auth'
 
@@ -21,7 +23,17 @@ async function fetchLiveEvent(id: string, viewerId: string | null) {
   const { data } = await admin.from('events').select('*').eq('id', id).maybeSingle()
   if (!data) return null
 
+  // Real seat count instead of the permanent "0/N" this used to show --
+  // approved bookings only, so a pile of still-pending requests doesn't
+  // make the event look fuller than it actually is.
+  const { count: approvedCount } = await admin
+    .from('bookings')
+    .select('id', { count: 'exact', head: true })
+    .eq('event_id', id)
+    .eq('status', 'approved')
+
   return {
+    id: data.id as string,
     title: data.title,
     category: data.category as EventCategory,
     tagLabel: String(data.category).toUpperCase(),
@@ -32,10 +44,11 @@ async function fetchLiveEvent(id: string, viewerId: string | null) {
     host: { name: 'the host' },
     eventsHosted: 1,
     guests: [],
-    seatsLabel: data.capacity ? `0/${data.capacity} seats` : 'Open seats',
+    seatsLabel: data.capacity ? `${approvedCount ?? 0}/${data.capacity} seats` : 'Open seats',
     houseRules: data.description || 'No details added yet.',
     priceLabel: data.contribution_amount ? `₹${data.contribution_amount}` : undefined,
     isHost: viewerId != null && data.host_id === viewerId,
+    isLive: true as const,
   }
 }
 
@@ -46,7 +59,7 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
   } = await supabase.auth.getUser()
 
   const demoEvent = EVENTS[params.slug]
-  const event = demoEvent ? { ...demoEvent, isHost: false } : await fetchLiveEvent(params.slug, user?.id ?? null)
+  const event = demoEvent ? { ...demoEvent, isHost: false, isLive: false as const } : await fetchLiveEvent(params.slug, user?.id ?? null)
   if (!event) notFound()
 
   const icon = categoryIcon[event.category]
@@ -137,6 +150,8 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
           <p className="text-[13px] text-muted font-medium leading-relaxed">{event.houseRules}</p>
         </div>
 
+        {event.isHost && event.isLive && <GuestRequestsPanel eventId={event.id} />}
+
         {event.priceLabel && (
           <div className="mt-5 nm-glass rounded-2xl p-3.5 flex items-center justify-between">
             <div className="text-[12.5px] font-bold text-muted">Buy-in · set by host</div>
@@ -174,6 +189,8 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
             <a href="/host" className="nm-btn w-full py-3.5 text-[13.5px] bg-ink2 text-white border border-white/10 text-center">
               Back to my events
             </a>
+          ) : event.isLive ? (
+            <JoinRequestButton eventId={event.id} />
           ) : (
             <button className="nm-btn nm-btn-gold w-full py-4 text-[14.5px]">Request to join →</button>
           )}
