@@ -2,12 +2,16 @@ import { describe, it, expect } from 'vitest'
 import { hrefsFor } from './Header'
 
 // Regression coverage for Home/logo navigation. Home and the logo always
-// use hrefsFor(...).home, and it always resolves to the marketing site,
-// nammane.in -- signed in or out, on either host. This is a deliberate
-// choice: a different host doesn't share the session cookie, so the
-// marketing page will show "Sign in / Sign up" even for someone still
-// signed in on the app -- that's expected for nammane.in's own session
-// state, not a logout, and the app.nammane.in session is untouched.
+// use hrefsFor(...).home:
+//  - on the marketing site, Home stays on nammane.in (relative "/")
+//  - inside the webapp, Home ALWAYS stays in the app (relative "/"),
+//    signed in or out. This was briefly made to cross to the marketing
+//    site instead, then reverted the same day: a different host doesn't
+//    share the app's session cookie, so the marketing page's header
+//    shows "Sign in / Sign up" no matter what -- there is no version of
+//    crossing hosts that doesn't look like getting signed out. Don't
+//    change this back without building real cross-domain session
+//    sharing first.
 describe('Header hrefsFor', () => {
   it.each([
     [true, true],
@@ -17,26 +21,28 @@ describe('Header hrefsFor', () => {
     expect(hrefs.home).toBe('/')
   })
 
-  it.each([
-    [false, true],
-    [false, false],
-  ])('inside the webapp, home crosses to the marketing site (signedIn=%s)', (isMarketing, signedIn) => {
-    const hrefs = hrefsFor(isMarketing, signedIn)
-    expect(hrefs.home).toBe('https://nammane.in')
+  it('inside the webapp while signed out, home stays in the app (not the marketing site)', () => {
+    const hrefs = hrefsFor(false, false)
+    expect(hrefs.home).toBe('/')
   })
 
-  it('on the webapp while signed in, every nav link except Home/Mobile App is a relative in-app route', () => {
+  it('inside the webapp while signed in, home stays in the app', () => {
     const hrefs = hrefsFor(false, true)
-    for (const [key, href] of Object.entries(hrefs)) {
-      if (key === 'home' || href === 'https://nammane.in/mobile-app') continue // intentionally cross-host
+    expect(hrefs.home).toBe('/')
+  })
+
+  it('on the webapp while signed in, every nav link is a relative in-app route', () => {
+    const hrefs = hrefsFor(false, true)
+    for (const href of Object.values(hrefs)) {
+      if (href === 'https://nammane.in/mobile-app') continue // intentionally cross-host
       expect(href.startsWith('http')).toBe(false)
     }
   })
 
-  it('on the webapp while signed out, every nav link except Home/Mobile App is a relative in-app route', () => {
+  it('on the webapp while signed out, every nav link except Mobile App is a relative in-app route', () => {
     const hrefs = hrefsFor(false, false)
-    for (const [key, href] of Object.entries(hrefs)) {
-      if (key === 'home' || href === 'https://nammane.in/mobile-app') continue // intentionally cross-host
+    for (const href of Object.values(hrefs)) {
+      if (href === 'https://nammane.in/mobile-app') continue // intentionally cross-host
       expect(href.startsWith('http')).toBe(false)
     }
   })

@@ -22,22 +22,23 @@ const WEBAPP_URL = 'https://app.nammane.in'
 // gate when signed out, straight into the real app page when signed
 // in. Inside the app itself, they're already relative in-app routes.
 //
-// Home (and the logo, which points at the same href) always points at
-// the marketing site, nammane.in -- on both hosts, signed in or not.
-// This is a deliberate, explicit choice (confirmed with the person this
-// app is built for): clicking Home/the logo takes you to nammane.in's
-// marketing homepage, full stop. Note this is a real cross-host
-// navigation from the app -- app.nammane.in and nammane.in don't share
-// a session cookie, so the marketing header will show "Sign in / Sign
-// up" there even while you're still signed in on the app. That's
-// expected for a different host's own session state, not a logout: the
-// app.nammane.in session is untouched, and Host/Join/Discover on the
-// marketing page still route straight into the app for a signed-in
-// visitor (see appHref below).
+// Home (and the logo, which points at the same href) ALWAYS stays inside
+// the app on app.nammane.in -- "/" already renders the right thing either
+// way (WebAppHero3D when signed out, the quick-actions home when signed
+// in -- see src/app/page.tsx).
+//
+// This was briefly changed to cross to nammane.in instead (on an explicit
+// ask), then reverted the same day once that was actually tried: a
+// different host doesn't share the app's session cookie, so the
+// marketing page's header shows "Sign in / Sign up" there no matter what
+// -- there is no version of "Home crosses hosts" that doesn't look like
+// getting signed out. Keeping Home in-app is the only fix that avoids
+// that appearance, so this is deliberately NOT going back to crossing
+// hosts again -- see the matching test in Header.hrefs.test.ts.
 export function hrefsFor(isMarketing: boolean, signedIn: boolean): Record<NavKey, string> {
   if (!isMarketing) {
     return {
-      home: 'https://nammane.in',
+      home: '/',
       host: '/host',
       join: '/discover',
       discover: '/discover',
