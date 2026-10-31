@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import BackButton from '@/components/BackButton'
 import HubBackdrop from '@/components/HubBackdrop'
-import HostToolsDeck from '@/components/HostToolsDeck'
+import HostToolsWheel from '@/components/HostToolsWheel'
 import { useAuth } from '@/lib/AuthProvider'
 import { emptyPokerEventData, type PokerEventData } from '@/lib/pokerLedger'
 import type { InviteEventInfo } from '@/lib/invite'
@@ -17,16 +17,88 @@ import type { PokerTabKey } from '@/components/poker/types'
 
 // Each tile gets its own gradient accent (from the landing page's own
 // nm2 neon palette) instead of one flat purple repeated eight times --
-// a lobby of distinct, lit tiles rather than a photocopied grid.
-const MENU: { tab: PokerTabKey; sub?: InvitationSubTab; label: string; hint: string; icon: string; accent: readonly [string, string] }[] = [
-  { tab: 'invite', sub: 'create', label: 'Create Invitation', hint: 'Write the message guests get', icon: 'i-ticket', accent: ['#ff4f9e', '#c23ffb'] },
-  { tab: 'invite', sub: 'preview', label: 'Preview the Invitation', hint: 'See exactly what guests see', icon: 'i-eye', accent: ['#4cc9f0', '#1a8fd1'] },
-  { tab: 'invite', sub: 'guests', label: 'Invite Guests', hint: 'Add numbers, send on WhatsApp', icon: 'i-chat', accent: ['#8b3ffb', '#ff4f9e'] },
-  { tab: 'invite', sub: 'approvals', label: 'Guest Approvals', hint: 'Approve guests onto a table', icon: 'i-check', accent: ['#7fe3a1', '#4cc9f0'] },
-  { tab: 'tables', label: 'Poker Tables', hint: 'Players, buy-ins, cash-outs', icon: 'i-seat', accent: ['#c23ffb', '#8b3ffb'] },
-  { tab: 'expenses', label: 'Rake & Expenses', hint: 'Food, drinks, who paid', icon: 'i-coins', accent: ['#ffd166', '#e8942c'] },
-  { tab: 'settle', label: 'Settle Up', hint: 'Who pays whom, how much', icon: 'i-shield', accent: ['#4cc9f0', '#8b3ffb'] },
-  { tab: 'games', label: 'Games', hint: 'Full history, every table', icon: 'i-club', accent: ['#ff4f9e', '#8b3ffb'] },
+// a lobby of distinct, lit tiles rather than a photocopied grid. `glyph`
+// is raw SVG markup (shapes only, centered on 0,0) used both for the
+// sprite-based icon elsewhere and as the wheel's generated "photo" --
+// see HostToolsWheel.tsx.
+const MENU: {
+  tab: PokerTabKey
+  sub?: InvitationSubTab
+  label: string
+  hint: string
+  icon: string
+  glyph: string
+  accent: readonly [string, string]
+}[] = [
+  {
+    tab: 'invite',
+    sub: 'create',
+    label: 'Create Invitation',
+    hint: 'Write the message guests get',
+    icon: 'i-ticket',
+    glyph: '<rect x="-70" y="-45" width="140" height="90" rx="14"/><path d="M0 -45 L0 45" stroke-dasharray="8 10"/>',
+    accent: ['#ff4f9e', '#c23ffb'],
+  },
+  {
+    tab: 'invite',
+    sub: 'preview',
+    label: 'Preview the Invitation',
+    hint: 'See exactly what guests see',
+    icon: 'i-eye',
+    glyph: '<ellipse cx="0" cy="0" rx="75" ry="42"/><circle cx="0" cy="0" r="20"/>',
+    accent: ['#4cc9f0', '#1a8fd1'],
+  },
+  {
+    tab: 'invite',
+    sub: 'guests',
+    label: 'Invite Guests',
+    hint: 'Add numbers, send on WhatsApp',
+    icon: 'i-chat',
+    glyph:
+      '<path d="M-70 -40 h140 a14 14 0 0 1 14 14 v46 a14 14 0 0 1 -14 14 h-90 l-30 26 v-26 h-20 a14 14 0 0 1 -14 -14 v-46 a14 14 0 0 1 14 -14 z"/>',
+    accent: ['#8b3ffb', '#ff4f9e'],
+  },
+  {
+    tab: 'invite',
+    sub: 'approvals',
+    label: 'Guest Approvals',
+    hint: 'Approve guests onto a table',
+    icon: 'i-check',
+    glyph: '<circle cx="0" cy="0" r="75"/><path d="M-30 2 L-8 28 L35 -25"/>',
+    accent: ['#7fe3a1', '#4cc9f0'],
+  },
+  {
+    tab: 'tables',
+    label: 'Poker Tables',
+    hint: 'Players, buy-ins, cash-outs',
+    icon: 'i-seat',
+    glyph: '<circle cx="0" cy="0" r="75"/><circle cx="0" cy="0" r="38"/>',
+    accent: ['#c23ffb', '#8b3ffb'],
+  },
+  {
+    tab: 'expenses',
+    label: 'Rake & Expenses',
+    hint: 'Food, drinks, who paid',
+    icon: 'i-coins',
+    glyph: '<circle cx="-25" cy="15" r="45"/><circle cx="28" cy="-18" r="45"/>',
+    accent: ['#ffd166', '#e8942c'],
+  },
+  {
+    tab: 'settle',
+    label: 'Settle Up',
+    hint: 'Who pays whom, how much',
+    icon: 'i-shield',
+    glyph: '<path d="M0 -80 L65 -52 V8 Q65 68 0 92 Q-65 68 -65 8 V-52 Z"/>',
+    accent: ['#4cc9f0', '#8b3ffb'],
+  },
+  {
+    tab: 'games',
+    label: 'Games',
+    hint: 'Full history, every table',
+    icon: 'i-club',
+    glyph: '<circle cx="0" cy="-28" r="26"/><circle cx="-26" cy="18" r="26"/><circle cx="26" cy="18" r="26"/><rect x="-9" y="30" width="18" height="40" rx="6"/>',
+    accent: ['#ff4f9e', '#8b3ffb'],
+  },
 ]
 
 const TAB_LABELS: Record<PokerTabKey, string> = {
@@ -167,12 +239,12 @@ export default function PokerHubPage() {
         )}
 
         {tab === 'menu' && (
-          <HostToolsDeck
+          <HostToolsWheel
             items={MENU.map((item) => ({
               key: item.label,
-              icon: item.icon,
               label: item.label,
               hint: item.hint,
+              glyph: item.glyph,
               accent: item.accent,
               onOpen: () => {
                 setTab(item.tab)
