@@ -6,6 +6,7 @@ import EventCard, { EventCardData } from '@/components/EventCard'
 import { createClient } from '@/lib/supabase'
 import { useAuth } from '@/lib/AuthProvider'
 import { categoryLabel } from '@/lib/eventCardStyle'
+import { METRO_CITIES } from '@/lib/cities'
 import DelayedLoader from '@/components/ui/delayed-loader'
 
 type EventRow = {
@@ -140,12 +141,15 @@ export default function Discover() {
       .finally(() => setInvitedLoading(false))
   }, [scope, invited])
 
-  // Distinct cities among public events, for the "Select City" mode --
-  // only events that actually set one show up as an option.
-  const cities = useMemo(
-    () => Array.from(new Set(events.filter((e) => e.is_public && e.city).map((e) => e.city as string))).sort(),
-    [events]
-  )
+  // The "Select City" dropdown always offers the 8 major metros (so it's
+  // never just "All cities" with nothing under it before any event has
+  // been published there), plus any other city a host has actually set
+  // on a public event that isn't already one of those 8.
+  const cities = useMemo(() => {
+    const fromEvents = events.filter((e) => e.is_public && e.city).map((e) => e.city as string)
+    const extra = fromEvents.filter((c) => !(METRO_CITIES as readonly string[]).includes(c))
+    return [...METRO_CITIES, ...Array.from(new Set(extra)).sort()]
+  }, [events])
 
   const visible = useMemo(() => {
     const source = scope === 'invited' ? invited ?? [] : events

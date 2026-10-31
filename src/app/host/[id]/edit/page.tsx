@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { EVENT_CATEGORIES, type EventCategory } from '@/lib/eventCardStyle'
 import { isEventCompleted } from '@/lib/eventStatus'
+import { METRO_CITIES } from '@/lib/cities'
 import CategoryCard from '@/components/CategoryCard'
 import BackButton from '@/components/BackButton'
 import { useAuth } from '@/lib/AuthProvider'
@@ -14,6 +15,7 @@ type EventRow = {
   category: EventCategory
   description: string | null
   starts_at: string | null
+  city: string | null
   address: string | null
   capacity: number | null
   contribution_amount: number | null
@@ -45,6 +47,7 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
   const [format, setFormat] = useState('')
   const [capacity, setCapacity] = useState('')
   const [price, setPrice] = useState('')
+  const [city, setCity] = useState('')
   const [venue, setVenue] = useState('')
 
   const [submitting, setSubmitting] = useState(false)
@@ -71,6 +74,7 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
         setFormat(ev.description || '')
         setCapacity(ev.capacity ? String(ev.capacity) : '')
         setPrice(ev.contribution_amount ? String(ev.contribution_amount) : '')
+        setCity(ev.city || '')
         setVenue(ev.address || '')
         setIsPublic(ev.is_public)
         setRadiusKm(ev.radius_km || 25)
@@ -111,6 +115,7 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
           category,
           description: format || null,
           starts_at: startsAt,
+          city: city || null,
           address: venue || null,
           capacity: capacity ? Number(capacity) : null,
           contribution_amount: price ? Number(price) : null,
@@ -251,6 +256,16 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
             />
           </div>
         </div>
+
+        <label className="nm-label">City</label>
+        <select value={city} onChange={(e) => setCity(e.target.value)} className="nm-field mb-4">
+          <option value="">Select city</option>
+          {METRO_CITIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
 
         <label className="nm-label">Venue (shared after approval)</label>
         <input

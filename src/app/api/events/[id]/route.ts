@@ -25,7 +25,7 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
 
   const { data, error } = await supabase
     .from('events')
-    .select('id,title,category,description,starts_at,address,capacity,contribution_amount,is_public,radius_km,lat,lng,host_id')
+    .select('id,title,category,description,starts_at,city,address,capacity,contribution_amount,is_public,radius_km,lat,lng,host_id')
     .eq('id', params.id)
     .maybeSingle()
 
@@ -72,6 +72,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       category,
       description,
       starts_at,
+      city,
       address,
       capacity,
       contribution_amount,
@@ -110,6 +111,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
         category,
         description: description || null,
         starts_at: starts_at || null,
+        city: city || null,
         address: address || null,
         capacity: capacity ? Number(capacity) : null,
         contribution_amount: contribution_amount ? Number(contribution_amount) : null,

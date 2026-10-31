@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { EVENT_CATEGORIES } from '@/lib/eventCardStyle'
+import { METRO_CITIES } from '@/lib/cities'
 import CategoryCard from '@/components/CategoryCard'
 import BackButton from '@/components/BackButton'
 import { useAuth } from '@/lib/AuthProvider'
@@ -30,6 +31,7 @@ export default function CreateEventPage() {
   const [format, setFormat] = useState('')
   const [capacity, setCapacity] = useState('6')
   const [price, setPrice] = useState('')
+  const [city, setCity] = useState('')
   const [venue, setVenue] = useState('')
   const [notes, setNotes] = useState('')
 
@@ -87,6 +89,7 @@ export default function CreateEventPage() {
           category,
           description: format || null,
           starts_at: startsAt,
+          city: city || null,
           address: venue || null,
           capacity: capacity ? Number(capacity) : null,
           contribution_amount: price ? Number(price) : null,
@@ -215,6 +218,19 @@ export default function CreateEventPage() {
         </div>
         <p className="text-[10.5px] text-muted2 font-semibold -mt-2.5 mb-4">
           Pricing stays hidden on your event unless you set it here — guests never see a number by default.
+        </p>
+
+        <label className="nm-label">City</label>
+        <select value={city} onChange={(e) => setCity(e.target.value)} className="nm-field mb-4">
+          <option value="">Select city</option>
+          {METRO_CITIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+        <p className="text-[10.5px] text-muted2 font-semibold -mt-2.5 mb-4">
+          Lets guests find your event under Discover &rarr; Select city.
         </p>
 
         <label className="nm-label">Venue (shared after approval)</label>
